@@ -1,0 +1,210 @@
+<div class="dashboard-shell max-w-7xl mx-auto px-4 py-8 lg:px-6 lg:py-12">
+	<ng-container *ngIf="currentUser$ | async as user; else noUser">
+		<div class="dashboard-layout">
+			<aside *ngIf="isAdmin(user.role)" class="dashboard-sidebar rounded-3xl border border-gray-100 bg-white p-5 shadow-[0_8px_30px_rgb(0,0,0,0.06)] lg:sticky lg:top-24 lg:self-start">
+				<p class="text-xs font-semibold uppercase tracking-[0.24em] text-indigo-600">Admin tools</p>
+				<h2 class="mt-2 text-2xl font-black text-gray-900">Sidebar</h2>
+				<p class="mt-2 text-sm text-gray-500">Raccourcis vers la création de catégories et de produits.</p>
+
+				<nav class="mt-6 space-y-3">
+					<a href="#category-form" class="sidebar-link">
+						<span>
+							<span class="sidebar-link-title">Créer une catégorie</span>
+							<span class="sidebar-link-subtitle">Ajoutez ou modifiez une catégorie</span>
+						</span>
+						<span aria-hidden="true">→</span>
+					</a>
+					<a href="#product-form" class="sidebar-link">
+						<span>
+							<span class="sidebar-link-title">Créer un produit</span>
+							<span class="sidebar-link-subtitle">Ajoutez ou modifiez un produit</span>
+						</span>
+						<span aria-hidden="true">→</span>
+					</a>
+					<a href="#category-list" class="sidebar-link sidebar-link-muted">
+						<span>
+							<span class="sidebar-link-title">Voir les catégories</span>
+							<span class="sidebar-link-subtitle">Liste existante</span>
+						</span>
+						<span aria-hidden="true">→</span>
+					</a>
+					<a href="#product-list" class="sidebar-link sidebar-link-muted">
+						<span>
+							<span class="sidebar-link-title">Voir les produits</span>
+							<span class="sidebar-link-subtitle">Catalogue chargé</span>
+						</span>
+						<span aria-hidden="true">→</span>
+					</a>
+				</nav>
+
+				<div class="mt-6 rounded-2xl border border-gray-100 bg-gray-50 p-4">
+					<p class="text-sm font-semibold text-gray-900">Session</p>
+					<p class="mt-1 text-sm text-gray-500">User ID: {{ user.userId ?? 'N/A' }}</p>
+					<p class="text-sm text-gray-500">Role: {{ user.role }}</p>
+				</div>
+			</aside>
+
+			<section class="dashboard-main space-y-6">
+				<div class="bg-white rounded-3xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.08)] p-8">
+					<p class="text-sm font-semibold uppercase tracking-[0.2em] text-indigo-600">Account</p>
+					<h1 class="mt-2 text-3xl font-black text-gray-900">{{ user.role }} dashboard</h1>
+					<p class="mt-3 text-gray-600">Logged in with the backend session returned by Spring Boot.</p>
+
+					<div class="mt-8 grid gap-4 sm:grid-cols-3">
+						<div class="rounded-2xl border border-gray-100 bg-gray-50 p-5">
+							<p class="text-sm text-gray-500">Role</p>
+							<p class="mt-2 text-lg font-bold text-gray-900">{{ user.role }}</p>
+						</div>
+						<div class="rounded-2xl border border-gray-100 bg-gray-50 p-5">
+							<p class="text-sm text-gray-500">User ID</p>
+							<p class="mt-2 text-lg font-bold text-gray-900">{{ user.userId ?? 'N/A' }}</p>
+						</div>
+						<div class="rounded-2xl border border-gray-100 bg-gray-50 p-5">
+							<p class="text-sm text-gray-500">Session</p>
+							<p class="mt-2 text-lg font-bold text-gray-900">Active</p>
+						</div>
+					</div>
+
+					<div class="mt-8 rounded-2xl bg-indigo-50 border border-indigo-100 p-5 text-indigo-900">
+						<p class="font-semibold">Backend contract</p>
+						<p class="mt-1 text-sm">This page is ready for the session returned by <span class="font-semibold">/api/auth/login</span>, <span class="font-semibold">/api/auth/register</span> and <span class="font-semibold">/api/auth/refresh</span>.</p>
+					</div>
+				</div>
+
+				<div *ngIf="isAdmin(user.role)" class="space-y-6">
+					<div class="flex flex-wrap items-center justify-between gap-4">
+						<div>
+							<p class="text-sm font-semibold uppercase tracking-[0.2em] text-indigo-600">Management</p>
+							<h2 class="text-2xl font-black text-gray-900">Category management</h2>
+							<p class="text-gray-500 text-sm mt-1">Uses <span class="font-semibold">GET /api/categories</span>, <span class="font-semibold">POST /api/categories</span>, <span class="font-semibold">PUT /api/categories/{{ '{' }}id{{ '}' }}</span>, and <span class="font-semibold">DELETE /api/categories/{{ '{' }}id{{ '}' }}</span>.</p>
+						</div>
+						<button *ngIf="selectedCategory" type="button" (click)="clearForm()" class="text-sm font-semibold text-gray-600 hover:text-gray-900">Cancel edit</button>
+					</div>
+
+					<div *ngIf="successMessage" class="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-emerald-700 text-sm font-medium">
+						{{ successMessage }}
+					</div>
+					<div *ngIf="categoryError" class="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-red-700 text-sm font-medium">
+						{{ categoryError }}
+					</div>
+
+					<div class="management-grid">
+						<form id="category-form" [formGroup]="categoryForm" (ngSubmit)="saveCategory()" class="rounded-3xl border border-gray-100 bg-gray-50 p-6 space-y-4">
+							<div>
+								<label class="block text-sm font-semibold text-gray-700 mb-1" for="category-name">Name</label>
+								<input id="category-name" formControlName="name" type="text" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Electronics">
+							</div>
+							<div>
+								<label class="block text-sm font-semibold text-gray-700 mb-1" for="category-description">Description</label>
+								<textarea id="category-description" formControlName="description" rows="4" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Category description"></textarea>
+							</div>
+							<div>
+								<label class="block text-sm font-semibold text-gray-700 mb-1" for="category-parent">Parent ID</label>
+								<input id="category-parent" formControlName="parentId" type="number" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Optional parent category id">
+							</div>
+							<button type="submit" [disabled]="categoryForm.invalid" class="w-full rounded-xl bg-black px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50">
+								{{ selectedCategory ? 'Update category' : 'Create category' }}
+							</button>
+						</form>
+
+						<div id="category-list" class="rounded-3xl border border-gray-100 bg-white p-6">
+							<div class="flex items-center justify-between mb-4">
+								<h3 class="text-lg font-bold text-gray-900">Existing categories</h3>
+								<span class="text-sm text-gray-500">{{ categories.length }} total</span>
+							</div>
+							<div *ngIf="loadingCategories" class="text-sm text-gray-500">Loading categories...</div>
+							<div *ngIf="!loadingCategories && categories.length === 0" class="rounded-2xl border border-dashed border-gray-200 bg-gray-50 p-6 text-sm text-gray-500">No categories found.</div>
+							<div class="space-y-3" *ngIf="categories.length > 0">
+								<div *ngFor="let category of categories" class="rounded-2xl border border-gray-100 bg-gray-50 p-4 flex items-start justify-between gap-4">
+									<div>
+										<p class="font-bold text-gray-900">{{ category.name }}</p>
+										<p class="text-sm text-gray-500 mt-1" *ngIf="category.description">{{ category.description }}</p>
+										<p class="text-xs text-gray-400 mt-1">ID: {{ category.id }} <span *ngIf="category.parentId !== null && category.parentId !== undefined">• Parent: {{ category.parentId }}</span></p>
+									</div>
+									<div class="flex items-center gap-2 shrink-0">
+										<button type="button" (click)="startEdit(category)" class="rounded-full border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-white">Edit</button>
+										<button type="button" (click)="removeCategory(category)" class="rounded-full border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-50">Delete</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="management-grid">
+						<form id="product-form" [formGroup]="productForm" (ngSubmit)="saveProduct()" class="rounded-3xl border border-gray-100 bg-gray-50 p-6 space-y-4">
+							<div class="flex items-center justify-between">
+								<h3 class="text-lg font-bold text-gray-900">Products</h3>
+								<button *ngIf="selectedProduct" type="button" (click)="clearProductForm()" class="text-sm font-semibold text-gray-600 hover:text-gray-900">Cancel edit</button>
+							</div>
+							<div>
+								<label class="block text-sm font-semibold text-gray-700 mb-1" for="product-name">Name</label>
+								<input id="product-name" formControlName="name" type="text" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Product name">
+							</div>
+							<div>
+								<label class="block text-sm font-semibold text-gray-700 mb-1" for="product-description">Description</label>
+								<textarea id="product-description" formControlName="description" rows="4" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Product description"></textarea>
+							</div>
+							<div class="grid grid-cols-2 gap-3">
+								<div>
+									<label class="block text-sm font-semibold text-gray-700 mb-1" for="product-price">Price</label>
+									<input id="product-price" formControlName="price" type="number" step="0.01" min="0" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="0.00">
+								</div>
+								<div>
+									<label class="block text-sm font-semibold text-gray-700 mb-1" for="product-promoPrice">Promo Price</label>
+									<input id="product-promoPrice" formControlName="promoPrice" type="number" step="0.01" min="0" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Optional">
+								</div>
+							</div>
+							<div>
+								<label class="block text-sm font-semibold text-gray-700 mb-1" for="product-stock">Stock</label>
+								<input id="product-stock" formControlName="stock" type="number" min="0" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="0">
+							</div>
+							<div>
+								<label class="block text-sm font-semibold text-gray-700 mb-1" for="product-images">Images (comma-separated URLs)</label>
+								<input id="product-images" formControlName="images" type="text" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="https://..., https://...">
+							</div>
+							<div>
+								<label class="block text-sm font-semibold text-gray-700 mb-1" for="product-category">Category</label>
+								<select id="product-category" formControlName="categoryId" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+									<option [ngValue]="null">Select a category</option>
+									<option *ngFor="let category of categories" [ngValue]="category.id">{{ category.name }}</option>
+								</select>
+							</div>
+							<button type="submit" [disabled]="productForm.invalid" class="w-full rounded-xl bg-black px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50">
+								{{ selectedProduct ? 'Update product' : 'Create product' }}
+							</button>
+						</form>
+
+						<div id="product-list" class="rounded-3xl border border-gray-100 bg-white p-6">
+							<div class="flex items-center justify-between mb-4">
+								<h3 class="text-lg font-bold text-gray-900">Existing products</h3>
+								<span class="text-sm text-gray-500">{{ products.length }} loaded</span>
+							</div>
+							<div *ngIf="loadingProducts" class="text-sm text-gray-500">Loading products...</div>
+							<div *ngIf="productError" class="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-red-700 text-sm font-medium mb-4">{{ productError }}</div>
+							<div *ngIf="!loadingProducts && products.length === 0" class="rounded-2xl border border-dashed border-gray-200 bg-gray-50 p-6 text-sm text-gray-500">No products found.</div>
+							<div class="space-y-3" *ngIf="products.length > 0">
+								<div *ngFor="let product of products" class="rounded-2xl border border-gray-100 bg-gray-50 p-4 flex items-start justify-between gap-4">
+									<div>
+										<p class="font-bold text-gray-900">{{ product.name }}</p>
+										<p class="text-sm text-gray-500 mt-1">${{ product.displayPrice.toFixed(2) }} <span *ngIf="product.categories.length > 0">• {{ product.categories.join(', ') }}</span></p>
+										<p class="text-xs text-gray-400 mt-1">ID: {{ product.id }} <span *ngIf="product.stock !== undefined">• Stock: {{ product.stock }}</span> <span *ngIf="product.averageRating > 0">• ⭐ {{ product.averageRating.toFixed(1) }}</span></p>
+									</div>
+									<div class="flex items-center gap-2 shrink-0">
+										<button type="button" (click)="startEditProduct(product)" class="rounded-full border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-white">Edit</button>
+										<button type="button" (click)="removeProduct(product)" class="rounded-full border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-50">Delete</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+	</ng-container>
+
+	<ng-template #noUser>
+		<div class="rounded-3xl border border-dashed border-gray-300 bg-gray-50 p-8 text-center text-gray-600">
+			No active session.
+		</div>
+	</ng-template>
+</div>

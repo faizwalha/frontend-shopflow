@@ -1,0 +1,7 @@
+<div class="flex">
+  <span *ngFor="let star of stars" class="text-yellow-400 text-[16px] tracking-widest cursor-default">
+    <ng-container *ngIf="star.filled && !star.half">★</ng-container>
+    <ng-container *ngIf="star.half">☆</ng-container>
+    <ng-container *ngIf="!star.filled && !star.half">☆</ng-container>
+  </span>
+</div>

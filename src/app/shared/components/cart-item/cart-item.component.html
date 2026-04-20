@@ -1,0 +1,25 @@
+<div class="flex items-center gap-5 py-5 border-b border-gray-100 group">
+  <div class="h-24 w-24 bg-gray-50 rounded-xl overflow-hidden shrink-0 border border-gray-100">
+     <img [src]="item.product.imageUrl || 'https://via.placeholder.com/80'" class="w-full h-full object-cover">
+  </div>
+  <div class="flex-grow">
+    <h4 class="font-bold text-gray-900 text-lg mb-1">{{item.product.name}}</h4>
+    <p class="text-indigo-600 font-semibold">${{item.product.price.toFixed(2)}}</p>
+  </div>
+  <div class="flex items-center gap-6">
+    <div class="flex items-center border border-gray-200 rounded-full bg-white shadow-sm overflow-hidden">
+      <button (click)="decrease.emit()" class="px-3 py-1.5 text-gray-600 hover:bg-gray-100 hover:text-black transition-colors font-medium">-</button>
+      <span class="px-3 w-10 text-center font-semibold text-gray-900">{{item.quantity}}</span>
+      <button (click)="increase.emit()" class="px-3 py-1.5 text-gray-600 hover:bg-gray-100 hover:text-black transition-colors font-medium">+</button>
+    </div>
+    <div class="flex flex-col items-end gap-1">
+       <span class="font-bold text-xl text-gray-900 w-20 text-right">${{(item.product.price * item.quantity).toFixed(2)}}</span>
+       <button (click)="remove.emit()" class="text-sm font-medium text-red-500 hover:text-red-700 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+          Remove
+       </button>
+    </div>
+  </div>
+</div>
