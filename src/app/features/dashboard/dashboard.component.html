@@ -65,6 +65,49 @@
 						</div>
 					</div>
 
+					<div *ngIf="loadingStats" class="mt-8 text-gray-500">Loading statistics...</div>
+					<div *ngIf="statsError" class="mt-8 text-red-600">{{ statsError }}</div>
+
+					<div *ngIf="adminStats" class="mt-8">
+						<h3 class="text-lg font-bold text-gray-900 mb-4">Platform Overview</h3>
+						<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+							<div class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+								<p class="text-sm text-gray-500">Total Revenue</p>
+								<p class="mt-2 text-2xl font-black text-gray-900">${{ adminStats.totalRevenue | number:'1.2-2' }}</p>
+							</div>
+							<div class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+								<p class="text-sm text-gray-500">Total Orders</p>
+								<p class="mt-2 text-2xl font-black text-gray-900">{{ adminStats.totalOrders }}</p>
+							</div>
+							<div class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+								<p class="text-sm text-gray-500">Total Users</p>
+								<p class="mt-2 text-2xl font-black text-gray-900">{{ adminStats.totalUsers }}</p>
+							</div>
+							<div class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+								<p class="text-sm text-gray-500">Total Products</p>
+								<p class="mt-2 text-2xl font-black text-gray-900">{{ adminStats.totalProducts }}</p>
+							</div>
+						</div>
+					</div>
+					
+					<div *ngIf="sellerStats" class="mt-8">
+						<h3 class="text-lg font-bold text-gray-900 mb-4">Seller Overview</h3>
+						<div class="grid gap-4 sm:grid-cols-3">
+							<div class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+								<p class="text-sm text-gray-500">Total Revenue</p>
+								<p class="mt-2 text-2xl font-black text-gray-900">${{ sellerStats.totalRevenue | number:'1.2-2' }}</p>
+							</div>
+							<div class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+								<p class="text-sm text-gray-500">Pending Orders</p>
+								<p class="mt-2 text-2xl font-black text-gray-900">{{ sellerStats.pendingOrders }}</p>
+							</div>
+							<div class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+								<p class="text-sm text-gray-500">Low Stock Products</p>
+								<p class="mt-2 text-2xl font-black text-gray-900">{{ sellerStats.lowStockProducts }}</p>
+							</div>
+						</div>
+					</div>
+
 					<div class="mt-8 rounded-2xl bg-indigo-50 border border-indigo-100 p-5 text-indigo-900">
 						<p class="font-semibold">Backend contract</p>
 						<p class="mt-1 text-sm">This page is ready for the session returned by <span class="font-semibold">/api/auth/login</span>, <span class="font-semibold">/api/auth/register</span> and <span class="font-semibold">/api/auth/refresh</span>.</p>

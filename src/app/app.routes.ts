@@ -45,6 +45,32 @@ export const routes: Routes = [
         canActivate: [authGuard],
         loadComponent: () => import('./features/dashboard/dashboard.component').then(c => c.DashboardComponent),
         title: 'Profile - ShopFlow'
+      },
+      {
+        path: 'orders',
+        canActivate: [authGuard],
+        loadComponent: () => import('./features/orders/orders.component').then(c => c.OrdersComponent),
+        title: 'My Orders - ShopFlow'
+      },
+      {
+        path: 'orders/:id',
+        canActivate: [authGuard],
+        loadComponent: () => import('./features/orders/order-details.component').then(c => c.OrderDetailsComponent),
+        title: 'Order Details - ShopFlow'
+      },
+      {
+        path: 'categories',
+        canActivate: [authGuard, roleGuard],
+        data: { expectedRoles: ['SELLER', 'ADMIN'] },
+        loadComponent: () => import('./features/categories/categories.component').then(c => c.CategoriesComponent),
+        title: 'Manage Categories - ShopFlow'
+      },
+      {
+        path: 'inventory',
+        canActivate: [authGuard, roleGuard],
+        data: { expectedRoles: ['SELLER', 'ADMIN'] },
+        loadComponent: () => import('./features/products-management/products-management.component').then(c => c.ProductsManagementComponent),
+        title: 'Manage Products - ShopFlow'
       }
     ]
   },

@@ -6,6 +6,8 @@ import { CategoryService } from '../../core/services/category.service';
 import { ProductService } from '../../core/services/product.service';
 import { CategoryRequest, CategoryResponse } from '../../core/models/category.models';
 import { ProductRequest, ProductResponse } from '../../core/models/product.models';
+import { DashboardService } from '../../core/services/dashboard.service';
+import { AdminDashboardResponse, SellerDashboardResponse } from '../../core/models/dashboard.models';
 
 @Component({
   selector: 'app-dashboard',
@@ -19,12 +21,19 @@ export class DashboardComponent implements OnInit {
   private authService = inject(AuthService);
   private categoryService = inject(CategoryService);
   private productService = inject(ProductService);
+  private dashboardService = inject(DashboardService);
 
   currentUser$ = this.authService.currentUser$;
   categories: CategoryResponse[] = [];
   products: ProductResponse[] = [];
   selectedCategory: CategoryResponse | null = null;
   selectedProduct: ProductResponse | null = null;
+  
+  adminStats: AdminDashboardResponse | null = null;
+  sellerStats: SellerDashboardResponse | null = null;
+  loadingStats = false;
+  statsError = '';
+
   loadingCategories = false;
   loadingProducts = false;
   categoryError = '';
@@ -48,8 +57,45 @@ export class DashboardComponent implements OnInit {
   });
 
   ngOnInit(): void {
+    this.loadStats();
     this.loadCategories();
     this.loadProducts();
+  }
+
+  loadStats(): void {
+    this.loadingStats = true;
+    this.currentUser$.subscribe(user => {
+      if (!user) {
+        this.loadingStats = false;
+        return;
+      }
+      
+      if (this.isAdmin(user.role)) {
+        this.dashboardService.getAdminDashboard().subscribe({
+          next: (stats) => {
+            this.adminStats = stats;
+            this.loadingStats = false;
+          },
+          error: (err) => {
+            this.statsError = 'Unable to load admin statistics.';
+            this.loadingStats = false;
+          }
+        });
+      } else if (user.role === 'SELLER') {
+        this.dashboardService.getSellerDashboard().subscribe({
+          next: (stats) => {
+            this.sellerStats = stats;
+            this.loadingStats = false;
+          },
+          error: (err) => {
+            this.statsError = 'Unable to load seller statistics.';
+            this.loadingStats = false;
+          }
+        });
+      } else {
+        this.loadingStats = false;
+      }
+    });
   }
 
   isAdmin(role: string | null | undefined): boolean {

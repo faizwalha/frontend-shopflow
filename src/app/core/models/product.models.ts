@@ -1,3 +1,11 @@
+export interface ProductVariant {
+  id: number;
+  attribute: string;
+  value: string;
+  additionalStock: number;
+  priceDelta: number;
+}
+
 export interface ProductResponse {
   id: number;
   name: string;
@@ -12,6 +20,7 @@ export interface ProductResponse {
   images: string[];
   categories: string[];
   averageRating: number;
+  variants?: ProductVariant[];
 }
 
 export interface ProductRequest {

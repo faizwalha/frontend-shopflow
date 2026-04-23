@@ -1,0 +1,90 @@
+<div class="max-w-7xl mx-auto px-4 py-12">
+  <div class="mb-10">
+    <h1 class="text-4xl font-black text-gray-900 tracking-tight">Category Management</h1>
+    <p class="text-lg text-gray-500 mt-2">Create and organize categories for your store.</p>
+  </div>
+
+  <div class="grid lg:grid-cols-3 gap-10">
+    <!-- Category Form -->
+    <div class="lg:col-span-1">
+      <div class="bg-white rounded-3xl border border-gray-100 shadow-xl p-8 sticky top-32">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">{{ selectedCategory ? 'Edit Category' : 'New Category' }}</h2>
+        
+        <form [formGroup]="categoryForm" (ngSubmit)="saveCategory()" class="space-y-5">
+          <div>
+            <label class="block text-sm font-bold text-gray-700 mb-2">Category Name</label>
+            <input type="text" formControlName="name" placeholder="e.g. Electronics" 
+                   class="w-full px-5 py-3 rounded-2xl border border-gray-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all">
+          </div>
+          
+          <div>
+            <label class="block text-sm font-bold text-gray-700 mb-2">Description</label>
+            <textarea formControlName="description" rows="3" placeholder="Tell us about this category..." 
+                      class="w-full px-5 py-3 rounded-2xl border border-gray-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all"></textarea>
+          </div>
+
+          <div>
+            <label class="block text-sm font-bold text-gray-700 mb-2">Parent Category (Optional)</label>
+            <select formControlName="parentId" class="w-full px-5 py-3 rounded-2xl border border-gray-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all appearance-none bg-white">
+              <option [ngValue]="null">None (Root Category)</option>
+              <option *ngFor="let cat of categories" [ngValue]="cat.id" [hidden]="cat.id === selectedCategory?.id">
+                {{ cat.name }}
+              </option>
+            </select>
+          </div>
+
+          <div *ngIf="categoryError" class="p-4 bg-red-50 text-red-700 rounded-2xl text-sm font-medium">
+            {{ categoryError }}
+          </div>
+
+          <div *ngIf="successMessage" class="p-4 bg-emerald-50 text-emerald-700 rounded-2xl text-sm font-medium">
+            {{ successMessage }}
+          </div>
+
+          <div class="flex gap-3 pt-4">
+            <button type="submit" [disabled]="categoryForm.invalid" 
+                    class="flex-1 bg-black text-white font-bold py-4 rounded-2xl hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-black/10">
+              {{ selectedCategory ? 'Update' : 'Create' }}
+            </button>
+            <button type="button" *ngIf="selectedCategory" (click)="clearForm()" 
+                    class="px-6 py-4 rounded-2xl border border-gray-200 font-bold text-gray-600 hover:bg-gray-50 transition-all">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Category List -->
+    <div class="lg:col-span-2">
+      <div *ngIf="loadingCategories" class="flex justify-center py-20">
+        <div class="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-indigo-600"></div>
+      </div>
+
+      <div *ngIf="!loadingCategories && categories.length === 0" class="text-center py-20 bg-gray-50 rounded-3xl border border-dashed border-gray-200">
+        <p class="text-gray-500 font-medium">No categories found. Start by creating one!</p>
+      </div>
+
+      <div *ngIf="!loadingCategories && categories.length > 0" class="grid gap-4">
+        <div *ngFor="let category of categories" class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-all flex items-center justify-between group">
+          <div>
+            <h3 class="text-xl font-bold text-gray-900">{{ category.name }}</h3>
+            <p class="text-gray-500 text-sm mt-1">{{ category.description || 'No description' }}</p>
+          </div>
+          <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button (click)="startEdit(category)" class="p-3 rounded-xl bg-gray-50 text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+            </button>
+            <button (click)="removeCategory(category)" class="p-3 rounded-xl bg-gray-50 text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

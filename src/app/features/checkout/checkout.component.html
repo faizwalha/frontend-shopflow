@@ -1,1 +1,158 @@
-<p>checkout works!</p>
+<div class="checkout-container">
+  <!-- Messages -->
+  <div *ngIf="errorMessage" class="alert alert-error">
+    {{ errorMessage }}
+  </div>
+  <div *ngIf="successMessage" class="alert alert-success">
+    {{ successMessage }}
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoadingCart || isLoadingAddresses" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading checkout...</p>
+  </div>
+
+  <!-- Checkout Content -->
+  <div *ngIf="!isLoadingCart && !isLoadingAddresses && cart" class="checkout-content">
+    <div class="checkout-header">
+      <h1>Checkout</h1>
+      <div class="progress-steps">
+        <div [class.active]="currentStep === 'address'" class="step">1. Address</div>
+        <div [class.active]="currentStep === 'review'" class="step">2. Review</div>
+        <div [class.active]="currentStep === 'payment'" class="step">3. Payment</div>
+        <div [class.active]="currentStep === 'confirmation'" class="step">4. Confirmation</div>
+      </div>
+    </div>
+
+    <!-- Step 1: Address Selection -->
+    <div *ngIf="currentStep === 'address'" class="checkout-section">
+      <h2>Shipping Address</h2>
+      
+      <!-- Existing Addresses -->
+      <div *ngIf="addresses && addresses.length > 0" class="addresses-list">
+        <h3>Select from saved addresses</h3>
+        <div *ngFor="let address of addresses" 
+             class="address-card" 
+             [class.selected]="selectedAddressId === address.id"
+             (click)="selectAddress(address.id)">
+          <div class="address-content">
+            <p><strong>{{ address.street }}</strong></p>
+            <p>{{ address.city }}, {{ address.postalCode }}, {{ address.country }}</p>
+            <span *ngIf="address.isDefault" class="default-badge">Default</span>
+          </div>
+          <input type="radio" [checked]="selectedAddressId === address.id" (change)="selectAddress(address.id)">
+        </div>
+      </div>
+
+      <!-- Add New Address -->
+      <div class="add-address-form">
+        <h3>Add New Address</h3>
+        <form [formGroup]="addressForm">
+          <div class="form-group">
+            <label for="street">Street:</label>
+            <input id="street" type="text" formControlName="street" class="form-input">
+          </div>
+          <div class="form-group">
+            <label for="city">City:</label>
+            <input id="city" type="text" formControlName="city" class="form-input">
+          </div>
+          <div class="form-group">
+            <label for="postalCode">Postal Code:</label>
+            <input id="postalCode" type="text" formControlName="postalCode" class="form-input">
+          </div>
+          <div class="form-group">
+            <label for="country">Country:</label>
+            <input id="country" type="text" formControlName="country" class="form-input">
+          </div>
+          <button type="button" class="btn btn-secondary" (click)="addNewAddress()">
+            Add Address
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Step 2: Review Order -->
+    <div *ngIf="currentStep === 'review'" class="checkout-section">
+      <h2>Review Your Order</h2>
+      
+      <!-- Selected Address -->
+      <div *ngIf="selectedAddressId" class="review-section">
+        <h3>Shipping Address</h3>
+        <ng-container *ngFor="let address of addresses">
+          <div *ngIf="address.id === selectedAddressId" class="address-display">
+            <p>{{ address.street }}</p>
+            <p>{{ address.city }}, {{ address.postalCode }}, {{ address.country }}</p>
+          </div>
+        </ng-container>
+      </div>
+
+      <!-- Order Items -->
+      <div class="review-section">
+        <h3>Order Items</h3>
+        <div class="order-items-review">
+          <div *ngFor="let item of cart.items" class="review-item">
+            <span>{{ item.product?.name }} x{{ item.quantity }}</span>
+            <span>${{ (item.quantity * (item.product?.price || 0)) | number: '1.2-2' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Totals -->
+      <div class="review-section totals-review">
+        <div class="total-row">
+          <span>Subtotal:</span>
+          <span>${{ cart.subtotal | number: '1.2-2' }}</span>
+        </div>
+        <div class="total-row" *ngIf="cart.discount && cart.discount > 0">
+          <span>Discount:</span>
+          <span>-${{ cart.discount | number: '1.2-2' }}</span>
+        </div>
+        <div class="total-row">
+          <span>Shipping:</span>
+          <span>${{ cart.shippingFee | number: '1.2-2' }}</span>
+        </div>
+        <div class="total-row total">
+          <span>Total:</span>
+          <span>${{ cart.totalTTC | number: '1.2-2' }}</span>
+        </div>
+      </div>
+
+      <div class="review-actions">
+        <button class="btn btn-secondary" (click)="currentStep = 'address'">Back</button>
+        <button class="btn btn-primary" (click)="goToPayment()">Continue to Payment</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Payment -->
+    <div *ngIf="currentStep === 'payment'" class="checkout-section">
+      <h2>Payment</h2>
+      <div class="payment-message">
+        <p>💳 Payment is simulated for demo purposes.</p>
+        <p>Click "Complete Order" to proceed.</p>
+      </div>
+      
+      <div class="payment-actions">
+        <button class="btn btn-secondary" (click)="currentStep = 'review'">Back</button>
+        <button class="btn btn-primary" (click)="placeOrder()" [disabled]="isPlacingOrder">
+          {{ isPlacingOrder ? 'Processing...' : 'Complete Order' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 4: Confirmation -->
+    <div *ngIf="currentStep === 'confirmation'" class="checkout-section">
+      <div class="confirmation-message">
+        <div class="success-icon">✓</div>
+        <h2>Order Confirmed!</h2>
+        <p>Your order has been placed successfully.</p>
+        <p>Redirecting to home page...</p>
+      </div>
+    </div>
+
+    <!-- Cancel Button -->
+    <div *ngIf="currentStep !== 'confirmation'" class="checkout-footer">
+      <button class="btn btn-outline" (click)="cancelCheckout()">Cancel</button>
+    </div>
+  </div>
+</div>
