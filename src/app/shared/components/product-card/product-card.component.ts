@@ -5,6 +5,8 @@ import { Product } from '../../models/models';
 import { RatingStarsComponent } from '../rating-stars/rating-stars.component';
 import { CartService } from '../../../core/services/cart.service';
 import { AddToCartRequest } from '../../../core/models/cart.models';
+import { AuthService } from '../../../core/services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-product-card',
@@ -15,6 +17,8 @@ import { AddToCartRequest } from '../../../core/models/cart.models';
 })
 export class ProductCardComponent {
   private cartService = inject(CartService);
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
   @Input({ required: true }) product!: Product;
 
@@ -24,6 +28,17 @@ export class ProductCardComponent {
 
   addToCart(): void {
     if (!this.product) {
+      return;
+    }
+
+    if (!this.authService.isAuthenticated()) {
+      // Save pending action to execute after login
+      localStorage.setItem('pending_cart_action', JSON.stringify({
+        productId: this.product.id,
+        variantId: null,
+        quantity: 1
+      }));
+      this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
       return;
     }
 

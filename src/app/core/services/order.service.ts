@@ -21,6 +21,10 @@ export class OrderService {
     return this.http.get<OrderListResponse>(`${this.apiUrl}/my`, { params });
   }
 
+  getSellerOrders(): Observable<Order[]> {
+    return this.http.get<Order[]>(`${this.apiUrl}/seller`);
+  }
+
   getOrderById(id: number): Observable<Order> {
     return this.http.get<Order>(`${this.apiUrl}/${id}`);
   }

@@ -17,6 +17,7 @@ export interface ProductResponse {
   active: boolean;
   createdAt: string;
   sellerName: string;
+  sellerId?: number;
   images: string[];
   categories: string[];
   averageRating: number;

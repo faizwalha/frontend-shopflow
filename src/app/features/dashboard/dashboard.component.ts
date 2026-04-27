@@ -7,6 +7,8 @@ import { CategoryService } from '../../core/services/category.service';
 import { ProductService } from '../../core/services/product.service';
 import { OrderService } from '../../core/services/order.service';
 import { DashboardService } from '../../core/services/dashboard.service';
+import { ToastService } from '../../core/services/toast.service';
+import { ConfirmService } from '../../core/services/confirm.service';
 import { CategoryRequest, CategoryResponse } from '../../core/models/category.models';
 import { ProductRequest, ProductResponse } from '../../core/models/product.models';
 import { AdminDashboardResponse, SellerDashboardResponse } from '../../core/models/dashboard.models';
@@ -69,6 +71,8 @@ export class DashboardComponent implements OnInit {
   private productService = inject(ProductService);
   private orderService = inject(OrderService);
   private dashboardService = inject(DashboardService);
+  private toastService = inject(ToastService);
+  private confirmService = inject(ConfirmService);
 
   readonly currentUser$ = this.authService.currentUser$;
   readonly navItems: DashboardNavItem[] = [
@@ -189,10 +193,35 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.restoreThemePreference();
-    this.loadStats();
-    this.loadCategories();
-    this.loadProducts();
-    this.loadOrders();
+    this.currentUser$.pipe(take(1)).subscribe(user => {
+      if (user && (user.role === 'ADMIN' || user.role === 'SELLER')) {
+        this.loadStats();
+        this.loadCategories();
+        this.loadProducts();
+        this.loadOrders();
+      } else if (user && user.role === 'CUSTOMER') {
+        // For customers, we might only want to load their stats or orders if the dashboard is used as profile
+        this.loadCustomerData();
+      }
+    });
+  }
+
+  private loadCustomerData(): void {
+    this.loadingOrders = true;
+    this.orderService.getMyOrders(0, 10).subscribe({
+      next: (response: any) => {
+        if (Array.isArray(response)) {
+          this.orders = response;
+        } else {
+          this.orders = response.content ?? [];
+        }
+        this.loadingOrders = false;
+      },
+      error: () => {
+        this.orderError = 'Unable to load your orders.';
+        this.loadingOrders = false;
+      }
+    });
   }
 
   loadStats(): void {
@@ -299,7 +328,7 @@ export class DashboardComponent implements OnInit {
         this.refreshNotifications();
       },
       error: () => {
-        this.categoryError = 'Unable to load categories.';
+        this.toastService.error('Unable to load categories.');
         this.loadingCategories = false;
       }
     });
@@ -314,7 +343,7 @@ export class DashboardComponent implements OnInit {
         this.refreshNotifications();
       },
       error: () => {
-        this.productError = 'Unable to load products.';
+        this.toastService.error('Unable to load products.');
         this.loadingProducts = false;
       }
     });
@@ -322,14 +351,28 @@ export class DashboardComponent implements OnInit {
 
   loadOrders(): void {
     this.loadingOrders = true;
-    this.orderService.getAllOrders(0, 50).subscribe({
-      next: (page) => {
-        this.orders = (page.content ?? []).slice().sort((left, right) => this.toTime(right.createdAt) - this.toTime(left.createdAt));
+    const user = this.authService.getCurrentUser();
+
+    // Use /api/orders for Admin, but /api/orders/seller for Sellers (avoids empty list)
+    const request$ = ((user?.role === 'ADMIN')
+      ? this.orderService.getAllOrders(0, 50)
+      : this.orderService.getSellerOrders()) as any;
+
+    request$.subscribe({
+      next: (response: any) => {
+        let orderList: Order[] = [];
+        if (Array.isArray(response)) {
+          orderList = response;
+        } else if (response && response.content) {
+          orderList = response.content;
+        }
+
+        this.orders = orderList.slice().sort((left, right) => this.toTime(right.createdAt) - this.toTime(left.createdAt));
         this.loadingOrders = false;
         this.refreshNotifications();
       },
       error: () => {
-        this.orderError = 'Unable to load orders.';
+        this.toastService.error('Unable to load orders.');
         this.loadingOrders = false;
       }
     });
@@ -430,32 +473,33 @@ export class DashboardComponent implements OnInit {
 
     request$.subscribe({
       next: () => {
-        this.successMessage = this.selectedProduct ? 'Product updated.' : 'Product created.';
-        this.productError = '';
+        this.toastService.success(this.selectedProduct ? 'Product updated.' : 'Product created.');
         this.clearProductForm();
         this.loadProducts();
       },
       error: (err) => {
-        this.successMessage = '';
-        this.productError = err?.error?.message || err?.message || 'Product save failed.';
+        this.toastService.error(err?.error?.message || err?.message || 'Product save failed.');
       }
     });
   }
 
   removeProduct(product: ProductResponse): void {
-    if (!confirm(`Delete product "${product.name}"?`)) {
-      return;
-    }
-
-    this.productService.deleteProduct(product.id).subscribe({
-      next: () => {
-        this.successMessage = 'Product deleted.';
-        this.productError = '';
-        this.loadProducts();
-      },
-      error: (err) => {
-        this.successMessage = '';
-        this.productError = err?.error?.message || err?.message || 'Product deletion failed.';
+    this.confirmService.confirm({
+      title: 'Delete Product',
+      message: `Are you sure you want to delete "${product.name}"? This action cannot be undone.`,
+      confirmText: 'Delete',
+      type: 'danger'
+    }).pipe(take(1)).subscribe(confirmed => {
+      if (confirmed) {
+        this.productService.deleteProduct(product.id).subscribe({
+          next: () => {
+            this.toastService.success('Product deleted.');
+            this.loadProducts();
+          },
+          error: (err) => {
+            this.toastService.error(err?.error?.message || err?.message || 'Product deletion failed.');
+          }
+        });
       }
     });
   }
@@ -474,13 +518,11 @@ export class DashboardComponent implements OnInit {
 
     this.productService.updateProduct(product.id, payload).subscribe({
       next: () => {
-        this.successMessage = `${product.name} ${product.active ? 'deactivated' : 'activated'}.`;
-        this.productError = '';
+        this.toastService.success(`${product.name} ${product.active ? 'deactivated' : 'activated'}.`);
         this.loadProducts();
       },
       error: (err) => {
-        this.successMessage = '';
-        this.productError = err?.error?.message || err?.message || 'Product status update failed.';
+        this.toastService.error(err?.error?.message || err?.message || 'Product status update failed.');
       }
     });
   }
@@ -499,13 +541,11 @@ export class DashboardComponent implements OnInit {
 
     this.productService.updateProduct(product.id, payload).subscribe({
       next: () => {
-        this.successMessage = `Updated stock for ${product.name}.`;
-        this.productError = '';
+        this.toastService.success(`Updated stock for ${product.name}.`);
         this.loadProducts();
       },
       error: (err) => {
-        this.successMessage = '';
-        this.productError = err?.error?.message || err?.message || 'Inventory update failed.';
+        this.toastService.error(err?.error?.message || err?.message || 'Inventory update failed.');
       }
     });
   }
@@ -523,32 +563,33 @@ export class DashboardComponent implements OnInit {
 
     request$.subscribe({
       next: () => {
-        this.successMessage = this.selectedCategory ? 'Category updated.' : 'Category created.';
-        this.categoryError = '';
+        this.toastService.success(this.selectedCategory ? 'Category updated.' : 'Category created.');
         this.clearForm();
         this.loadCategories();
       },
       error: (err) => {
-        this.successMessage = '';
-        this.categoryError = err?.error?.message || err?.message || 'Category save failed.';
+        this.toastService.error(err?.error?.message || err?.message || 'Category save failed.');
       }
     });
   }
 
   removeCategory(category: CategoryResponse): void {
-    if (!confirm(`Delete category "${category.name}"?`)) {
-      return;
-    }
-
-    this.categoryService.deleteCategory(category.id).subscribe({
-      next: () => {
-        this.successMessage = 'Category deleted.';
-        this.categoryError = '';
-        this.loadCategories();
-      },
-      error: (err) => {
-        this.successMessage = '';
-        this.categoryError = err?.error?.message || err?.message || 'Category deletion failed.';
+    this.confirmService.confirm({
+      title: 'Delete Category',
+      message: `Are you sure you want to delete "${category.name}"? This action cannot be undone.`,
+      confirmText: 'Delete',
+      type: 'danger'
+    }).pipe(take(1)).subscribe(confirmed => {
+      if (confirmed) {
+        this.categoryService.deleteCategory(category.id).subscribe({
+          next: () => {
+            this.toastService.success('Category deleted.');
+            this.loadCategories();
+          },
+          error: (err) => {
+            this.toastService.error(err?.error?.message || err?.message || 'Category deletion failed.');
+          }
+        });
       }
     });
   }
@@ -573,12 +614,11 @@ export class DashboardComponent implements OnInit {
       next: (updatedOrder) => {
         this.selectedOrder = updatedOrder;
         this.orders = this.orders.map(order => order.id === updatedOrder.id ? updatedOrder : order);
-        this.successMessage = `Order ${updatedOrder.orderNumber} updated.`;
-        this.orderError = '';
+        this.toastService.success(`Order ${updatedOrder.orderNumber} updated.`);
         this.refreshNotifications();
       },
       error: (err) => {
-        this.orderError = err?.error?.message || err?.message || 'Order update failed.';
+        this.toastService.error(err?.error?.message || err?.message || 'Order update failed.');
       }
     });
   }
@@ -590,9 +630,20 @@ export class DashboardComponent implements OnInit {
   }
 
   get overviewMetrics(): OverviewMetric[] {
+    const user = this.authService.getCurrentUser();
+    const isSeller = user?.role === 'SELLER';
+
     const revenue = this.adminStats?.totalRevenue ?? this.sellerStats?.totalRevenue ?? this.orders.reduce((sum, order) => sum + order.totalTTC, 0);
     const orderCount = this.adminStats?.totalOrders ?? this.orders.length;
-    const productCount = this.adminStats?.totalProducts ?? this.products.length;
+
+    let productsList = this.products;
+    if (isSeller && user?.userId) {
+      productsList = productsList.filter(p => {
+        const sid = p.sellerId ?? (p as any).userId ?? (p as any).ownerId ?? (p as any).seller?.id;
+        return sid == user.userId;
+      });
+    }
+    const productCount = this.adminStats?.totalProducts ?? productsList.length;
     const customerCount = this.adminStats?.totalUsers ?? this.customerSummaries.length;
 
     return [
@@ -625,7 +676,17 @@ export class DashboardComponent implements OnInit {
 
   get filteredProducts(): ProductResponse[] {
     const query = this.searchQuery.trim().toLowerCase();
-    return this.products.filter(product => this.matchesProductQuery(product, query));
+    const user = this.authService.getCurrentUser();
+    let list = this.products;
+
+    if (user?.role === 'SELLER' && user.userId) {
+      list = list.filter(p => {
+        const sid = p.sellerId ?? (p as any).userId ?? (p as any).ownerId ?? (p as any).seller?.id;
+        return sid == user.userId;
+      });
+    }
+
+    return list.filter(product => this.matchesProductQuery(product, query));
   }
 
   get filteredCategories(): CategoryResponse[] {
@@ -667,8 +728,40 @@ export class DashboardComponent implements OnInit {
       .sort((left, right) => right.lifetimeValue - left.lifetimeValue);
   }
 
+  get filteredCustomerSummaries(): CustomerSummary[] {
+    const query = this.searchQuery.trim().toLowerCase();
+    const allSummaries = this.customerSummaries;
+
+    if (!query) {
+      return allSummaries;
+    }
+
+    return allSummaries.filter(customer =>
+      customer.displayName.toLowerCase().includes(query) ||
+      customer.email.toLowerCase().includes(query) ||
+      customer.customerId.toString().includes(query)
+    );
+  }
+
   get lowStockProducts(): ProductResponse[] {
-    return this.products.filter(product => this.getProductStockStatus(product) === 'Low stock' || this.getProductStockStatus(product) === 'Out of stock');
+    const user = this.authService.getCurrentUser();
+    let list = this.products.filter(product =>
+      this.getProductStockStatus(product) === 'Low stock' ||
+      this.getProductStockStatus(product) === 'Out of stock'
+    );
+
+    if (user?.role === 'SELLER' && user.userId) {
+      list = list.filter(p => {
+        const sid = p.sellerId ?? (p as any).userId ?? (p as any).ownerId ?? (p as any).seller?.id;
+        return sid == user.userId;
+      });
+    }
+
+    return list;
+  }
+
+  get filteredInventoryProducts(): ProductResponse[] {
+    return this.filteredProducts;
   }
 
   get pendingOrdersCount(): number {
@@ -688,7 +781,7 @@ export class DashboardComponent implements OnInit {
   }
 
   get customerPageCount(): number {
-    return Math.max(1, Math.ceil(this.customerSummaries.length / 8));
+    return Math.max(1, Math.ceil(this.filteredCustomerSummaries.length / 8));
   }
 
   get visibleProducts(): ProductResponse[] {
@@ -704,7 +797,7 @@ export class DashboardComponent implements OnInit {
   }
 
   get visibleCustomers(): CustomerSummary[] {
-    return this.paginate(this.customerSummaries, this.customerPageIndex, 8);
+    return this.paginate(this.filteredCustomerSummaries, this.customerPageIndex, 8);
   }
 
   get chartSeries(): ChartPoint[] {

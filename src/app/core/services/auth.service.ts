@@ -100,7 +100,7 @@ export class AuthService {
     localStorage.removeItem(this.roleKey);
     localStorage.removeItem(this.userIdKey);
     this.currentUserSubject.next(null);
-    this.router.navigate(['/login']);
+    this.router.navigate(['/']);
   }
 
   getToken(): string | null {

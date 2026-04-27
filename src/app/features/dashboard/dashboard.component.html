@@ -3,27 +3,25 @@
     <div class="dashboard-shell mx-auto max-w-[1600px] px-4 py-4 sm:px-6 lg:px-8 lg:py-6">
       <div class="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
         <aside class="dashboard-sidebar hidden lg:sticky lg:top-6 lg:block">
-          <div class="rounded-[28px] border border-slate-200/80 bg-white/90 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.08)] backdrop-blur-xl">
+          <div
+            class="rounded-[28px] border border-slate-200/80 bg-white/90 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.08)] backdrop-blur-xl">
             <div class="flex items-center gap-3">
-              <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600 to-fuchsia-600 text-lg font-black text-white shadow-lg shadow-violet-500/20">S</div>
+              <div
+                class="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600 to-fuchsia-600 text-lg font-black text-white shadow-lg shadow-violet-500/20">
+                S</div>
               <div>
                 <p class="text-xs font-semibold uppercase tracking-[0.26em] text-violet-700">ShopFlow Admin</p>
                 <h2 class="text-lg font-black tracking-tight text-slate-950">Command Center</h2>
               </div>
             </div>
 
-            
+
 
             <nav class="mt-6 space-y-2">
-              <button
-                *ngFor="let item of navItems"
-                type="button"
-                class="dashboard-nav-item"
+              <button *ngFor="let item of navItems" type="button" class="dashboard-nav-item"
                 [class.dashboard-nav-item-active]="activeSection === item.section"
                 [class.dashboard-nav-item-disabled]="item.adminOnly && !isAdmin(user.role)"
-                [disabled]="item.adminOnly && !isAdmin(user.role)"
-                (click)="setActiveSection(item.section)"
-              >
+                [disabled]="item.adminOnly && !isAdmin(user.role)" (click)="setActiveSection(item.section)">
                 <div class="flex flex-1 flex-col items-start">
                   <span class="text-sm font-semibold text-slate-950">{{ item.label }}</span>
                   <span class="text-xs text-slate-500">{{ item.description }}</span>
@@ -35,7 +33,8 @@
 
         <main class="dashboard-main space-y-6">
           <section *ngIf="activeSection === 'overview'" class="space-y-6">
-            <article class="rounded-[28px] border border-slate-200/80 bg-white p-5 shadow-[0_18px_50px_rgba(15,23,42,0.08)]">
+            <article
+              class="rounded-[28px] border border-slate-200/80 bg-white p-5 shadow-[0_18px_50px_rgba(15,23,42,0.08)]">
               <div class="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <p class="text-xs font-semibold uppercase tracking-[0.24em] text-violet-700">Overview</p>
@@ -43,13 +42,10 @@
                   <p class="mt-1 text-sm text-slate-500">{{ activeSectionDescription }}</p>
                 </div>
                 <div class="flex items-center gap-2">
-                  <button
-                    *ngFor="let period of chartPeriods"
-                    type="button"
+                  <button *ngFor="let period of chartPeriods" type="button"
                     class="dashboard-secondary-button !px-4 !py-2"
                     [class.dashboard-icon-button-active]="selectedChartPeriod === period"
-                    (click)="setChartPeriod(period)"
-                  >
+                    (click)="setChartPeriod(period)">
                     {{ period | titlecase }}
                   </button>
                 </div>
@@ -66,10 +62,12 @@
               <div class="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-4">
                 <div class="flex items-center justify-between gap-2">
                   <h3 class="text-base font-black text-slate-900">Revenue trend</h3>
-                  <span class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{{ selectedChartPeriod }}</span>
+                  <span class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{{ selectedChartPeriod
+                    }}</span>
                 </div>
                 <svg class="mt-4 w-full" viewBox="0 0 320 160" preserveAspectRatio="none" aria-label="Revenue chart">
-                  <polyline fill="none" stroke="url(#overviewGradient)" stroke-width="4" [attr.points]="chartLinePoints"></polyline>
+                  <polyline fill="none" stroke="url(#overviewGradient)" stroke-width="4"
+                    [attr.points]="chartLinePoints"></polyline>
                   <defs>
                     <linearGradient id="overviewGradient" x1="0" y1="0" x2="1" y2="0">
                       <stop offset="0%" stop-color="#7c3aed"></stop>
@@ -85,15 +83,31 @@
           </section>
 
           <section *ngIf="activeSection === 'products'" class="space-y-6">
-            <article class="rounded-[28px] border border-slate-200/80 bg-white p-5 shadow-[0_18px_50px_rgba(15,23,42,0.08)]">
+            <article
+              class="rounded-[28px] border border-slate-200/80 bg-white p-5 shadow-[0_18px_50px_rgba(15,23,42,0.08)]">
               <div class="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <p class="text-xs font-semibold uppercase tracking-[0.24em] text-violet-700">Products</p>
                   <h2 class="mt-1 text-xl font-black text-slate-950">Product management</h2>
                 </div>
+
+                <div class="flex-1 max-w-sm mx-4">
+                  <div class="relative">
+                    <input type="text" [value]="searchQuery" (input)="onSearchChange($event)"
+                      placeholder="Search products..." class="dashboard-input !py-2 !pl-10 !rounded-full">
+                    <div class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                      <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8" />
+                        <path d="m21 21-4.3-4.3" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
                 <div class="flex items-center gap-3">
                   <span class="text-sm text-slate-500">{{ filteredProducts.length }} result(s)</span>
-                  <button type="button" class="dashboard-primary-button px-4 py-2" (click)="openCreateProductModal()">+ Create product</button>
+                  <button type="button" class="dashboard-primary-button px-4 py-2" (click)="openCreateProductModal()">+
+                    Create product</button>
                 </div>
               </div>
 
@@ -113,7 +127,8 @@
                       <td>
                         <div>
                           <div class="font-semibold text-slate-950">{{ product.name }}</div>
-                          <div class="mt-1 text-xs text-slate-500">{{ product.categories.join(', ') || 'Uncategorized' }}</div>
+                          <div class="mt-1 text-xs text-slate-500">{{ product.categories.join(', ') || 'Uncategorized'
+                            }}</div>
                         </div>
                       </td>
                       <td class="font-semibold text-slate-950">${{ product.displayPrice | number:'1.2-2' }}</td>
@@ -132,27 +147,28 @@
                         </div>
                       </td>
                       <td class="text-center">
-                        <button
-                          type="button"
-                          class="status-chip status-chip-button"
+                        <button type="button" class="status-chip status-chip-button"
                           [ngClass]="product.active ? 'status-cancelled' : 'status-delivered'"
                           (click)="toggleProductStatus(product)"
                           [attr.aria-label]="product.active ? 'Désactiver le produit' : 'Activer le produit'"
-                          [title]="product.active ? 'Cliquer pour désactiver' : 'Cliquer pour activer'"
-                        >
+                          [title]="product.active ? 'Cliquer pour désactiver' : 'Cliquer pour activer'">
                           {{ product.active ? 'Désactiver' : 'Activer' }}
                         </button>
                       </td>
                       <td class="text-center">
                         <div class="flex items-center justify-center gap-2">
-                          <button type="button" class="dashboard-table-icon-button dashboard-table-icon-button-edit" aria-label="Edit product" (click)="startEditProduct(product)">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                          <button type="button" class="dashboard-table-icon-button dashboard-table-icon-button-edit"
+                            aria-label="Edit product" (click)="startEditProduct(product)">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                               <path d="M12 20h9" />
                               <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
                             </svg>
                           </button>
-                          <button type="button" class="dashboard-table-icon-button dashboard-table-icon-button-danger" aria-label="Delete product" (click)="removeProduct(product)">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                          <button type="button" class="dashboard-table-icon-button dashboard-table-icon-button-danger"
+                            aria-label="Delete product" (click)="removeProduct(product)">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                               <path d="M3 6h18" />
                               <path d="M8 6V4h8v2" />
                               <path d="M6 6l1 14h10l1-14" />
@@ -164,22 +180,27 @@
                       </td>
                     </tr>
                     <tr *ngIf="visibleProducts.length === 0">
-                      <td colspan="5" class="px-6 py-10 text-center text-sm text-slate-500">No matching products found.</td>
+                      <td colspan="5" class="px-6 py-10 text-center text-sm text-slate-500">No matching products found.
+                      </td>
                     </tr>
                   </tbody>
                 </table>
               </div>
 
               <div *ngIf="isProductModalOpen" class="product-modal-backdrop" (click)="clearProductForm()">
-                <form [formGroup]="productForm" (ngSubmit)="saveProduct()" class="product-modal" (click)="$event.stopPropagation()">
+                <form [formGroup]="productForm" (ngSubmit)="saveProduct()" class="product-modal"
+                  (click)="$event.stopPropagation()">
                   <div class="flex items-start justify-between gap-4">
                     <div>
                       <p class="text-xs font-semibold uppercase tracking-[0.24em] text-violet-700">Product form</p>
-                      <h3 class="mt-1 text-xl font-black text-slate-950">{{ selectedProduct ? 'Edit product' : 'Create product' }}</h3>
+                      <h3 class="mt-1 text-xl font-black text-slate-950">{{ selectedProduct ? 'Edit product' : 'Create
+                        product' }}</h3>
                       <p class="mt-1 text-sm text-slate-500">Simple popup for product creation and updates.</p>
                     </div>
-                    <button type="button" class="dashboard-table-icon-button dashboard-table-icon-button-danger" aria-label="Close popup" (click)="clearProductForm()">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <button type="button" class="dashboard-table-icon-button dashboard-table-icon-button-danger"
+                      aria-label="Close popup" (click)="clearProductForm()">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <path d="M18 6 6 18" />
                         <path d="M6 6l12 12" />
                       </svg>
@@ -189,26 +210,31 @@
                   <div class="mt-5 grid gap-4 sm:grid-cols-2">
                     <div class="sm:col-span-2">
                       <label class="dashboard-label" for="product-name">Name</label>
-                      <input id="product-name" formControlName="name" type="text" class="dashboard-input" placeholder="Product name">
+                      <input id="product-name" formControlName="name" type="text" class="dashboard-input"
+                        placeholder="Product name">
                     </div>
 
                     <div class="sm:col-span-2">
                       <label class="dashboard-label" for="product-description">Description</label>
-                      <textarea id="product-description" formControlName="description" rows="4" class="dashboard-input" placeholder="Product description"></textarea>
+                      <textarea id="product-description" formControlName="description" rows="4" class="dashboard-input"
+                        placeholder="Product description"></textarea>
                     </div>
 
                     <div>
                       <label class="dashboard-label" for="product-price">Price</label>
-                      <input id="product-price" formControlName="price" type="number" min="0" step="0.01" class="dashboard-input" placeholder="0.00">
+                      <input id="product-price" formControlName="price" type="number" min="0" step="0.01"
+                        class="dashboard-input" placeholder="0.00">
                     </div>
                     <div>
                       <label class="dashboard-label" for="product-promo">Promo price</label>
-                      <input id="product-promo" formControlName="promoPrice" type="number" min="0" step="0.01" class="dashboard-input" placeholder="Optional">
+                      <input id="product-promo" formControlName="promoPrice" type="number" min="0" step="0.01"
+                        class="dashboard-input" placeholder="Optional">
                     </div>
 
                     <div>
                       <label class="dashboard-label" for="product-stock">Stock</label>
-                      <input id="product-stock" formControlName="stock" type="number" min="0" class="dashboard-input" placeholder="0">
+                      <input id="product-stock" formControlName="stock" type="number" min="0" class="dashboard-input"
+                        placeholder="0">
                     </div>
                     <div>
                       <label class="dashboard-label" for="product-category">Category</label>
@@ -220,12 +246,14 @@
 
                     <div class="sm:col-span-2">
                       <label class="dashboard-label" for="product-images">Images</label>
-                      <input id="product-images" formControlName="images" type="text" class="dashboard-input" placeholder="Comma-separated URLs">
+                      <input id="product-images" formControlName="images" type="text" class="dashboard-input"
+                        placeholder="Comma-separated URLs">
                     </div>
                   </div>
 
                   <div class="mt-5 flex items-center justify-end gap-3">
-                    <button type="button" class="dashboard-secondary-button" (click)="clearProductForm()">Cancel</button>
+                    <button type="button" class="dashboard-secondary-button"
+                      (click)="clearProductForm()">Cancel</button>
                     <button type="submit" [disabled]="productForm.invalid" class="dashboard-primary-button">
                       {{ selectedProduct ? 'Update product' : 'Create product' }}
                     </button>
@@ -233,31 +261,51 @@
                 </form>
               </div>
 
-              <div class="mt-5 flex items-center justify-between gap-3 rounded-[20px] bg-slate-50 px-4 py-3 text-sm text-slate-600">
+              <div
+                class="mt-5 flex items-center justify-between gap-3 rounded-[20px] bg-slate-50 px-4 py-3 text-sm text-slate-600">
                 <span>Page {{ productPageIndex + 1 }} of {{ productPageCount }}</span>
                 <div class="flex items-center gap-2">
-                  <button type="button" class="dashboard-secondary-button" (click)="previousPage('products')" [disabled]="productPageIndex === 0">Previous</button>
-                  <button type="button" class="dashboard-secondary-button" (click)="nextPage('products')" [disabled]="productPageIndex >= productPageCount - 1">Next</button>
+                  <button type="button" class="dashboard-secondary-button" (click)="previousPage('products')"
+                    [disabled]="productPageIndex === 0">Previous</button>
+                  <button type="button" class="dashboard-secondary-button" (click)="nextPage('products')"
+                    [disabled]="productPageIndex >= productPageCount - 1">Next</button>
                 </div>
               </div>
             </article>
           </section>
 
           <section *ngIf="activeSection === 'categories'" class="space-y-6">
-            <article class="rounded-[28px] border border-slate-200/80 bg-white p-5 shadow-[0_18px_50px_rgba(15,23,42,0.08)]">
+            <article
+              class="rounded-[28px] border border-slate-200/80 bg-white p-5 shadow-[0_18px_50px_rgba(15,23,42,0.08)]">
               <div class="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <p class="text-xs font-semibold uppercase tracking-[0.24em] text-violet-700">Categories</p>
                   <h2 class="mt-1 text-xl font-black text-slate-950">Categories management</h2>
                 </div>
+
+                <div class="flex-1 max-w-sm mx-4">
+                  <div class="relative">
+                    <input type="text" [value]="searchQuery" (input)="onSearchChange($event)"
+                      placeholder="Search categories..." class="dashboard-input !py-2 !pl-10 !rounded-full">
+                    <div class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                      <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8" />
+                        <path d="m21 21-4.3-4.3" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
                 <div class="flex items-center gap-3">
                   <span class="text-sm text-slate-500">{{ filteredCategories.length }} result(s)</span>
-                  <button type="button" class="dashboard-primary-button px-4 py-2" (click)="openCreateCategoryModal()">+ Create category</button>
+                  <button type="button" class="dashboard-primary-button px-4 py-2" (click)="openCreateCategoryModal()">+
+                    Create category</button>
                 </div>
               </div>
 
-              <div *ngIf="loadingCategories" class="mt-5 rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-6 text-sm text-slate-500">Loading categories...</div>
-              <div *ngIf="categoryError" class="mt-5 rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm font-medium text-rose-700">{{ categoryError }}</div>
+              <div *ngIf="loadingCategories"
+                class="mt-5 rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-6 text-sm text-slate-500">
+                Loading categories...</div>
 
               <div class="mt-5 overflow-hidden rounded-[24px] border border-slate-200" *ngIf="!loadingCategories">
                 <table class="dashboard-table dashboard-table-compact">
@@ -276,14 +324,18 @@
                       <td class="text-center font-semibold text-slate-700">{{ category.parentId ?? '—' }}</td>
                       <td class="text-center">
                         <div class="flex items-center justify-center gap-2">
-                          <button type="button" class="dashboard-table-icon-button dashboard-table-icon-button-edit" aria-label="Edit category" (click)="startEdit(category)">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                          <button type="button" class="dashboard-table-icon-button dashboard-table-icon-button-edit"
+                            aria-label="Edit category" (click)="startEdit(category)">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                               <path d="M12 20h9" />
                               <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
                             </svg>
                           </button>
-                          <button type="button" class="dashboard-table-icon-button dashboard-table-icon-button-danger" aria-label="Delete category" (click)="removeCategory(category)">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                          <button type="button" class="dashboard-table-icon-button dashboard-table-icon-button-danger"
+                            aria-label="Delete category" (click)="removeCategory(category)">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                               <path d="M3 6h18" />
                               <path d="M8 6V4h8v2" />
                               <path d="M6 6l1 14h10l1-14" />
@@ -302,15 +354,19 @@
               </div>
 
               <div *ngIf="isCategoryModalOpen" class="product-modal-backdrop" (click)="clearForm()">
-                <form [formGroup]="categoryForm" (ngSubmit)="saveCategory()" class="product-modal" (click)="$event.stopPropagation()">
+                <form [formGroup]="categoryForm" (ngSubmit)="saveCategory()" class="product-modal"
+                  (click)="$event.stopPropagation()">
                   <div class="flex items-start justify-between gap-4">
                     <div>
                       <p class="text-xs font-semibold uppercase tracking-[0.24em] text-violet-700">Category form</p>
-                      <h3 class="mt-1 text-xl font-black text-slate-950">{{ selectedCategory ? 'Edit category' : 'Create category' }}</h3>
+                      <h3 class="mt-1 text-xl font-black text-slate-950">{{ selectedCategory ? 'Edit category' : 'Create
+                        category' }}</h3>
                       <p class="mt-1 text-sm text-slate-500">Simple popup for category creation and updates.</p>
                     </div>
-                    <button type="button" class="dashboard-table-icon-button dashboard-table-icon-button-danger" aria-label="Close popup" (click)="clearForm()">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <button type="button" class="dashboard-table-icon-button dashboard-table-icon-button-danger"
+                      aria-label="Close popup" (click)="clearForm()">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <path d="M18 6 6 18" />
                         <path d="M6 6l12 12" />
                       </svg>
@@ -320,17 +376,20 @@
                   <div class="mt-5 space-y-4">
                     <div>
                       <label class="dashboard-label" for="category-name">Name</label>
-                      <input id="category-name" formControlName="name" type="text" class="dashboard-input" placeholder="Category name">
+                      <input id="category-name" formControlName="name" type="text" class="dashboard-input"
+                        placeholder="Category name">
                     </div>
 
                     <div>
                       <label class="dashboard-label" for="category-description">Description</label>
-                      <textarea id="category-description" formControlName="description" rows="4" class="dashboard-input" placeholder="Category description"></textarea>
+                      <textarea id="category-description" formControlName="description" rows="4" class="dashboard-input"
+                        placeholder="Category description"></textarea>
                     </div>
 
                     <div>
                       <label class="dashboard-label" for="category-parent">Parent ID</label>
-                      <input id="category-parent" formControlName="parentId" type="number" min="0" class="dashboard-input" placeholder="Optional parent">
+                      <input id="category-parent" formControlName="parentId" type="number" min="0"
+                        class="dashboard-input" placeholder="Optional parent">
                     </div>
                   </div>
 
@@ -343,24 +402,43 @@
                 </form>
               </div>
 
-              <div class="mt-5 flex items-center justify-between gap-3 rounded-[20px] bg-slate-50 px-4 py-3 text-sm text-slate-600">
+              <div
+                class="mt-5 flex items-center justify-between gap-3 rounded-[20px] bg-slate-50 px-4 py-3 text-sm text-slate-600">
                 <span>Page {{ categoryPageIndex + 1 }} of {{ categoryPageCount }}</span>
                 <div class="flex items-center gap-2">
-                  <button type="button" class="dashboard-secondary-button" (click)="previousPage('categories')" [disabled]="categoryPageIndex === 0">Previous</button>
-                  <button type="button" class="dashboard-secondary-button" (click)="nextPage('categories')" [disabled]="categoryPageIndex >= categoryPageCount - 1">Next</button>
+                  <button type="button" class="dashboard-secondary-button" (click)="previousPage('categories')"
+                    [disabled]="categoryPageIndex === 0">Previous</button>
+                  <button type="button" class="dashboard-secondary-button" (click)="nextPage('categories')"
+                    [disabled]="categoryPageIndex >= categoryPageCount - 1">Next</button>
                 </div>
               </div>
             </article>
           </section>
 
           <section *ngIf="activeSection === 'inventory'" class="space-y-6">
-            <article class="rounded-[28px] border border-slate-200/80 bg-white p-5 shadow-[0_18px_50px_rgba(15,23,42,0.08)]">
+            <article
+              class="rounded-[28px] border border-slate-200/80 bg-white p-5 shadow-[0_18px_50px_rgba(15,23,42,0.08)]">
               <div class="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <p class="text-xs font-semibold uppercase tracking-[0.24em] text-violet-700">Inventory</p>
                   <h2 class="mt-1 text-xl font-black text-slate-950">Stock tracking</h2>
                 </div>
-                <span class="rounded-full bg-amber-50 px-3 py-1 text-sm font-semibold text-amber-700">{{ lowStockProducts.length }} low stock alert(s)</span>
+
+                <div class="flex-1 max-w-sm mx-4">
+                  <div class="relative">
+                    <input type="text" [value]="searchQuery" (input)="onSearchChange($event)"
+                      placeholder="Search inventory..." class="dashboard-input !py-2 !pl-10 !rounded-full">
+                    <div class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                      <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8" />
+                        <path d="m21 21-4.3-4.3" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                <span class="rounded-full bg-amber-50 px-3 py-1 text-sm font-semibold text-amber-700">{{
+                  lowStockProducts.length }} low stock alert(s)</span>
               </div>
 
               <div class="mt-5 overflow-hidden rounded-[24px] border border-slate-200">
@@ -374,22 +452,27 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr *ngFor="let product of lowStockProducts">
+                    <tr *ngFor="let product of filteredInventoryProducts">
                       <td>
                         <div class="font-semibold text-slate-950">{{ product.name }}</div>
                         <div class="text-xs text-slate-500">{{ product.categories.join(', ') || 'Uncategorized' }}</div>
                       </td>
                       <td class="font-semibold text-slate-950">{{ product.stock }}</td>
-                      <td><span class="status-chip" [ngClass]="getProductStockStatus(product) === 'Out of stock' ? 'status-cancelled' : 'status-processing'">{{ getProductStockStatus(product) }}</span></td>
+                      <td><span class="status-chip"
+                          [ngClass]="getProductStockStatus(product) === 'Out of stock' ? 'status-cancelled' : 'status-processing'">{{
+                          getProductStockStatus(product) }}</span></td>
                       <td>
                         <div class="flex items-center gap-2">
-                          <input #stockInput type="number" min="0" [value]="product.stock" class="dashboard-input dashboard-input-inline w-28">
-                          <button type="button" class="dashboard-secondary-button" (click)="updateInventoryStock(product, stockInput.valueAsNumber)">Update</button>
+                          <input #stockInput type="number" min="0" [value]="product.stock"
+                            class="dashboard-input dashboard-input-inline w-28">
+                          <button type="button" class="dashboard-secondary-button"
+                            (click)="updateInventoryStock(product, stockInput.valueAsNumber)">Update</button>
                         </div>
                       </td>
                     </tr>
-                    <tr *ngIf="lowStockProducts.length === 0">
-                      <td colspan="4" class="px-6 py-10 text-center text-sm text-slate-500">No low stock products at the moment.</td>
+                    <tr *ngIf="filteredInventoryProducts.length === 0">
+                      <td colspan="4" class="px-6 py-10 text-center text-sm text-slate-500">No products found in your
+                        inventory.</td>
                     </tr>
                   </tbody>
                 </table>
@@ -398,16 +481,30 @@
           </section>
 
           <section *ngIf="activeSection === 'orders'" class="space-y-6">
-            <article class="rounded-[28px] border border-slate-200/80 bg-white p-5 shadow-[0_18px_50px_rgba(15,23,42,0.08)]">
+            <article
+              class="rounded-[28px] border border-slate-200/80 bg-white p-5 shadow-[0_18px_50px_rgba(15,23,42,0.08)]">
               <div class="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <p class="text-xs font-semibold uppercase tracking-[0.24em] text-violet-700">Orders</p>
                   <h2 class="mt-1 text-xl font-black text-slate-950">Orders management</h2>
                 </div>
-                <span class="rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-600">{{ filteredOrders.length }} results</span>
-              </div>
 
-              <div *ngIf="orderError" class="mt-5 rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm font-medium text-rose-700">{{ orderError }}</div>
+                <div class="flex-1 max-w-sm mx-4">
+                  <div class="relative">
+                    <input type="text" [value]="searchQuery" (input)="onSearchChange($event)"
+                      placeholder="Search orders..." class="dashboard-input !py-2 !pl-10 !rounded-full">
+                    <div class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                      <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8" />
+                        <path d="m21 21-4.3-4.3" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                <span class="rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-600">{{
+                  filteredOrders.length }} results</span>
+              </div>
 
               <div class="mt-5 overflow-hidden rounded-[24px] border border-slate-200">
                 <table class="dashboard-table dashboard-table-compact">
@@ -431,13 +528,16 @@
                         <div class="font-semibold text-slate-950">Customer #{{ order.customerId }}</div>
                         <div class="text-xs text-slate-500">{{ order.address?.city || 'No address yet' }}</div>
                       </td>
-                      <td><span class="status-chip" [ngClass]="'status-' + order.status.toLowerCase()">{{ order.status }}</span></td>
+                      <td><span class="status-chip" [ngClass]="'status-' + order.status.toLowerCase()">{{ order.status
+                          }}</span></td>
                       <td class="font-semibold text-slate-950">${{ order.totalTTC | number:'1.2-2' }}</td>
                       <td class="text-slate-600">{{ order.createdAt | date:'MMM d, y, h:mm a' }}</td>
                       <td>
                         <div class="flex items-center gap-2">
-                          <button type="button" class="text-sm font-semibold text-violet-700 hover:text-violet-900" (click)="openOrderDetails(order)">View</button>
-                          <button type="button" class="text-sm font-semibold text-emerald-700 hover:text-emerald-900" (click)="setOrderStatus(order, 'SHIPPED')">Ship</button>
+                          <button type="button" class="text-sm font-semibold text-violet-700 hover:text-violet-900"
+                            (click)="openOrderDetails(order)">View</button>
+                          <button type="button" class="text-sm font-semibold text-emerald-700 hover:text-emerald-900"
+                            (click)="setOrderStatus(order, 'SHIPPED')">Ship</button>
                         </div>
                       </td>
                     </tr>
@@ -448,24 +548,43 @@
                 </table>
               </div>
 
-              <div class="mt-5 flex items-center justify-between gap-3 rounded-[20px] bg-slate-50 px-4 py-3 text-sm text-slate-600">
+              <div
+                class="mt-5 flex items-center justify-between gap-3 rounded-[20px] bg-slate-50 px-4 py-3 text-sm text-slate-600">
                 <span>Page {{ orderPageIndex + 1 }} of {{ orderPageCount }}</span>
                 <div class="flex items-center gap-2">
-                  <button type="button" class="dashboard-secondary-button" (click)="previousPage('orders')" [disabled]="orderPageIndex === 0">Previous</button>
-                  <button type="button" class="dashboard-secondary-button" (click)="nextPage('orders')" [disabled]="orderPageIndex >= orderPageCount - 1">Next</button>
+                  <button type="button" class="dashboard-secondary-button" (click)="previousPage('orders')"
+                    [disabled]="orderPageIndex === 0">Previous</button>
+                  <button type="button" class="dashboard-secondary-button" (click)="nextPage('orders')"
+                    [disabled]="orderPageIndex >= orderPageCount - 1">Next</button>
                 </div>
               </div>
             </article>
           </section>
 
           <section *ngIf="activeSection === 'customers' && isAdmin(user.role)" class="space-y-6">
-            <article class="rounded-[28px] border border-slate-200/80 bg-white p-5 shadow-[0_18px_50px_rgba(15,23,42,0.08)]">
+            <article
+              class="rounded-[28px] border border-slate-200/80 bg-white p-5 shadow-[0_18px_50px_rgba(15,23,42,0.08)]">
               <div class="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <p class="text-xs font-semibold uppercase tracking-[0.24em] text-violet-700">Customers</p>
                   <h2 class="mt-1 text-xl font-black text-slate-950">Customer directory</h2>
                 </div>
-                <span class="rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-600">{{ customerSummaries.length }} buyers</span>
+
+                <div class="flex-1 max-w-sm mx-4">
+                  <div class="relative">
+                    <input type="text" [value]="searchQuery" (input)="onSearchChange($event)"
+                      placeholder="Search customers..." class="dashboard-input !py-2 !pl-10 !rounded-full">
+                    <div class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                      <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8" />
+                        <path d="m21 21-4.3-4.3" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                <span class="rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-600">{{
+                  customerSummaries.length }} buyers</span>
               </div>
 
               <div class="mt-5 overflow-hidden rounded-[24px] border border-slate-200">
@@ -487,44 +606,56 @@
                       <td class="font-semibold text-slate-950">{{ customer.orderCount }}</td>
                       <td class="font-semibold text-slate-950">${{ customer.lifetimeValue | number:'1.2-2' }}</td>
                       <td class="text-slate-600">{{ customer.lastOrderDate | date:'MMM d, y' }}</td>
-                      <td><span class="status-chip" [ngClass]="'status-' + customer.lastStatus.toLowerCase()">{{ customer.lastStatus }}</span></td>
+                      <td><span class="status-chip" [ngClass]="'status-' + customer.lastStatus.toLowerCase()">{{
+                          customer.lastStatus }}</span></td>
                     </tr>
                     <tr *ngIf="visibleCustomers.length === 0">
-                      <td colspan="6" class="px-6 py-10 text-center text-sm text-slate-500">No customer data available yet.</td>
+                      <td colspan="6" class="px-6 py-10 text-center text-sm text-slate-500">No customer data available
+                        yet.</td>
                     </tr>
                   </tbody>
                 </table>
               </div>
 
-              <div class="mt-5 flex items-center justify-between gap-3 rounded-[20px] bg-slate-50 px-4 py-3 text-sm text-slate-600">
+              <div
+                class="mt-5 flex items-center justify-between gap-3 rounded-[20px] bg-slate-50 px-4 py-3 text-sm text-slate-600">
                 <span>Page {{ customerPageIndex + 1 }} of {{ customerPageCount }}</span>
                 <div class="flex items-center gap-2">
-                  <button type="button" class="dashboard-secondary-button" (click)="previousPage('customers')" [disabled]="customerPageIndex === 0">Previous</button>
-                  <button type="button" class="dashboard-secondary-button" (click)="nextPage('customers')" [disabled]="customerPageIndex >= customerPageCount - 1">Next</button>
+                  <button type="button" class="dashboard-secondary-button" (click)="previousPage('customers')"
+                    [disabled]="customerPageIndex === 0">Previous</button>
+                  <button type="button" class="dashboard-secondary-button" (click)="nextPage('customers')"
+                    [disabled]="customerPageIndex >= customerPageCount - 1">Next</button>
                 </div>
               </div>
             </article>
           </section>
 
-          <section *ngIf="loadingStats || loadingCategories || loadingProducts || loadingOrders" class="rounded-[28px] border border-slate-200/80 bg-white p-5 shadow-[0_18px_50px_rgba(15,23,42,0.08)] text-sm text-slate-500">
+          <section *ngIf="loadingStats || loadingCategories || loadingProducts || loadingOrders"
+            class="rounded-[28px] border border-slate-200/80 bg-white p-5 shadow-[0_18px_50px_rgba(15,23,42,0.08)] text-sm text-slate-500">
             Loading dashboard data...
           </section>
 
-          <section *ngIf="statsError" class="rounded-[28px] border border-rose-200 bg-rose-50 p-4 text-sm font-medium text-rose-700">{{ statsError }}</section>
-          <section *ngIf="successMessage" class="rounded-[28px] border border-emerald-200 bg-emerald-50 p-4 text-sm font-medium text-emerald-700">{{ successMessage }}</section>
+          <section *ngIf="statsError"
+            class="rounded-[28px] border border-rose-200 bg-rose-50 p-4 text-sm font-medium text-rose-700">{{ statsError
+            }}</section>
         </main>
       </div>
 
-      <div *ngIf="selectedOrder" class="fixed inset-0 z-40 flex items-center justify-center bg-slate-950/55 px-4 py-6 backdrop-blur-sm">
-        <div class="w-full max-w-3xl rounded-[32px] border border-slate-200 bg-white p-6 shadow-[0_30px_90px_rgba(15,23,42,0.25)]">
+      <div *ngIf="selectedOrder"
+        class="fixed inset-0 z-40 flex items-center justify-center bg-slate-950/55 px-4 py-6 backdrop-blur-sm">
+        <div
+          class="w-full max-w-3xl rounded-[32px] border border-slate-200 bg-white p-6 shadow-[0_30px_90px_rgba(15,23,42,0.25)]">
           <div class="flex flex-wrap items-start justify-between gap-4">
             <div>
               <p class="text-xs font-semibold uppercase tracking-[0.24em] text-violet-700">Order details</p>
               <h3 class="mt-1 text-2xl font-black text-slate-950">{{ selectedOrder.orderNumber }}</h3>
-              <p class="mt-1 text-sm text-slate-500">Order #{{ selectedOrder.id }} · Customer #{{ selectedOrder.customerId }}</p>
+              <p class="mt-1 text-sm text-slate-500">Order #{{ selectedOrder.id }} · Customer #{{
+                selectedOrder.customerId }}</p>
             </div>
             <button type="button" class="dashboard-icon-button" (click)="closeOrderDetails()">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m6 6 12 12m0-12L6 18"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m6 6 12 12m0-12L6 18" />
+              </svg>
             </button>
           </div>
 
@@ -541,8 +672,9 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr *ngFor="let item of selectedOrder.items">
-                      <td class="font-semibold text-slate-950">{{ item.product?.name || 'Product #' + item.productId }}</td>
+                    <tr *ngFor="let item of (selectedOrder.items || [])">
+                      <td class="font-semibold text-slate-950">{{ item.product?.name || 'Product #' + item.productId }}
+                      </td>
                       <td>{{ item.quantity }}</td>
                       <td>${{ item.unitPrice | number:'1.2-2' }}</td>
                       <td>${{ (item.unitPrice * item.quantity) | number:'1.2-2' }}</td>
@@ -559,12 +691,17 @@
                   <option *ngFor="let status of orderStatuses" [ngValue]="status">{{ status }}</option>
                 </select>
               </div>
-              <button type="button" class="dashboard-primary-button w-full" (click)="updateSelectedOrderStatus()">Save status</button>
+              <button type="button" class="dashboard-primary-button w-full" (click)="updateSelectedOrderStatus()">Save
+                status</button>
               <div class="space-y-2 text-sm text-slate-600">
-                <p><span class="font-semibold text-slate-950">Total:</span> ${{ selectedOrder.totalTTC | number:'1.2-2' }}</p>
-                <p><span class="font-semibold text-slate-950">Shipping:</span> ${{ selectedOrder.shippingFee | number:'1.2-2' }}</p>
-                <p><span class="font-semibold text-slate-950">Discount:</span> ${{ (selectedOrder.discount || 0) | number:'1.2-2' }}</p>
-                <p><span class="font-semibold text-slate-950">Placed:</span> {{ selectedOrder.createdAt | date:'MMM d, y, h:mm a' }}</p>
+                <p><span class="font-semibold text-slate-950">Total:</span> ${{ selectedOrder.totalTTC | number:'1.2-2'
+                  }}</p>
+                <p><span class="font-semibold text-slate-950">Shipping:</span> ${{ selectedOrder.shippingFee |
+                  number:'1.2-2' }}</p>
+                <p><span class="font-semibold text-slate-950">Discount:</span> ${{ (selectedOrder.discount || 0) |
+                  number:'1.2-2' }}</p>
+                <p><span class="font-semibold text-slate-950">Placed:</span> {{ selectedOrder.createdAt | date:'MMM d,
+                  y, h:mm a' }}</p>
               </div>
             </div>
           </div>

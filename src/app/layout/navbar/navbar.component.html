@@ -10,22 +10,17 @@
 
       <!-- Main Navigation -->
       <div class="hidden sm:ml-8 sm:flex sm:space-x-8 items-center h-full">
-        <a routerLink="/" routerLinkActive="border-violet-500 text-gray-900" [routerLinkActiveOptions]="{exact: true}" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors h-full">Home</a>
+
         <a routerLink="/products" routerLinkActive="border-violet-500 text-gray-900" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors h-full">Catalog</a>
         
         <!-- Seller/Admin Management Links -->
+        <!-- Seller/Admin Management Links -->
         <ng-container *ngIf="currentUser$ | async as user">
           <a *ngIf="user.role === 'ADMIN' || user.role === 'SELLER'" 
-             routerLink="/inventory" 
+             routerLink="/dashboard" 
              routerLinkActive="border-violet-500 text-gray-900" 
              class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors h-full">
-            Inventory
-          </a>
-          <a *ngIf="user.role === 'ADMIN' || user.role === 'SELLER'" 
-             routerLink="/categories" 
-             routerLinkActive="border-violet-500 text-gray-900" 
-             class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors h-full">
-            Categories
+            Dashboard
           </a>
         </ng-container>
       </div>
@@ -42,12 +37,22 @@
         </button>
 
         <!-- Cart -->
-        <a routerLink="/cart" class="relative text-gray-400 hover:text-gray-600 transition-colors p-1">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-          </svg>
-          <span class="absolute top-0 right-0 -mt-1 -mr-1 px-1.5 py-0.5 bg-violet-600 text-white text-[10px] font-bold rounded-full border-2 border-white shadow-sm">{{cartItemsCount}}</span>
-        </a>
+        <ng-container *ngIf="currentUser$ | async as user; else guestCart">
+          <a *ngIf="user.role === 'CUSTOMER'" routerLink="/cart" class="relative text-gray-400 hover:text-gray-600 transition-colors p-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+            </svg>
+            <span class="absolute top-0 right-0 -mt-1 -mr-1 px-1.5 py-0.5 bg-violet-600 text-white text-[10px] font-bold rounded-full border-2 border-white shadow-sm">{{cartItemsCount$ | async}}</span>
+          </a>
+        </ng-container>
+        <ng-template #guestCart>
+          <a routerLink="/cart" class="relative text-gray-400 hover:text-gray-600 transition-colors p-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+            </svg>
+            <span class="absolute top-0 right-0 -mt-1 -mr-1 px-1.5 py-0.5 bg-violet-600 text-white text-[10px] font-bold rounded-full border-2 border-white shadow-sm">{{cartItemsCount$ | async}}</span>
+          </a>
+        </ng-template>
 
         <!-- Auth / Profile -->
         <ng-container *ngIf="currentUser$ | async as user; else loginButton">
@@ -63,9 +68,6 @@
             <div class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right border border-gray-50 z-50">
               <a routerLink="/profile" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 font-medium">Profile</a>
               <a routerLink="/orders" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 font-medium">My Orders</a>
-              <a *ngIf="user.role === 'ADMIN' || user.role === 'SELLER'" routerLink="/dashboard" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 font-medium">Dashboard</a>
-              <a *ngIf="user.role === 'ADMIN' || user.role === 'SELLER'" routerLink="/inventory" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 font-medium">Inventory</a>
-              <a *ngIf="user.role === 'ADMIN' || user.role === 'SELLER'" routerLink="/categories" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 font-medium">Categories</a>
               <button (click)="logout()" class="block w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 font-medium">Sign out</button>
             </div>
           </div>

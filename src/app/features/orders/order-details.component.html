@@ -13,14 +13,6 @@
     Loading order details...
   </div>
 
-  <div *ngIf="error" class="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-700 font-medium mb-6">
-    {{ error }}
-  </div>
-
-  <div *ngIf="successMessage" class="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 text-emerald-700 font-medium mb-6">
-    {{ successMessage }}
-  </div>
-
   <div *ngIf="order && !loading" class="space-y-6">
     <!-- Order Info Card -->
     <div class="rounded-3xl border border-gray-100 bg-white p-8 shadow-sm">
@@ -59,7 +51,7 @@
       <h2 class="text-xl font-bold text-gray-900 mb-6">Items</h2>
       
       <div class="space-y-4">
-        <div *ngFor="let item of order.items" class="flex items-center gap-4 p-4 rounded-2xl border border-gray-100">
+        <div *ngFor="let item of (order.items || [])" class="flex items-center gap-4 p-4 rounded-2xl border border-gray-100">
           <div class="h-16 w-16 flex-shrink-0 overflow-hidden rounded-xl bg-gray-100 border border-gray-200">
             <img [src]="item.product?.images?.[0] || 'https://via.placeholder.com/100'" [alt]="item.product?.name" class="h-full w-full object-cover">
           </div>

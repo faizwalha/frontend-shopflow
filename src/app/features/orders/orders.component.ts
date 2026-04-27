@@ -4,6 +4,9 @@ import { RouterModule } from '@angular/router';
 import { OrderService } from '../../core/services/order.service';
 import { Order } from '../../core/models/order.models';
 import { OrderStatusBadgeComponent } from '../../shared/components/order-status-badge/order-status-badge.component';
+import { ToastService } from '../../core/services/toast.service';
+import { ConfirmService } from '../../core/services/confirm.service';
+import { take } from 'rxjs';
 
 @Component({
   selector: 'app-orders',
@@ -13,6 +16,8 @@ import { OrderStatusBadgeComponent } from '../../shared/components/order-status-
 })
 export class OrdersComponent implements OnInit {
   private orderService = inject(OrderService);
+  private toastService = inject(ToastService);
+  private confirmService = inject(ConfirmService);
 
   orders: Order[] = [];
   loading = false;
@@ -34,14 +39,20 @@ export class OrdersComponent implements OnInit {
     this.successMessage = '';
 
     this.orderService.getMyOrders(page, this.pageSize).subscribe({
-      next: (response) => {
-        this.orders = response.content ?? [];
-        this.totalPages = response.totalPages ?? 0;
+      next: (response: any) => {
+        // Handle both paginated (response.content) and simple array responses
+        if (Array.isArray(response)) {
+          this.orders = response;
+          this.totalPages = 1;
+        } else {
+          this.orders = response.content ?? [];
+          this.totalPages = response.totalPages ?? 0;
+        }
         this.currentPage = page;
         this.loading = false;
       },
       error: (err) => {
-        this.error = err?.error?.message || err?.message || 'Unable to load your orders.';
+        this.toastService.error(err?.error?.message || err?.message || 'Unable to load your orders.');
         this.loading = false;
       }
     });
@@ -52,30 +63,34 @@ export class OrdersComponent implements OnInit {
       return;
     }
 
-    if (!confirm(`Cancel order ${order.orderNumber}?`)) {
-      return;
-    }
+    this.confirmService.confirm({
+      title: 'Cancel Order',
+      message: `Are you sure you want to cancel order ${order.orderNumber}?`,
+      confirmText: 'Yes, Cancel',
+      type: 'warning'
+    }).pipe(take(1)).subscribe(confirmed => {
+      if (confirmed) {
+        this.isCancelling = true;
+        this.cancellingOrderId = order.id;
 
-    this.isCancelling = true;
-    this.cancellingOrderId = order.id;
-    this.successMessage = '';
-
-    this.orderService.cancelOrder(order.id).subscribe({
-      next: (updatedOrder) => {
-        this.successMessage = `Order ${updatedOrder.orderNumber} has been cancelled.`;
-        this.orders = this.orders.map((entry) => entry.id === updatedOrder.id ? updatedOrder : entry);
-        this.isCancelling = false;
-        this.cancellingOrderId = null;
-      },
-      error: (err) => {
-        this.error = err?.error?.message || err?.message || 'Unable to cancel the order.';
-        this.isCancelling = false;
-        this.cancellingOrderId = null;
+        this.orderService.cancelOrder(order.id).subscribe({
+          next: (updatedOrder) => {
+            this.toastService.success(`Order ${updatedOrder.orderNumber} has been cancelled.`);
+            this.orders = this.orders.map((entry) => entry.id === updatedOrder.id ? updatedOrder : entry);
+            this.isCancelling = false;
+            this.cancellingOrderId = null;
+          },
+          error: (err) => {
+            this.toastService.error(err?.error?.message || err?.message || 'Unable to cancel the order.');
+            this.isCancelling = false;
+            this.cancellingOrderId = null;
+          }
+        });
       }
     });
   }
 
-  formatCurrency(value: number): string {
-    return value.toFixed(2);
+  formatCurrency(value: number | undefined | null): string {
+    return (value ?? 0).toFixed(2);
   }
 }

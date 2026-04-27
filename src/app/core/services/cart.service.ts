@@ -1,7 +1,8 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, BehaviorSubject, switchMap, tap } from 'rxjs';
+import { Observable, BehaviorSubject, switchMap, tap, of } from 'rxjs';
 import { Cart, CartItem, AddToCartRequest, UpdateCartItemRequest, ApplyCouponRequest } from '../models/cart.models';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'

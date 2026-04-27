@@ -4,10 +4,13 @@ import { RouterModule } from '@angular/router';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { FooterComponent } from '../footer/footer.component';
 
+import { ToastComponent } from '../../shared/components/toast/toast.component';
+import { ConfirmComponent } from '../../shared/components/confirm/confirm.component';
+
 @Component({
   selector: 'app-main-layout',
   standalone: true,
-  imports: [CommonModule, RouterModule, NavbarComponent, FooterComponent],
+  imports: [CommonModule, RouterModule, NavbarComponent, FooterComponent, ToastComponent, ConfirmComponent],
   templateUrl: './main-layout.component.html'
 })
 export class MainLayoutComponent {}

@@ -2,7 +2,8 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
-import { Observable } from 'rxjs';
+import { CartService } from '../../core/services/cart.service';
+import { Observable, map } from 'rxjs';
 
 @Component({
   selector: 'app-navbar',
@@ -12,8 +13,13 @@ import { Observable } from 'rxjs';
 })
 export class NavbarComponent {
   private authService = inject(AuthService);
+  private cartService = inject(CartService);
+  
   currentUser$: Observable<any> = this.authService.currentUser$;
-  cartItemsCount = 0; // In a real app we'd subscribe to CartService
+  
+  cartItemsCount$ = this.cartService.cart$.pipe(
+    map(cart => cart?.items.reduce((acc, item) => acc + item.quantity, 0) ?? 0)
+  );
 
   logout() {
     this.authService.logout();

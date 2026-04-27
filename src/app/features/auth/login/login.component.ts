@@ -4,6 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { LoginRequest } from '../../../core/models/auth.models';
+import { CartService } from '../../../core/services/cart.service';
 
 @Component({
   selector: 'app-login',
@@ -16,6 +17,8 @@ export class LoginComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private cartService = inject(CartService);
+
 
   loginForm = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
@@ -43,7 +46,24 @@ export class LoginComponent {
         }
 
         const role = response.role ?? this.authService.getRole();
-        const targetRoute = role === 'ADMIN' || role === 'SELLER' ? '/dashboard' : '/';
+        const targetRoute = role === 'ADMIN' || role === 'SELLER' ? '/dashboard' : (this.route.snapshot.queryParamMap.get('returnUrl') || '/');
+        
+        // Handle pending cart action
+        const pendingAction = localStorage.getItem('pending_cart_action');
+        if (pendingAction) {
+          try {
+            const action = JSON.parse(pendingAction);
+            localStorage.removeItem('pending_cart_action'); // Clear early to avoid loops
+            this.cartService.addItem(action).subscribe({
+              next: () => this.router.navigateByUrl(targetRoute),
+              error: () => this.router.navigateByUrl(targetRoute)
+            });
+            return;
+          } catch {
+            localStorage.removeItem('pending_cart_action');
+          }
+        }
+
         this.router.navigateByUrl(targetRoute);
       },
       error: (err) => {
