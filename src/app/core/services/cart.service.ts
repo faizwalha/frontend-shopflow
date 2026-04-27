@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, BehaviorSubject, tap } from 'rxjs';
+import { Observable, BehaviorSubject, switchMap, tap } from 'rxjs';
 import { Cart, CartItem, AddToCartRequest, UpdateCartItemRequest, ApplyCouponRequest } from '../models/cart.models';
 
 @Injectable({
@@ -38,14 +38,14 @@ export class CartService {
 
   updateItemQuantity(itemId: number, quantity: number): Observable<Cart> {
     const params = new HttpParams().set('quantity', quantity.toString());
-    return this.http.put<Cart>(`${this.apiUrl}/items/${itemId}`, {}, { params }).pipe(
-      tap(cart => this.cartSubject.next(cart))
+    return this.http.put(`${this.apiUrl}/items/${itemId}`, null, { params, responseType: 'text' }).pipe(
+      switchMap(() => this.getCart())
     );
   }
 
   removeItem(itemId: number): Observable<Cart> {
-    return this.http.delete<Cart>(`${this.apiUrl}/items/${itemId}`).pipe(
-      tap(cart => this.cartSubject.next(cart))
+    return this.http.delete(`${this.apiUrl}/items/${itemId}`, { responseType: 'text' }).pipe(
+      switchMap(() => this.getCart())
     );
   }
 

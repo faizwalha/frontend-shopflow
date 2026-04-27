@@ -27,9 +27,6 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
             return throwError(() => refreshErr);
           })
         );
-      } else if (err.status === 403 && !isAuthEndpoint) {
-        console.warn('Forbidden, logging out...');
-        authService.logout();
       }
 
       const errorMsg = err.error?.message || err.statusText;

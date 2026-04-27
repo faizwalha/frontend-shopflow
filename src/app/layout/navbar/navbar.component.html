@@ -3,27 +3,27 @@
     <div class="flex justify-between h-20 items-center">
       <!-- Logo -->
       <div class="flex-shrink-0 flex items-center">
-        <a routerLink="/" class="text-3xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
+        <a routerLink="/" class="text-3xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-violet-600 to-fuchsia-600">
           ShopFlow
         </a>
       </div>
 
       <!-- Main Navigation -->
       <div class="hidden sm:ml-8 sm:flex sm:space-x-8 items-center h-full">
-        <a routerLink="/" routerLinkActive="border-indigo-500 text-gray-900" [routerLinkActiveOptions]="{exact: true}" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors h-full">Home</a>
-        <a routerLink="/products" routerLinkActive="border-indigo-500 text-gray-900" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors h-full">Catalog</a>
+        <a routerLink="/" routerLinkActive="border-violet-500 text-gray-900" [routerLinkActiveOptions]="{exact: true}" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors h-full">Home</a>
+        <a routerLink="/products" routerLinkActive="border-violet-500 text-gray-900" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors h-full">Catalog</a>
         
         <!-- Seller/Admin Management Links -->
         <ng-container *ngIf="currentUser$ | async as user">
           <a *ngIf="user.role === 'ADMIN' || user.role === 'SELLER'" 
              routerLink="/inventory" 
-             routerLinkActive="border-indigo-500 text-gray-900" 
+             routerLinkActive="border-violet-500 text-gray-900" 
              class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors h-full">
             Inventory
           </a>
           <a *ngIf="user.role === 'ADMIN' || user.role === 'SELLER'" 
              routerLink="/categories" 
-             routerLinkActive="border-indigo-500 text-gray-900" 
+             routerLinkActive="border-violet-500 text-gray-900" 
              class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors h-full">
             Categories
           </a>
@@ -46,7 +46,7 @@
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
           </svg>
-          <span class="absolute top-0 right-0 -mt-1 -mr-1 px-1.5 py-0.5 bg-indigo-600 text-white text-[10px] font-bold rounded-full border-2 border-white shadow-sm">{{cartItemsCount}}</span>
+          <span class="absolute top-0 right-0 -mt-1 -mr-1 px-1.5 py-0.5 bg-violet-600 text-white text-[10px] font-bold rounded-full border-2 border-white shadow-sm">{{cartItemsCount}}</span>
         </a>
 
         <!-- Auth / Profile -->
@@ -54,7 +54,7 @@
           <!-- Profile Dropdown mock -->
           <div class="relative group cursor-pointer">
             <div class="flex items-center gap-2 border border-gray-100 rounded-full py-1 pl-1 pr-3 hover:shadow-md transition-shadow bg-white">
-              <div class="h-8 w-8 rounded-full bg-gradient-to-tr from-purple-500 to-indigo-500 text-white flex items-center justify-center font-bold text-sm shadow-inner">
+              <div class="h-8 w-8 rounded-full bg-gradient-to-tr from-violet-500 to-fuchsia-500 text-white flex items-center justify-center font-bold text-sm shadow-inner">
                 {{ user.role.charAt(0) }}
               </div>
               <span class="text-sm font-semibold text-gray-700 capitalize">{{ user.role.toLowerCase() }}</span>
@@ -72,7 +72,7 @@
         </ng-container>
 
         <ng-template #loginButton>
-          <a routerLink="/login" class="inline-flex items-center justify-center px-5 py-2.5 border border-transparent text-sm font-bold rounded-full text-white bg-black hover:bg-gray-800 transition-all shadow-md hover:shadow-lg focus:ring-4 focus:ring-gray-200">
+          <a routerLink="/login" class="inline-flex items-center justify-center px-5 py-2.5 border border-transparent text-sm font-bold rounded-full text-white bg-violet-600 hover:bg-violet-700 transition-all shadow-md hover:shadow-lg focus:ring-4 focus:ring-violet-200">
             Sign In
           </a>
         </ng-template>

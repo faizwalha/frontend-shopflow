@@ -29,6 +29,7 @@ export interface ProductRequest {
   price: number;
   promoPrice?: number;
   stock: number;
+  active?: boolean;
   images?: string[];
   categoryIds?: number[];
 }

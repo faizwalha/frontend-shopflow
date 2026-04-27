@@ -5,4 +5,5 @@
 /* Custom global styles */
 body {
   @apply bg-gray-50 text-gray-900;
+  background-image: radial-gradient(circle at top, rgba(139, 92, 246, 0.08), transparent 32%);
 }

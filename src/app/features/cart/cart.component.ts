@@ -50,36 +50,71 @@ export class CartComponent implements OnInit, OnDestroy {
     });
   }
 
-  onQuantityChange(itemId: number, event: Event) {
+  onQuantityChange(item: CartItem, event: Event) {
     const value = (event.target as HTMLInputElement)?.valueAsNumber;
-    const quantity = Number.isFinite(value) ? value : 1;
-    this.updateQuantity(itemId, quantity);
+    const quantity = Number.isFinite(value) ? Math.max(1, Math.trunc(value)) : 1;
+    const idCandidates = this.getCartItemIdCandidates(item);
+
+    if (idCandidates.length === 0) {
+      this.errorMessage = 'Invalid cart item identifier';
+      return;
+    }
+
+    this.updateQuantity(item, quantity, idCandidates);
   }
 
-  updateQuantity(itemId: number, quantity: number) {
+  updateQuantity(item: CartItem, quantity: number, idCandidates = this.getCartItemIdCandidates(item)) {
+    const [itemId, ...restCandidates] = idCandidates;
+
+    if (itemId == null) {
+      this.errorMessage = 'Invalid cart item identifier';
+      return;
+    }
+
     if (quantity <= 0) {
-      this.removeItem(itemId);
+      this.removeItemWithCandidates(item, idCandidates);
       return;
     }
 
     this.cartService.updateItemQuantity(itemId, quantity).subscribe({
       next: () => {
+        this.errorMessage = '';
         this.successMessage = 'Quantity updated';
         setTimeout(() => this.successMessage = '', 3000);
       },
       error: (err) => {
+        if (restCandidates.length > 0) {
+          this.updateQuantity(item, quantity, restCandidates);
+          return;
+        }
         this.errorMessage = err?.error?.message || 'Failed to update quantity';
       }
     });
   }
 
-  removeItem(itemId: number) {
+  removeItem(item: CartItem) {
+    this.removeItemWithCandidates(item, this.getCartItemIdCandidates(item));
+  }
+
+  private removeItemWithCandidates(item: CartItem, idCandidates: number[]) {
+    const [itemId, ...restCandidates] = idCandidates;
+
+    if (itemId == null) {
+      this.errorMessage = 'Invalid cart item identifier';
+      return;
+    }
+
     this.cartService.removeItem(itemId).subscribe({
       next: () => {
+        this.errorMessage = '';
         this.successMessage = 'Item removed from cart';
         setTimeout(() => this.successMessage = '', 3000);
       },
       error: (err) => {
+        if (restCandidates.length > 0) {
+          this.removeItemWithCandidates(item, restCandidates);
+          return;
+        }
         this.errorMessage = err?.error?.message || 'Failed to remove item';
       }
     });
@@ -137,8 +172,28 @@ export class CartComponent implements OnInit, OnDestroy {
     this.router.navigate(['/products']);
   }
 
+  getProductName(item: CartItem): string {
+    return item.product?.name || item.productName || 'Product';
+  }
+
+  getUnitPrice(item: CartItem): number {
+    return item.product?.price ?? item.unitPrice ?? item.price ?? 0;
+  }
+
+  getLineTotal(item: CartItem): number {
+    return this.getUnitPrice(item) * item.quantity;
+  }
+
+  getCartItemIdCandidates(item: CartItem): number[] {
+    const candidates = [item.id, item.itemId, item.cartItemId, item.productId]
+      .filter((value): value is number => Number.isFinite(value))
+      .map(value => Number(value));
+
+    return Array.from(new Set(candidates));
+  }
+
   getProductImage(item: CartItem): string {
-    return item.product?.images?.[0] || 'https://via.placeholder.com/100';
+    return item.product?.images?.[0] || item.productImage || item.imageUrl || 'https://via.placeholder.com/100';
   }
 
   ngOnDestroy() {

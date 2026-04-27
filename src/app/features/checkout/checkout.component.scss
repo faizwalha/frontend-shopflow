@@ -1,0 +1,22 @@
+:host {
+	display: block;
+ }
+
+.checkout-shell {
+	position: relative;
+}
+
+.checkout-shell::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+	background:
+		radial-gradient(circle at top left, rgba(99, 102, 241, 0.08), transparent 30%),
+		radial-gradient(circle at top right, rgba(16, 185, 129, 0.06), transparent 28%);
+}
+
+.checkout-shell > * {
+	position: relative;
+	z-index: 1;
+}

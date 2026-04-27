@@ -1,8 +1,15 @@
 export interface CartItem {
   id: number;
+  itemId?: number;
+  cartItemId?: number;
   productId: number;
   variantId?: number | null;
   quantity: number;
+  productName?: string;
+  productImage?: string;
+  imageUrl?: string;
+  unitPrice?: number;
+  price?: number;
   product?: {
     id: number;
     name: string;
