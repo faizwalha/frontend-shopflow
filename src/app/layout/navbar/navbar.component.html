@@ -58,11 +58,19 @@
         <ng-container *ngIf="currentUser$ | async as user; else loginButton">
           <!-- Profile Dropdown mock -->
           <div class="relative group cursor-pointer">
-            <div class="flex items-center gap-2 border border-gray-100 rounded-full py-1 pl-1 pr-3 hover:shadow-md transition-shadow bg-white">
-              <div class="h-8 w-8 rounded-full bg-gradient-to-tr from-violet-500 to-fuchsia-500 text-white flex items-center justify-center font-bold text-sm shadow-inner">
-                {{ user.role.charAt(0) }}
+            <div class="flex items-center gap-2 border border-gray-100 rounded-full py-1.5 pl-1.5 pr-4 hover:shadow-md transition-shadow bg-white">
+              <div class="h-8 w-8 rounded-full overflow-hidden bg-violet-100 text-violet-600 flex items-center justify-center font-bold text-sm shadow-inner ring-2 ring-violet-50">
+                <img *ngIf="user.logo" [src]="user.logo" class="h-full w-full object-cover" 
+                     (error)="user.logo = undefined"
+                     [alt]="user.shopName || user.firstName">
+                <span *ngIf="!user.logo">{{ (user.role === 'SELLER' ? user.shopName : user.firstName)?.charAt(0) || user.role.charAt(0) }}</span>
               </div>
-              <span class="text-sm font-semibold text-gray-700 capitalize">{{ user.role.toLowerCase() }}</span>
+              <div class="flex flex-col">
+                <span class="text-xs font-black text-gray-900 leading-tight">
+                  {{ user.role === 'SELLER' ? (user.shopName || 'Seller') : user.firstName }}
+                </span>
+                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">{{ user.role }}</span>
+              </div>
             </div>
             
             <div class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right border border-gray-50 z-50">

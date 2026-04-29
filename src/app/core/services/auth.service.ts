@@ -19,6 +19,9 @@ export class AuthService {
   private currentUserSubject = new BehaviorSubject<AuthSession | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
   
+  private userProfileSubject = new BehaviorSubject<User | null>(null);
+  public userProfile$ = this.userProfileSubject.asObservable();
+  
   constructor() {
     this.restoreSession();
   }
@@ -40,6 +43,8 @@ export class AuthService {
       role,
       userId: Number.isFinite(userId as number) ? userId : undefined
     });
+
+    this.refreshProfile().subscribe();
   }
 
   private persistSession(response: AuthResponse): void {
@@ -69,13 +74,19 @@ export class AuthService {
 
   login(credentials: LoginRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials).pipe(
-      tap(response => this.persistSession(response))
+      tap(response => {
+        this.persistSession(response);
+        this.refreshProfile().subscribe();
+      })
     );
   }
 
   register(user: RegisterRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/register`, user).pipe(
-      tap(response => this.persistSession(response))
+      tap(response => {
+        this.persistSession(response);
+        this.refreshProfile().subscribe();
+      })
     );
   }
 
@@ -100,6 +111,7 @@ export class AuthService {
     localStorage.removeItem(this.roleKey);
     localStorage.removeItem(this.userIdKey);
     this.currentUserSubject.next(null);
+    this.userProfileSubject.next(null);
     this.router.navigate(['/']);
   }
 
@@ -133,10 +145,30 @@ export class AuthService {
   }
 
   updateProfile(user: Partial<User>): Observable<User> {
-    return this.http.put<User>(`${this.apiUrl}/profile`, user);
+    return this.http.put<User>(`${this.apiUrl}/profile`, user).pipe(
+      tap(updatedUser => this.userProfileSubject.next(updatedUser))
+    );
   }
 
   createSellerProfile(profile: FormData): Observable<SellerProfileResponse> {
-    return this.http.post<SellerProfileResponse>(`/api/seller-profiles`, profile);
+    return this.http.post<SellerProfileResponse>(`/api/seller-profiles`, profile).pipe(
+      tap(response => {
+        const currentUser = this.userProfileSubject.value;
+        if (currentUser) {
+          this.userProfileSubject.next({
+            ...currentUser,
+            shopName: response.shopName,
+            description: response.description,
+            logo: response.logo
+          });
+        }
+      })
+    );
+  }
+
+  refreshProfile(): Observable<User> {
+    return this.getProfile().pipe(
+      tap(user => this.userProfileSubject.next(user))
+    );
   }
 }

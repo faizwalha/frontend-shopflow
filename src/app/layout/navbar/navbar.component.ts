@@ -15,7 +15,7 @@ export class NavbarComponent {
   private authService = inject(AuthService);
   private cartService = inject(CartService);
   
-  currentUser$: Observable<any> = this.authService.currentUser$;
+  currentUser$ = this.authService.userProfile$;
   
   cartItemsCount$ = this.cartService.cart$.pipe(
     map(cart => cart?.items.reduce((acc, item) => acc + item.quantity, 0) ?? 0)
