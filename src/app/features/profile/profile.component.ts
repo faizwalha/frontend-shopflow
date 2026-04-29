@@ -207,6 +207,7 @@ export class ProfileComponent implements OnInit {
 
   private finishUpdate(): void {
     this.isEditing = false;
+    this.authService.refreshProfile().subscribe();
     this.toastService.success('Profil mis à jour avec succès');
   }
 }
