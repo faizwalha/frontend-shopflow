@@ -19,7 +19,10 @@ export class HomeComponent implements OnInit {
   private categoryService = inject(CategoryService);
   private productService = inject(ProductService);
 
+  allFeaturedProducts: Product[] = [];
   featuredProducts: Product[] = [];
+  featuredProductsPageIndex = 0;
+  readonly featuredProductsPageSize = 4;
 
   featuredCategories: CategoryResponse[] = [];
 
@@ -33,10 +36,12 @@ export class HomeComponent implements OnInit {
   ngOnInit(): void {
     this.productService.getTopSellingProducts().subscribe({
       next: (products: ProductResponse[]) => {
-        this.featuredProducts = products.slice(0, 4).map(product => this.mapProduct(product));
+        this.allFeaturedProducts = products.map(product => this.mapProduct(product));
+        this.applyFeaturedProductsPagination();
       },
       error: () => {
-        this.featuredProducts = this.getFallbackProducts();
+        this.allFeaturedProducts = this.getFallbackProducts();
+        this.applyFeaturedProductsPagination();
       }
     });
 
@@ -54,6 +59,33 @@ export class HomeComponent implements OnInit {
     return this.categoryImages[categoryName.toLowerCase()] ?? 'https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=2029&auto=format&fit=crop';
   }
 
+  get featuredProductsPageCount(): number {
+    return Math.max(1, Math.ceil(this.allFeaturedProducts.length / this.featuredProductsPageSize));
+  }
+
+  nextFeaturedProductsPage(): void {
+    if (this.featuredProductsPageIndex < this.featuredProductsPageCount - 1) {
+      this.featuredProductsPageIndex += 1;
+      this.applyFeaturedProductsPagination();
+    }
+  }
+
+  previousFeaturedProductsPage(): void {
+    if (this.featuredProductsPageIndex > 0) {
+      this.featuredProductsPageIndex -= 1;
+      this.applyFeaturedProductsPagination();
+    }
+  }
+
+  goToFeaturedProductsPage(pageIndex: number): void {
+    if (pageIndex < 0 || pageIndex >= this.featuredProductsPageCount) {
+      return;
+    }
+
+    this.featuredProductsPageIndex = pageIndex;
+    this.applyFeaturedProductsPagination();
+  }
+
   private mapProduct(product: ProductResponse): Product {
     return {
       id: product.id,
@@ -65,6 +97,12 @@ export class HomeComponent implements OnInit {
       rating: product.averageRating ?? 0,
       reviewsCount: 0
     };
+  }
+
+  private applyFeaturedProductsPagination(): void {
+    const startIndex = this.featuredProductsPageIndex * this.featuredProductsPageSize;
+    const endIndex = startIndex + this.featuredProductsPageSize;
+    this.featuredProducts = this.allFeaturedProducts.slice(startIndex, endIndex);
   }
 
   private getFallbackProducts(): Product[] {

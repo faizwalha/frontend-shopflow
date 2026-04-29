@@ -32,6 +32,29 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
       <app-product-card *ngFor="let product of featuredProducts" [product]="product"></app-product-card>
     </div>
+
+    <div class="mt-12 flex justify-center" *ngIf="featuredProductsPageCount > 1">
+      <nav class="relative z-0 inline-flex shadow-sm rounded-md bg-white border border-gray-200 p-1">
+        <button (click)="previousFeaturedProductsPage()" [disabled]="featuredProductsPageIndex === 0"
+          class="relative inline-flex items-center px-3 py-2 rounded-l-md bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors disabled:opacity-40">
+          Previous
+        </button>
+        <button *ngFor="let page of [].constructor(featuredProductsPageCount); let index = index"
+          (click)="goToFeaturedProductsPage(index)"
+          [class.bg-indigo-50]="featuredProductsPageIndex === index"
+          [class.text-indigo-600]="featuredProductsPageIndex === index"
+          [class.bg-white]="featuredProductsPageIndex !== index"
+          [class.text-gray-700]="featuredProductsPageIndex !== index"
+          class="relative inline-flex items-center px-4 py-2 text-sm font-semibold hover:bg-gray-50 rounded-md mx-1 transition-colors">
+          {{ index + 1 }}
+        </button>
+        <button (click)="nextFeaturedProductsPage()"
+          [disabled]="featuredProductsPageIndex >= featuredProductsPageCount - 1"
+          class="relative inline-flex items-center px-3 py-2 rounded-r-md bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors disabled:opacity-40">
+          Next
+        </button>
+      </nav>
+    </div>
   </section>
   
   <!-- Categories -->
