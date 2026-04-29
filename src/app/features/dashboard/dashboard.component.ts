@@ -14,7 +14,7 @@ import { ProductRequest, ProductResponse } from '../../core/models/product.model
 import { AdminDashboardResponse, SellerDashboardResponse } from '../../core/models/dashboard.models';
 import { Order, OrderStatus } from '../../core/models/order.models';
 
-type DashboardSection = 'overview' | 'products' | 'categories' | 'inventory' | 'orders' | 'customers';
+type DashboardSection = 'overview' | 'products' | 'categories' | 'customers';
 type ChartPeriod = 'daily' | 'weekly' | 'monthly';
 type NotificationTone = 'info' | 'success' | 'warning';
 
@@ -22,7 +22,7 @@ interface DashboardNavItem {
   section: DashboardSection;
   label: string;
   description: string;
-  icon: 'overview' | 'products' | 'categories' | 'inventory' | 'orders' | 'customers';
+  icon: 'overview' | 'products' | 'categories' | 'customers';
   adminOnly?: boolean;
 }
 
@@ -79,8 +79,6 @@ export class DashboardComponent implements OnInit {
     { section: 'overview', label: 'Overview', description: 'Daily performance snapshot', icon: 'overview' },
     { section: 'products', label: 'Products', description: 'Catalog and merchandising', icon: 'products' },
     { section: 'categories', label: 'Categories', description: 'Collection structure', icon: 'categories', adminOnly: true },
-    { section: 'inventory', label: 'Inventory', description: 'Stock health and alerts', icon: 'inventory' },
-    { section: 'orders', label: 'Orders', description: 'Fulfillment workflow', icon: 'orders' },
     { section: 'customers', label: 'Customers', description: 'Buyer activity summary', icon: 'customers', adminOnly: true }
   ];
 
@@ -98,14 +96,6 @@ export class DashboardComponent implements OnInit {
     categories: {
       title: 'Category Management',
       description: 'Keep the catalog structure clean and easy to navigate.'
-    },
-    inventory: {
-      title: 'Inventory Management',
-      description: 'Monitor stock levels and update quantities quickly.'
-    },
-    orders: {
-      title: 'Orders Management',
-      description: 'Review orders, update statuses, and inspect order details.'
     },
     customers: {
       title: 'Customers',
@@ -198,7 +188,6 @@ export class DashboardComponent implements OnInit {
         this.loadStats();
         this.loadCategories();
         this.loadProducts();
-        this.loadOrders();
       } else if (user && user.role === 'CUSTOMER') {
         // For customers, we might only want to load their stats or orders if the dashboard is used as profile
         this.loadCustomerData();
@@ -597,7 +586,6 @@ export class DashboardComponent implements OnInit {
   openOrderDetails(order: Order): void {
     this.selectedOrder = order;
     this.selectedOrderStatus = order.status;
-    this.activeSection = 'orders';
     this.isNotificationsOpen = false;
   }
 

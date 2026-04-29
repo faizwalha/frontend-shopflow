@@ -74,8 +74,8 @@
             </div>
             
             <div class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right border border-gray-50 z-50">
-              <a routerLink="/profile" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 font-medium">Profile</a>
-              <a routerLink="/orders" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 font-medium">My Orders</a>
+              <a *ngIf="user.role !== 'ADMIN'" routerLink="/profile" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 font-medium">Profile</a>
+              <a *ngIf="user.role !== 'ADMIN'" routerLink="/orders" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 font-medium">My Orders</a>
               <button (click)="logout()" class="block w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 font-medium">Sign out</button>
             </div>
           </div>
