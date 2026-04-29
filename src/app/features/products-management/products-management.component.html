@@ -100,8 +100,8 @@
               <span class="px-4 py-1.5 rounded-full bg-indigo-50 text-indigo-600 text-xs font-bold">{{product.categories[0] || 'None'}}</span>
             </td>
             <td class="px-8 py-6">
-              <span class="font-bold text-gray-900">${{product.displayPrice}}</span>
-              <span *ngIf="product.promoPrice" class="ml-2 text-xs line-through text-gray-400">${{product.price}}</span>
+              <span class="font-bold text-gray-900">${{ product.promoPrice || product.price }}</span>
+              <span *ngIf="product.promoPrice" class="ml-2 text-xs line-through text-gray-400">(${{ product.price }})</span>
             </td>
             <td class="px-8 py-6">
               <span [class.text-red-500]="product.stock < 5" class="font-bold text-gray-900">{{product.stock}} units</span>

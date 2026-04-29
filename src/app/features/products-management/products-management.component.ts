@@ -117,11 +117,21 @@ export class ProductsManagementComponent implements OnInit {
       : this.productService.createProduct(payload);
 
     request$.subscribe({
-      next: () => {
+      next: (updatedProduct: ProductResponse) => {
         this.successMessage = `Product ${this.selectedProduct ? 'updated' : 'created'} successfully!`;
         this.submitting = false;
         this.showForm = false;
-        this.loadData();
+        
+        if (this.selectedProduct) {
+          // Mettre à jour l'objet localement pour un affichage immédiat
+          const index = this.products.findIndex(p => p.id === updatedProduct.id);
+          if (index !== -1) {
+            this.products[index] = updatedProduct;
+          }
+        } else {
+          this.loadData();
+        }
+        
         setTimeout(() => this.successMessage = '', 3000);
       },
       error: (err) => {
