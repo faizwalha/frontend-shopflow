@@ -18,15 +18,16 @@
 
 
             <nav class="mt-6 space-y-2">
-              <button *ngFor="let item of navItems" type="button" class="dashboard-nav-item"
-                [class.dashboard-nav-item-active]="activeSection === item.section"
-                [class.dashboard-nav-item-disabled]="item.adminOnly && !isAdmin(user.role)"
-                [disabled]="item.adminOnly && !isAdmin(user.role)" (click)="setActiveSection(item.section)">
-                <div class="flex flex-1 flex-col items-start">
-                  <span class="text-sm font-semibold text-slate-950">{{ item.label }}</span>
-                  <span class="text-xs text-slate-500">{{ item.description }}</span>
-                </div>
-              </button>
+              <ng-container *ngFor="let item of navItems">
+                <button *ngIf="!item.adminOnly || isAdmin(user.role)" type="button" class="dashboard-nav-item"
+                  [class.dashboard-nav-item-active]="activeSection === item.section"
+                  (click)="setActiveSection(item.section)">
+                  <div class="flex flex-1 flex-col items-start">
+                    <span class="text-sm font-semibold text-slate-950">{{ item.label }}</span>
+                    <span class="text-xs text-slate-500">{{ item.description }}</span>
+                  </div>
+                </button>
+              </ng-container>
             </nav>
           </div>
         </aside>

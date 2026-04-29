@@ -78,7 +78,7 @@ export class DashboardComponent implements OnInit {
   readonly navItems: DashboardNavItem[] = [
     { section: 'overview', label: 'Overview', description: 'Daily performance snapshot', icon: 'overview' },
     { section: 'products', label: 'Products', description: 'Catalog and merchandising', icon: 'products' },
-    { section: 'categories', label: 'Categories', description: 'Collection structure', icon: 'categories' },
+    { section: 'categories', label: 'Categories', description: 'Collection structure', icon: 'categories', adminOnly: true },
     { section: 'inventory', label: 'Inventory', description: 'Stock health and alerts', icon: 'inventory' },
     { section: 'orders', label: 'Orders', description: 'Fulfillment workflow', icon: 'orders' },
     { section: 'customers', label: 'Customers', description: 'Buyer activity summary', icon: 'customers', adminOnly: true }

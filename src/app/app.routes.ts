@@ -67,7 +67,7 @@ export const routes: Routes = [
       {
         path: 'categories',
         canActivate: [authGuard, roleGuard],
-        data: { expectedRoles: ['SELLER', 'ADMIN'] },
+        data: { expectedRoles: ['ADMIN'] },
         loadComponent: () => import('./features/categories/categories.component').then(c => c.CategoriesComponent),
         title: 'Manage Categories - ShopFlow'
       },
