@@ -1,100 +1,245 @@
 <div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
   <div class="max-w-4xl mx-auto">
-    <!-- Header/Banner Profile -->
-
-
     <!-- Main Content -->
     <div class="grid grid-cols-1 gap-8">
       <div class="bg-white rounded-[32px] border border-gray-100 p-6 sm:p-8 shadow-[0_18px_50px_rgba(15,23,42,0.08)] backdrop-blur-xl">
-        <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-50">
-          <h2 class="text-xl font-black text-slate-950 tracking-tight">Personal Information</h2>
-        </div>
-
+        
         <div *ngIf="isLoading" class="py-12 flex flex-col items-center justify-center">
           <div class="inline-block animate-spin rounded-full h-10 w-10 border-t-4 border-b-4 border-indigo-600 mb-4"></div>
           <p class="text-slate-500 font-bold animate-pulse">Synchronizing your details...</p>
         </div>
 
-        <form *ngIf="!isLoading" [formGroup]="profileForm" (ngSubmit)="onSubmit()">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
-            <!-- First Name -->
-            <div class="space-y-1.5">
-              <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">First Name</label>
-              <input type="text" formControlName="firstName" 
-                     [readonly]="!isEditing"
-                     class="w-full px-5 py-3 rounded-xl border-2 transition-all duration-200 outline-none font-bold text-sm"
-                     [ngClass]="isEditing ? 'border-indigo-100 focus:border-indigo-500 bg-white' : 'border-transparent bg-gray-50 text-slate-600'">
+        <div *ngIf="!isLoading">
+          <!-- Main Profile Form (Personal + Shop) -->
+          <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+            <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-50">
+              <h2 class="text-xl font-black text-slate-950 tracking-tight">Personal Information</h2>
             </div>
 
-            <!-- Last Name -->
-            <div class="space-y-1.5">
-              <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Last Name</label>
-              <input type="text" formControlName="lastName" 
-                     [readonly]="!isEditing"
-                     class="w-full px-5 py-3 rounded-xl border-2 transition-all duration-200 outline-none font-bold text-sm"
-                     [ngClass]="isEditing ? 'border-indigo-100 focus:border-indigo-500 bg-white' : 'border-transparent bg-gray-50 text-slate-600'">
-            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6 mb-10">
+              <!-- First Name -->
+              <div class="space-y-1.5">
+                <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">First Name</label>
+                <input type="text" formControlName="firstName" 
+                       [readonly]="!isEditing"
+                       class="w-full px-5 py-3 rounded-xl border-2 transition-all duration-200 outline-none font-bold text-sm"
+                       [ngClass]="isEditing ? 'border-indigo-100 focus:border-indigo-500 bg-white' : 'border-transparent bg-gray-50 text-slate-600'">
+              </div>
 
-            <!-- Email (Permanent) -->
-            <div class="md:col-span-2 space-y-1.5">
-              <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Email Address</label>
-              <div class="relative group">
-                <input type="email" formControlName="email" 
-                       class="w-full px-5 py-3 rounded-xl border-2 border-transparent bg-gray-100 text-slate-400 font-bold text-sm cursor-not-allowed">
-                <div class="absolute right-5 top-1/2 -translate-y-1/2 text-slate-300">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
-                  </svg>
+              <!-- Last Name -->
+              <div class="space-y-1.5">
+                <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Last Name</label>
+                <input type="text" formControlName="lastName" 
+                       [readonly]="!isEditing"
+                       class="w-full px-5 py-3 rounded-xl border-2 transition-all duration-200 outline-none font-bold text-sm"
+                       [ngClass]="isEditing ? 'border-indigo-100 focus:border-indigo-500 bg-white' : 'border-transparent bg-gray-50 text-slate-600'">
+              </div>
+
+              <!-- Email (Permanent) -->
+              <div class="md:col-span-2 space-y-1.5">
+                <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Email Address</label>
+                <div class="relative group">
+                  <input type="email" formControlName="email" 
+                         class="w-full px-5 py-3 rounded-xl border-2 border-transparent bg-gray-100 text-slate-400 font-bold text-sm cursor-not-allowed">
+                  <div class="absolute right-5 top-1/2 -translate-y-1/2 text-slate-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <!-- Phone Number -->
-            <div class="space-y-1.5">
-              <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Phone Number</label>
-              <input type="text" formControlName="phoneNumber" 
-                     [readonly]="!isEditing"
-                     placeholder="Not provided"
-                     class="w-full px-5 py-3 rounded-xl border-2 transition-all duration-200 outline-none font-bold text-sm placeholder:text-gray-300 placeholder:font-medium"
-                     [ngClass]="isEditing ? 'border-indigo-100 focus:border-indigo-500 bg-white' : 'border-transparent bg-gray-50 text-slate-600'">
+            <!-- Seller Specific Information -->
+            <div *ngIf="user?.role === 'SELLER'" class="mt-10 pt-10 border-t border-gray-100 mb-10">
+              <div class="flex items-center gap-3 mb-6">
+                <div class="p-2 bg-amber-50 rounded-lg">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-600" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 100-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
+                  </svg>
+                </div>
+                <h3 class="text-lg font-black text-slate-950 tracking-tight">Shop Information</h3>
+                <div *ngIf="user?.rating" class="ml-auto flex items-center gap-1 bg-amber-50 px-3 py-1 rounded-full">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-amber-500" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                  <span class="text-amber-700 text-xs font-bold">{{user?.rating}}</span>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Logo Section -->
+                <div class="flex flex-col items-center gap-4">
+                  <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400">Shop Logo</label>
+                  <div class="relative group">
+                    <div class="h-32 w-32 rounded-3xl overflow-hidden border-4 border-gray-50 shadow-inner bg-gray-50 flex items-center justify-center">
+                      <img *ngIf="user?.logo" [src]="user?.logo" class="h-full w-full object-cover">
+                      <div *ngIf="!user?.logo" class="flex flex-col items-center text-slate-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                    </div>
+                    <button type="button" *ngIf="isEditing" (click)="logoInput.click()"
+                            class="absolute -bottom-2 -right-2 bg-indigo-600 text-white p-2.5 rounded-2xl shadow-lg hover:bg-indigo-700 transition-transform hover:scale-110">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                      </svg>
+                    </button>
+                    <input #logoInput type="file" class="hidden" (change)="onFileSelected($event)" accept="image/*">
+                  </div>
+                </div>
+
+                <!-- Shop Details -->
+                <div class="md:col-span-3 space-y-6">
+                  <div class="space-y-1.5">
+                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Shop Name</label>
+                    <input type="text" formControlName="shopName" 
+                           [readonly]="!isEditing"
+                           placeholder="Your shop name"
+                           class="w-full px-5 py-3 rounded-xl border-2 transition-all duration-200 outline-none font-bold text-sm"
+                           [ngClass]="isEditing ? 'border-indigo-100 focus:border-indigo-500 bg-white' : 'border-transparent bg-gray-50 text-slate-600'">
+                  </div>
+
+                  <div class="space-y-1.5">
+                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Shop Description</label>
+                    <textarea formControlName="description" 
+                              [readonly]="!isEditing"
+                              rows="4"
+                              placeholder="Tell customers about your shop..."
+                              class="w-full px-5 py-3 rounded-xl border-2 transition-all duration-200 outline-none font-bold text-sm resize-none"
+                              [ngClass]="isEditing ? 'border-indigo-100 focus:border-indigo-500 bg-white' : 'border-transparent bg-gray-50 text-slate-600'"></textarea>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <!-- Address -->
-            <div class="md:col-span-2 space-y-1.5">
-              <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Shipping Address</label>
-              <textarea formControlName="address" 
-                        [readonly]="!isEditing"
-                        rows="3"
-                        placeholder="Provide your full delivery address"
-                        class="w-full px-5 py-3 rounded-xl border-2 transition-all duration-200 outline-none font-bold text-sm resize-none placeholder:text-gray-300 placeholder:font-medium"
-                        [ngClass]="isEditing ? 'border-indigo-100 focus:border-indigo-500 bg-white' : 'border-transparent bg-gray-50 text-slate-600'"></textarea>
+            <!-- Action Buttons for Profile -->
+            <div class="mt-8 flex flex-col sm:flex-row justify-end gap-4 pt-6 border-t border-gray-50">
+              <button type="button" *ngIf="!isEditing" (click)="toggleEdit()"
+                      class="bg-indigo-600 hover:bg-indigo-700 text-white px-10 py-3.5 rounded-full font-bold text-base transition duration-300 shadow-xl shadow-indigo-100 flex items-center justify-center">
+                Edit Profile
+              </button>
+
+              <ng-container *ngIf="isEditing">
+                <button type="button" (click)="toggleEdit()"
+                        class="order-2 sm:order-1 px-8 py-3 rounded-full font-black text-slate-500 hover:bg-gray-100 transition-all border border-transparent">
+                  Discard Changes
+                </button>
+                <button type="submit" [disabled]="profileForm.invalid"
+                        class="order-1 sm:order-2 bg-green-600 hover:bg-green-700 text-white px-10 py-3 rounded-full font-black transition duration-300 shadow-xl shadow-green-100 disabled:opacity-50 disabled:shadow-none flex items-center justify-center gap-2">
+                   Save Profile
+                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                   </svg>
+                </button>
+              </ng-container>
+            </div>
+          </form>
+
+          <!-- Address Management Section (Outside main form to avoid nesting) -->
+          <div class="mt-10 pt-10 border-t border-gray-100">
+            <div class="flex items-center justify-between mb-6">
+              <div class="flex items-center gap-3">
+                <div class="p-2 bg-indigo-50 rounded-lg">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+                <h3 class="text-lg font-black text-slate-950 tracking-tight">Addresses</h3>
+              </div>
+              <button type="button" *ngIf="!showAddressForm" (click)="toggleAddressForm()"
+                      class="text-indigo-600 hover:text-indigo-700 font-bold text-sm flex items-center gap-2 group">
+                <span class="w-6 h-6 rounded-full bg-indigo-50 flex items-center justify-center group-hover:bg-indigo-100 transition-colors">+</span>
+                Add Address
+              </button>
+            </div>
+
+            <!-- Address Form (Inline) -->
+            <div *ngIf="showAddressForm" class="bg-gray-50 rounded-2xl p-6 mb-8 border-2 border-dashed border-gray-200">
+              <form [formGroup]="addressForm" (ngSubmit)="saveAddress()" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div class="space-y-1.5 md:col-span-2">
+                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Street</label>
+                    <input type="text" formControlName="street" placeholder="e.g. 123 Main St"
+                           class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-indigo-500 outline-none font-bold text-sm bg-white">
+                  </div>
+                  <div class="space-y-1.5">
+                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">City</label>
+                    <input type="text" formControlName="city" placeholder="e.g. Tunis"
+                           class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-indigo-500 outline-none font-bold text-sm bg-white">
+                  </div>
+                  <div class="space-y-1.5">
+                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Postal Code</label>
+                    <input type="text" formControlName="postalCode" placeholder="e.g. 1000"
+                           class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-indigo-500 outline-none font-bold text-sm bg-white">
+                  </div>
+                  <div class="space-y-1.5">
+                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Country</label>
+                    <input type="text" formControlName="country" 
+                           class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-indigo-500 outline-none font-bold text-sm bg-white">
+                  </div>
+                  <div class="flex items-center gap-3 py-2">
+                    <input type="checkbox" formControlName="defaultAddress" id="isDefault" class="w-4 h-4 text-indigo-600 rounded">
+                    <label for="isDefault" class="text-sm font-bold text-slate-600 cursor-pointer">Set as principal address</label>
+                  </div>
+                </div>
+                <div class="flex justify-end gap-3 pt-4">
+                  <button type="button" (click)="cancelAddressEdit()" 
+                          class="px-6 py-2 rounded-xl text-sm font-black text-slate-500 hover:bg-gray-100 transition-colors">
+                    Cancel
+                  </button>
+                  <button type="submit" [disabled]="addressForm.invalid"
+                          class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-xl font-black text-sm transition-all shadow-lg shadow-indigo-100">
+                    {{ editingAddressId ? 'Update' : 'Add' }} Address
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Address List -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div *ngFor="let addr of user?.addresses" 
+                   class="relative bg-white border-2 rounded-2xl p-5 transition-all duration-300 group"
+                   [ngClass]="addr.defaultAddress ? 'border-indigo-600 shadow-xl shadow-indigo-50' : 'border-gray-100 hover:border-indigo-100'">
+                
+                <div *ngIf="addr.defaultAddress" 
+                     class="absolute -top-3 left-4 bg-indigo-600 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
+                  Principal
+                </div>
+
+                <div class="space-y-1">
+                  <p class="font-black text-slate-900 text-sm">{{addr.street}}</p>
+                  <p class="text-slate-500 font-bold text-xs">{{addr.city}}, {{addr.postalCode}}</p>
+                  <p class="text-slate-400 font-bold text-[10px] uppercase tracking-widest">{{addr.country}}</p>
+                </div>
+
+                <div class="mt-4 pt-4 border-t border-gray-50 flex items-center justify-between">
+                  <div class="flex gap-3">
+                    <button type="button" (click)="toggleAddressForm(addr)" class="text-indigo-600 hover:text-indigo-800 text-xs font-black">Edit</button>
+                    <button type="button" (click)="deleteAddress(addr.id)" class="text-rose-500 hover:text-rose-700 text-xs font-black">Delete</button>
+                  </div>
+                  <button type="button" *ngIf="!addr.defaultAddress" (click)="setAsPrincipal(addr.id)"
+                          class="bg-gray-50 hover:bg-indigo-600 hover:text-white text-slate-500 px-3 py-1.5 rounded-lg text-[10px] font-black transition-all duration-300">
+                    Set Principal
+                  </button>
+                </div>
+              </div>
+
+              <!-- Empty State -->
+              <div *ngIf="!user?.addresses?.length && !showAddressForm" 
+                   class="sm:col-span-2 py-12 flex flex-col items-center justify-center text-slate-400">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-3 opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <p class="font-bold text-sm">No addresses found</p>
+                <button type="button" (click)="toggleAddressForm()" class="mt-4 text-indigo-600 font-black text-xs hover:underline">Add your first address</button>
+              </div>
             </div>
           </div>
-
-          <!-- Action Buttons -->
-          <div class="mt-8 flex flex-col sm:flex-row justify-end gap-4 pt-6 border-t border-gray-50">
-            <button type="button" *ngIf="!isEditing" (click)="toggleEdit()"
-                    class="bg-indigo-600 hover:bg-indigo-700 text-white px-10 py-3.5 rounded-full font-bold text-base transition duration-300 shadow-xl shadow-indigo-100 flex items-center justify-center">
-              Edit Profile
-            </button>
-
-            <ng-container *ngIf="isEditing">
-              <button type="button" (click)="toggleEdit()"
-                      class="order-2 sm:order-1 px-8 py-3 rounded-full font-black text-slate-500 hover:bg-gray-100 transition-all border border-transparent">
-                Discard Changes
-              </button>
-              <button type="submit" [disabled]="profileForm.invalid"
-                      class="order-1 sm:order-2 bg-green-600 hover:bg-green-700 text-white px-10 py-3 rounded-full font-black transition duration-300 shadow-xl shadow-green-100 disabled:opacity-50 disabled:shadow-none flex items-center justify-center gap-2">
-                 Save Profile
-                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                   <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                 </svg>
-              </button>
-            </ng-container>
-          </div>
-        </form>
-      </div>
-
         </div>
+      </div>
+    </div>
   </div>
 </div>

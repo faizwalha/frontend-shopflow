@@ -68,7 +68,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     this.addressService.getAddresses().subscribe({
       next: (addresses) => {
         this.addresses = addresses;
-        const defaultAddress = addresses.find(a => a.isDefault);
+        const defaultAddress = addresses.find(a => a.defaultAddress);
         if (defaultAddress) {
           this.selectedAddressId = defaultAddress.id;
         }
