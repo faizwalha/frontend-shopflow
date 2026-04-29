@@ -36,3 +36,15 @@ export interface User {
   phoneNumber?: string;
   address?: string;
 }
+
+export interface SellerProfileRequest {
+  shopName: string;
+  description: string;
+  logo?: string;
+  userId?: number;
+}
+
+export interface SellerProfileResponse extends SellerProfileRequest {
+  id: number;
+  rating: number;
+}

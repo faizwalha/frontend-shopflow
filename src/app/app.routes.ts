@@ -47,6 +47,12 @@ export const routes: Routes = [
         title: 'Profile - ShopFlow'
       },
       {
+        path: 'seller-setup',
+        canActivate: [authGuard],
+        loadComponent: () => import('./features/auth/seller-setup/seller-setup.component').then(c => c.SellerSetupComponent),
+        title: 'Seller Setup - ShopFlow'
+      },
+      {
         path: 'orders',
         canActivate: [authGuard],
         loadComponent: () => import('./features/orders/orders.component').then(c => c.OrdersComponent),

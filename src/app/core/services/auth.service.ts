@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';
-import { AuthResponse, AuthSession, LoginRequest, RegisterRequest, User } from '../models/auth.models';
+import { AuthResponse, AuthSession, LoginRequest, RegisterRequest, User, SellerProfileResponse } from '../models/auth.models';
 
 @Injectable({
   providedIn: 'root'
@@ -134,5 +134,9 @@ export class AuthService {
 
   updateProfile(user: Partial<User>): Observable<User> {
     return this.http.put<User>(`${this.apiUrl}/profile`, user);
+  }
+
+  createSellerProfile(profile: FormData): Observable<SellerProfileResponse> {
+    return this.http.post<SellerProfileResponse>(`/api/seller-profiles`, profile);
   }
 }

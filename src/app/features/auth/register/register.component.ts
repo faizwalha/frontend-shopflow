@@ -41,8 +41,12 @@ export class RegisterComponent {
     this.authService.register(payload).subscribe({
       next: (response) => {
         this.isLoading = false;
-        const targetRoute = response.role === 'ADMIN' || response.role === 'SELLER' ? '/dashboard' : '/';
-        this.router.navigate([targetRoute]);
+        if (response.role === 'SELLER') {
+          this.router.navigate(['/seller-setup']);
+        } else {
+          const targetRoute = response.role === 'ADMIN' ? '/dashboard' : '/';
+          this.router.navigate([targetRoute]);
+        }
       },
       error: (err) => {
         this.isLoading = false;

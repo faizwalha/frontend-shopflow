@@ -1,0 +1,59 @@
+<div class="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-md w-full space-y-8 bg-white p-10 rounded-[32px] shadow-[0_18px_50px_rgba(15,23,42,0.08)] border border-gray-100">
+    <div class="text-center">
+      <div class="mx-auto h-16 w-16 rounded-2xl bg-gradient-to-tr from-violet-600 to-fuchsia-600 flex items-center justify-center text-white shadow-lg shadow-violet-200 mb-6">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+        </svg>
+      </div>
+      <h2 class="text-3xl font-black text-gray-900 tracking-tight">Setup Your Shop</h2>
+      <p class="mt-2 text-sm text-slate-500 font-medium italic">Final step to start selling on ShopFlow</p>
+    </div>
+
+    <form class="mt-8 space-y-6" [formGroup]="sellerForm" (ngSubmit)="onSubmit()">
+      <div *ngIf="errorMessage" class="p-4 bg-red-50 text-red-600 rounded-2xl text-sm font-bold border border-red-100">
+        {{ errorMessage }}
+      </div>
+
+      <div class="space-y-5">
+        <div>
+          <label class="block text-xs font-black uppercase tracking-widest text-slate-400 ml-1 mb-2">Shop Name</label>
+          <input formControlName="shopName" type="text" required
+                 class="w-full px-6 py-4 rounded-2xl border-2 border-gray-50 bg-gray-50 focus:bg-white focus:border-indigo-500 transition-all duration-200 outline-none font-bold text-sm"
+                 placeholder="Enter your business name">
+        </div>
+
+        <div>
+          <label class="block text-xs font-black uppercase tracking-widest text-slate-400 ml-1 mb-2">Description</label>
+          <textarea formControlName="description" rows="4"
+                    class="w-full px-6 py-4 rounded-2xl border-2 border-gray-50 bg-gray-50 focus:bg-white focus:border-indigo-500 transition-all duration-200 outline-none font-bold text-sm resize-none"
+                    placeholder="Tell customers about your products..."></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-black uppercase tracking-widest text-slate-400 ml-1 mb-2">Logo File</label>
+          <label class="w-full flex items-center justify-between gap-3 px-6 py-4 rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50 hover:bg-white hover:border-indigo-500 transition-all duration-200 cursor-pointer">
+            <span class="text-sm font-bold text-slate-600 truncate">{{ logoFileName }}</span>
+            <span class="shrink-0 px-4 py-2 rounded-full bg-indigo-600 text-white text-xs font-black tracking-wide">Browse</span>
+            <input type="file" accept="image/*" class="hidden" (change)="onLogoSelected($event)">
+          </label>
+          <p class="mt-2 text-xs text-slate-400 ml-1">The selected file is uploaded directly and stored as a server-side path.</p>
+        </div>
+      </div>
+
+      <div>
+        <button type="submit" [disabled]="sellerForm.invalid || isLoading"
+                class="group relative w-full flex justify-center py-4 px-4 border border-transparent text-sm font-black rounded-full text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-200 transition-all shadow-xl shadow-indigo-100 disabled:opacity-50">
+          <span *ngIf="!isLoading">Complete Setup</span>
+          <span *ngIf="isLoading" class="flex items-center gap-2">
+            <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Finalizing...
+          </span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
