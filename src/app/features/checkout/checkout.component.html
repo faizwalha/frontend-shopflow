@@ -75,7 +75,7 @@
                   <div class="min-w-0 flex-1">
                     <div class="flex flex-wrap items-center gap-2">
                       <p class="font-semibold text-slate-900">{{ address.street }}</p>
-                      <span *ngIf="address.isDefault" class="rounded-full bg-emerald-100 px-2.5 py-1 text-[11px] font-semibold text-emerald-700">Default</span>
+                      <span *ngIf="address.defaultAddress" class="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-600">Default</span>
                     </div>
                     <p class="mt-1 text-sm text-slate-500">{{ address.city }}, {{ address.postalCode }}, {{ address.country }}</p>
                   </div>

@@ -4,7 +4,7 @@ export interface Address {
   city: string;
   postalCode: string;
   country: string;
-  isDefault: boolean;
+  defaultAddress: boolean;
   createdAt?: string;
 }
 
@@ -13,6 +13,7 @@ export interface AddressRequest {
   city: string;
   postalCode: string;
   country: string;
+  defaultAddress?: boolean;
 }
 
 export interface AddressResponse extends Address {}

@@ -1,3 +1,5 @@
+import { Address } from './address.models';
+
 export interface AuthResponse {
   accessToken?: string;
   refreshToken?: string;
@@ -33,8 +35,12 @@ export interface User {
   firstName: string;
   lastName: string;
   role: 'ADMIN' | 'SELLER' | 'CUSTOMER';
-  phoneNumber?: string;
   address?: string;
+  shopName?: string;
+  description?: string;
+  logo?: string;
+  rating?: number;
+  addresses?: Address[];
 }
 
 export interface SellerProfileRequest {
