@@ -19,10 +19,13 @@ export class CatalogComponent implements OnInit {
   private categoryService = inject(CategoryService);
   private productService = inject(ProductService);
 
+  private allLoadedProducts: Product[] = [];
   filteredProducts: Product[] = [];
   categories: string[] = ['All'];
   selectedCategory = 'All';
   searchQuery = '';
+  selectedSort = 'latest';
+  selectedPriceMax = 1000;
   loadingCategories = false;
   categoryError = '';
   loadingProducts = false;
@@ -103,7 +106,8 @@ export class CatalogComponent implements OnInit {
         this.totalPages = page.totalPages ?? 0;
         this.pageNumbers = Array.from({ length: this.totalPages }, (_, index) => index);
         this.totalElements = page.totalElements ?? products.length;
-        this.filteredProducts = this.applyLocalCategoryFilter(products.map(product => this.mapProduct(product)));
+        this.allLoadedProducts = products.map(product => this.mapProduct(product));
+        this.applyFilters();
         this.loadingProducts = false;
       },
       error: () => {
@@ -136,6 +140,34 @@ export class CatalogComponent implements OnInit {
   }
 
   applyFilters() {
-    this.loadProducts();
+    const categoryFiltered = this.applyLocalCategoryFilter(this.allLoadedProducts);
+    const priceFiltered = categoryFiltered.filter(product => product.price <= this.selectedPriceMax);
+
+    const sorted = [...priceFiltered].sort((left, right) => {
+      switch (this.selectedSort) {
+        case 'price-asc':
+          return left.price - right.price;
+        case 'price-desc':
+          return right.price - left.price;
+        case 'rating-desc':
+          return right.rating - left.rating;
+        case 'latest':
+        default:
+          return 0;
+      }
+    });
+
+    this.filteredProducts = sorted;
+  }
+
+  onPriceRangeChange(event: Event): void {
+    const value = Number((event.target as HTMLInputElement).value);
+    this.selectedPriceMax = Number.isFinite(value) ? value : 1000;
+    this.applyFilters();
+  }
+
+  onSortChange(event: Event): void {
+    this.selectedSort = (event.target as HTMLSelectElement).value || 'latest';
+    this.applyFilters();
   }
 }
