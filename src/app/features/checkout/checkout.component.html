@@ -43,10 +43,18 @@
               <p class="mt-1 text-sm text-slate-500">Choose an existing address or add a new one.</p>
             </div>
 
-            <div *ngIf="addresses && addresses.length > 0" class="space-y-3">
+            <div *ngIf="addresses && addresses.length > 0" class="space-y-4">
               <div class="flex items-center justify-between">
                 <h4 class="text-sm font-semibold uppercase tracking-[0.2em] text-slate-400">Saved addresses</h4>
-                <span class="text-sm text-slate-500">{{ addresses.length }} saved</span>
+                <button
+                  type="button"
+                  (click)="openAddressModal()"
+                  class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-700 transition hover:bg-slate-50 hover:border-indigo-300">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+                  </svg>
+                  New Address
+                </button>
               </div>
 
               <div class="grid gap-3">
@@ -73,34 +81,89 @@
                   </div>
                 </button>
               </div>
+
+              <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end pt-6 border-t border-slate-100">
+                <button 
+                  type="button" 
+                  class="rounded-full border border-slate-200 px-8 py-3 text-sm font-bold text-slate-600 transition hover:bg-slate-50" 
+                  (click)="cancelCheckout()">
+                  Cancel checkout
+                </button>
+                <button 
+                  type="button" 
+                  class="rounded-full px-8 py-3 text-sm font-bold text-white shadow-lg transition disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-none" 
+                  [class.bg-indigo-600]="selectedAddressId"
+                  [class.hover:bg-indigo-500]="selectedAddressId"
+                  (click)="currentStep = 'review'" 
+                  [disabled]="!selectedAddressId">
+                  Continue to review
+                </button>
+              </div>
             </div>
 
-            <div class="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-              <div class="mb-4">
-                <h4 class="text-sm font-semibold uppercase tracking-[0.2em] text-slate-400">Add a new address</h4>
+            <!-- Empty State -->
+            <div *ngIf="!addresses || addresses.length === 0" class="flex flex-col items-center justify-center py-12 px-6 rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50/50">
+              <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
+              <h4 class="text-lg font-bold text-slate-900">No saved addresses</h4>
+              <p class="text-sm text-slate-500 text-center mt-1 mb-6">You need to add a shipping address to complete your order.</p>
+              <button
+                type="button"
+                (click)="openAddressModal()"
+                class="rounded-full bg-indigo-600 px-8 py-3 text-sm font-bold text-white shadow-[0_10px_20px_-5px_rgba(79,70,229,0.3)] transition hover:bg-indigo-500">
+                Add New Address
+              </button>
+            </div>
+          </div>
+
+          <!-- Add Address Modal -->
+          <div *ngIf="isAddressModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-hidden">
+            <!-- Backdrop -->
+            <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" (click)="closeAddressModal()"></div>
+
+            <!-- Modal Content -->
+            <div class="relative w-full max-w-xl scale-100 transform rounded-3xl bg-white p-6 shadow-2xl transition-all sm:p-10 animate-in fade-in zoom-in duration-300">
+              <div class="mb-8 flex items-center justify-between">
+                <div>
+                  <h3 class="text-2xl font-black text-slate-900">Add New Address</h3>
+                  <p class="mt-1 text-sm text-slate-500">Enter your shipping details below.</p>
+                </div>
+                <button (click)="closeAddressModal()" class="rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
               </div>
 
-              <form [formGroup]="addressForm" class="grid gap-4 sm:grid-cols-2">
-                <div class="sm:col-span-2">
-                  <label for="street" class="mb-2 block text-sm font-semibold text-slate-700">Street</label>
-                  <input id="street" type="text" formControlName="street" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100">
-                </div>
-                <div>
-                  <label for="city" class="mb-2 block text-sm font-semibold text-slate-700">City</label>
-                  <input id="city" type="text" formControlName="city" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100">
-                </div>
-                <div>
-                  <label for="postalCode" class="mb-2 block text-sm font-semibold text-slate-700">Postal Code</label>
-                  <input id="postalCode" type="text" formControlName="postalCode" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100">
-                </div>
-                <div class="sm:col-span-2">
-                  <label for="country" class="mb-2 block text-sm font-semibold text-slate-700">Country</label>
-                  <input id="country" type="text" formControlName="country" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100">
+              <form [formGroup]="addressForm" (ngSubmit)="addNewAddress()" class="grid gap-5">
+                <div class="space-y-2">
+                  <label for="street" class="text-sm font-bold text-slate-700">Street Address</label>
+                  <input id="street" type="text" formControlName="street" placeholder="e.g. 123 Main St" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-sm outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-100">
                 </div>
 
-                <div class="sm:col-span-2 flex flex-col gap-3 sm:flex-row">
-                  <button type="button" class="inline-flex rounded-full bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800" (click)="addNewAddress()">Add Address</button>
-                  <button type="button" class="inline-flex rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50" (click)="currentStep = 'review'" [disabled]="!selectedAddressId">Continue to review</button>
+                <div class="grid grid-cols-2 gap-5">
+                  <div class="space-y-2">
+                    <label for="city" class="text-sm font-bold text-slate-700">City</label>
+                    <input id="city" type="text" formControlName="city" placeholder="City" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-sm outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-100">
+                  </div>
+                  <div class="space-y-2">
+                    <label for="postalCode" class="text-sm font-bold text-slate-700">Postal Code</label>
+                    <input id="postalCode" type="text" formControlName="postalCode" placeholder="Code" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-sm outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-100">
+                  </div>
+                </div>
+
+                <div class="space-y-2">
+                  <label for="country" class="text-sm font-bold text-slate-700">Country</label>
+                  <input id="country" type="text" formControlName="country" placeholder="Country" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-sm outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-100">
+                </div>
+
+                <div class="mt-4 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                  <button type="button" (click)="closeAddressModal()" class="rounded-full border border-slate-200 px-8 py-4 text-sm font-bold text-slate-600 transition hover:bg-slate-50">Cancel</button>
+                  <button type="submit" [disabled]="addressForm.invalid" class="rounded-full bg-slate-900 px-8 py-4 text-sm font-bold text-white shadow-lg transition hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed">Save Address</button>
                 </div>
               </form>
             </div>
@@ -158,9 +221,9 @@
               </div>
             </div>
 
-            <div class="flex flex-col gap-3 sm:flex-row">
-              <button type="button" class="inline-flex rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50" (click)="currentStep = 'address'">Back</button>
-              <button type="button" class="inline-flex rounded-full bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500" (click)="goToPayment()">Continue to payment</button>
+            <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+              <button type="button" class="inline-flex rounded-full border border-slate-200 bg-white px-8 py-3 text-sm font-bold text-slate-700 transition hover:bg-slate-50" (click)="currentStep = 'address'">Back</button>
+              <button type="button" class="inline-flex rounded-full bg-indigo-600 px-8 py-3 text-sm font-bold text-white shadow-lg transition hover:bg-indigo-500" (click)="goToPayment()">Continue to payment</button>
             </div>
           </div>
 
@@ -175,9 +238,9 @@
               <p class="mt-2 text-sm text-indigo-700">Credit card and digital wallets can be integrated here later.</p>
             </div>
 
-            <div class="flex flex-col gap-3 sm:flex-row">
-              <button type="button" class="inline-flex rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50" (click)="currentStep = 'review'">Back</button>
-              <button type="button" class="inline-flex rounded-full bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60" (click)="placeOrder()" [disabled]="isPlacingOrder">
+            <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+              <button type="button" class="inline-flex rounded-full border border-slate-200 bg-white px-8 py-3 text-sm font-bold text-slate-700 transition hover:bg-slate-50" (click)="currentStep = 'review'">Back</button>
+              <button type="button" class="inline-flex rounded-full bg-indigo-600 px-8 py-3 text-sm font-bold text-white shadow-lg transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-60" (click)="placeOrder()" [disabled]="isPlacingOrder">
                 {{ isPlacingOrder ? 'Processing...' : 'Complete order' }}
               </button>
             </div>
@@ -196,7 +259,7 @@
             </div>
           </div>
 
-          <div *ngIf="currentStep !== 'confirmation'" class="mt-8 flex justify-end">
+          <div *ngIf="currentStep !== 'confirmation'" class="mt-8 hidden">
             <button type="button" class="rounded-full border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-50" (click)="cancelCheckout()">Cancel checkout</button>
           </div>
         </div>

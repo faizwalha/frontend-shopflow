@@ -9,13 +9,18 @@ import { AuthService } from './auth.service';
 })
 export class CartService {
   private http = inject(HttpClient);
+  private authService = inject(AuthService);
   private apiUrl = '/api/cart';
 
   private cartSubject = new BehaviorSubject<Cart | null>(null);
   public cart$ = this.cartSubject.asObservable();
 
   constructor() {
-    this.loadCart();
+    if (this.authService.isAuthenticated()) {
+      this.loadCart();
+    } else {
+      this.cartSubject.next(null);
+    }
   }
 
   private loadCart(): void {

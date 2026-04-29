@@ -6,6 +6,7 @@ import { FooterComponent } from '../footer/footer.component';
 
 import { ToastComponent } from '../../shared/components/toast/toast.component';
 import { ConfirmComponent } from '../../shared/components/confirm/confirm.component';
+import { HostListener } from '@angular/core';
 
 @Component({
   selector: 'app-main-layout',
@@ -13,4 +14,15 @@ import { ConfirmComponent } from '../../shared/components/confirm/confirm.compon
   imports: [CommonModule, RouterModule, NavbarComponent, FooterComponent, ToastComponent, ConfirmComponent],
   templateUrl: './main-layout.component.html'
 })
-export class MainLayoutComponent {}
+export class MainLayoutComponent {
+  showScrollTop = false;
+
+  @HostListener('window:scroll', [])
+  onWindowScroll() {
+    this.showScrollTop = window.scrollY > 300;
+  }
+
+  scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}

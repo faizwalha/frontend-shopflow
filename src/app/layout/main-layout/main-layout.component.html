@@ -1,5 +1,7 @@
 <div class="flex flex-col min-h-screen bg-gray-50/50 font-sans text-gray-900 selection:bg-violet-100 selection:text-violet-900">
-  <app-navbar></app-navbar>
+  <div class="sticky top-0 z-50">
+    <app-navbar></app-navbar>
+  </div>
   
   <main class="flex-grow">
     <router-outlet></router-outlet>
@@ -8,4 +10,17 @@
   <app-footer></app-footer>
   <app-toast></app-toast>
   <app-confirm></app-confirm>
+
+  <!-- Scroll to Top Button -->
+  <button 
+    *ngIf="showScrollTop"
+    (click)="scrollToTop()"
+    class="fixed bottom-8 right-8 p-3 rounded-full bg-violet-600 text-white shadow-lg hover:bg-violet-700 transition-all duration-300 z-50 animate-bounce"
+    aria-label="Scroll to top"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="Tag 5 15l7-7 7 7" />
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+    </svg>
+  </button>
 </div>

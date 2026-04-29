@@ -31,6 +31,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   isLoadingCart = true;
   isLoadingAddresses = true;
   isPlacingOrder = false;
+  isAddressModalOpen = false;
   errorMessage = '';
   successMessage = '';
   currentStep: 'address' | 'review' | 'payment' | 'confirmation' = 'address';
@@ -80,6 +81,15 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     });
   }
 
+  openAddressModal() {
+    this.isAddressModalOpen = true;
+    this.addressForm.reset();
+  }
+
+  closeAddressModal() {
+    this.isAddressModalOpen = false;
+  }
+
   selectAddress(id: number) {
     this.selectedAddressId = id;
     this.currentStep = 'review';
@@ -96,6 +106,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
         this.addresses = [...this.addresses, newAddress];
         this.selectedAddressId = newAddress.id;
         this.addressForm.reset();
+        this.isAddressModalOpen = false;
         this.currentStep = 'review';
         this.successMessage = 'Address added successfully';
         setTimeout(() => this.successMessage = '', 3000);
