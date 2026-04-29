@@ -443,33 +443,69 @@
               </div>
 
               <div class="mt-5 overflow-hidden rounded-[24px] border border-slate-200">
-                <table class="dashboard-table dashboard-table-compact">
-                  <thead>
-                    <tr>
-                      <th>Customer</th>
-                      <th>Email</th>
-                      <th>Orders</th>
-                      <th>Lifetime value</th>
-                      <th>Last order</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let customer of visibleCustomers">
-                      <td class="font-semibold text-slate-950">{{ customer.displayName }}</td>
-                      <td class="text-slate-600">{{ customer.email }}</td>
-                      <td class="font-semibold text-slate-950">{{ customer.orderCount }}</td>
-                      <td class="font-semibold text-slate-950">${{ customer.lifetimeValue | number:'1.2-2' }}</td>
-                      <td class="text-slate-600">{{ customer.lastOrderDate | date:'MMM d, y' }}</td>
-                      <td><span class="status-chip" [ngClass]="'status-' + customer.lastStatus.toLowerCase()">{{
-                          customer.lastStatus }}</span></td>
-                    </tr>
-                    <tr *ngIf="visibleCustomers.length === 0">
-                      <td colspan="6" class="px-6 py-10 text-center text-sm text-slate-500">No customer data available
-                        yet.</td>
-                    </tr>
-                  </tbody>
-                </table>
+                <ng-container *ngIf="isAdmin((currentUser$ | async)?.role); else customerSummariesBlock">
+                  <table class="dashboard-table dashboard-table-compact">
+                    <thead>
+                      <tr>
+                        <th>Name / Email</th>
+                        <th>Roles</th>
+                        <th>Active</th>
+                        <th>Created</th>
+                        <th class="text-center">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let u of adminUsers">
+                        <td>
+                          <div class="font-semibold text-slate-950">{{ u.displayName || ('User #' + u.id) }}</div>
+                          <div class="text-xs text-slate-500">{{ u.email }}</div>
+                        </td>
+                        <td class="text-slate-600">{{ (u.roles || []).join(', ') }}</td>
+                        <td class="font-semibold text-slate-950">{{ u.active ? 'Active' : 'Disabled' }}</td>
+                        <td class="text-slate-600">{{ u.createdAt ? (u.createdAt | date:'MMM d, y') : '—' }}</td>
+                        <td class="text-center">
+                          <div class="flex items-center justify-center gap-2">
+                            <button *ngIf="!u.active" type="button" class="dashboard-secondary-button" (click)="setUserActive(u, true)">Activate</button>
+                            <button *ngIf="u.active" type="button" class="dashboard-secondary-button" (click)="setUserActive(u, false)">Deactivate</button>
+                            <button type="button" class="dashboard-table-icon-button dashboard-table-icon-button-danger" aria-label="Delete user" (click)="removeUser(u)">
+                              Delete
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr *ngIf="adminUsers.length === 0">
+                        <td colspan="5" class="px-6 py-10 text-center text-sm text-slate-500">No users found.</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </ng-container>
+                <ng-template #customerSummariesBlock>
+                  <table class="dashboard-table dashboard-table-compact">
+                    <thead>
+                      <tr>
+                        <th>Customer</th>
+                        <th>Email</th>
+                        <th>Orders</th>
+                        <th>Lifetime value</th>
+                        <th>Last order</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let customer of visibleCustomers">
+                        <td class="font-semibold text-slate-950">{{ customer.displayName }}</td>
+                        <td class="text-slate-600">{{ customer.email }}</td>
+                        <td class="font-semibold text-slate-950">{{ customer.orderCount }}</td>
+                        <td class="font-semibold text-slate-950">${{ customer.lifetimeValue | number:'1.2-2' }}</td>
+                        <td class="text-slate-600">{{ customer.lastOrderDate | date:'MMM d, y' }}</td>
+                        <td><span class="status-chip" [ngClass]="'status-' + customer.lastStatus.toLowerCase()">{{ customer.lastStatus }}</span></td>
+                      </tr>
+                      <tr *ngIf="visibleCustomers.length === 0">
+                        <td colspan="6" class="px-6 py-10 text-center text-sm text-slate-500">No customer data available yet.</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </ng-template>
               </div>
 
               <div

@@ -8,6 +8,8 @@ import { ProductService } from '../../core/services/product.service';
 import { OrderService } from '../../core/services/order.service';
 import { DashboardService } from '../../core/services/dashboard.service';
 import { ToastService } from '../../core/services/toast.service';
+import { AdminUserService } from '../../core/services/admin-user.service';
+import { AdminUser } from '../../core/models/user.models';
 import { ConfirmService } from '../../core/services/confirm.service';
 import { CategoryRequest, CategoryResponse } from '../../core/models/category.models';
 import { ProductRequest, ProductResponse } from '../../core/models/product.models';
@@ -72,6 +74,7 @@ export class DashboardComponent implements OnInit {
   private orderService = inject(OrderService);
   private dashboardService = inject(DashboardService);
   private toastService = inject(ToastService);
+  private adminUserService = inject(AdminUserService);
   private confirmService = inject(ConfirmService);
 
   readonly currentUser$ = this.authService.currentUser$;
@@ -132,12 +135,15 @@ export class DashboardComponent implements OnInit {
   loadingCategories = false;
   loadingProducts = false;
   loadingOrders = false;
+  loadingUsers = false;
 
   statsError = '';
   categoryError = '';
   productError = '';
   orderError = '';
   successMessage = '';
+
+  adminUsers: AdminUser[] = [];
 
   categoryForm = this.fb.nonNullable.group({
     name: ['', [Validators.required]],
@@ -188,6 +194,10 @@ export class DashboardComponent implements OnInit {
         this.loadStats();
         this.loadCategories();
         this.loadProducts();
+        this.loadOrders();
+        if (this.isAdmin(user.role)) {
+          this.loadAdminUsers();
+        }
       } else if (user && user.role === 'CUSTOMER') {
         // For customers, we might only want to load their stats or orders if the dashboard is used as profile
         this.loadCustomerData();
@@ -364,6 +374,55 @@ export class DashboardComponent implements OnInit {
         this.toastService.error('Unable to load orders.');
         this.loadingOrders = false;
       }
+    });
+  }
+
+  loadAdminUsers(): void {
+    this.loadingUsers = true;
+    this.adminUserService.listUsers().subscribe({
+      next: (users) => {
+        this.adminUsers = users;
+        this.loadingUsers = false;
+      },
+      error: () => {
+        this.toastService.error('Unable to load users.');
+        this.loadingUsers = false;
+      }
+    });
+  }
+
+  setUserActive(user: AdminUser, active: boolean): void {
+    this.confirmService.confirm({
+      title: `${active ? 'Activate' : 'Deactivate'} user`,
+      message: `Are you sure you want to ${active ? 'activate' : 'deactivate'} ${user.email}?`,
+      confirmText: active ? 'Activate' : 'Deactivate'
+    }).pipe(take(1)).subscribe(confirmed => {
+      if (!confirmed) return;
+      this.adminUserService.setActive(user.id, active).subscribe({
+        next: (updated) => {
+          this.toastService.success(`User ${updated.email} updated.`);
+          this.loadAdminUsers();
+        },
+        error: () => this.toastService.error('Unable to update user.')
+      });
+    });
+  }
+
+  removeUser(user: AdminUser): void {
+    this.confirmService.confirm({
+      title: 'Delete user',
+      message: `Delete user ${user.email}? This cannot be undone.`,
+      confirmText: 'Delete',
+      type: 'danger'
+    }).pipe(take(1)).subscribe(confirmed => {
+      if (!confirmed) return;
+      this.adminUserService.deleteUser(user.id).subscribe({
+        next: () => {
+          this.toastService.success('User deleted.');
+          this.loadAdminUsers();
+        },
+        error: () => this.toastService.error('Unable to delete user.')
+      });
     });
   }
 
