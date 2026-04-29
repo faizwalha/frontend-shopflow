@@ -27,6 +27,10 @@ export interface RegisterRequest {
   firstName: string;
   lastName: string;
   role?: 'ADMIN' | 'SELLER' | 'CUSTOMER';
+  street?: string;
+  city?: string;
+  postalCode?: string;
+  country?: string;
 }
 
 export interface User {

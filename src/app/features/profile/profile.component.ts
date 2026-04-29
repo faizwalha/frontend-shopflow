@@ -6,6 +6,8 @@ import { User } from '../../core/models/auth.models';
 import { ToastService } from '../../core/services/toast.service';
 import { AddressService } from '../../core/services/address.service';
 import { Address, AddressRequest } from '../../core/models/address.models';
+import { AddressAutocompleteService, AddressSuggestion } from '../../core/services/address-autocomplete.service';
+import { Observable, debounceTime, distinctUntilChanged, of, switchMap, tap } from 'rxjs';
 
 @Component({
   selector: 'app-profile',
@@ -19,6 +21,7 @@ export class ProfileComponent implements OnInit {
   private fb = inject(FormBuilder);
   private toastService = inject(ToastService);
   private addressService = inject(AddressService);
+  private addressAutocompleteService = inject(AddressAutocompleteService);
 
   user: User | null = null;
   profileForm: FormGroup;
@@ -26,11 +29,22 @@ export class ProfileComponent implements OnInit {
   isEditing = false;
   isLoading = true;
   selectedFile: File | null = null;
-  
+
   showAddressForm = false;
   editingAddressId: number | null = null;
+  addressSuggestions: AddressSuggestion[] = [];
+  countries$: Observable<string[]>;
+  cities$: Observable<string[]>;
+  streets$: Observable<string[]>;
+  showAddressSuggestions = false;
+  isCitiesLoading = false;
+  isStreetsLoading = false;
 
   constructor() {
+    this.countries$ = this.addressAutocompleteService.getCountriesList();
+    this.cities$ = of([]);
+    this.streets$ = of([]);
+
     this.profileForm = this.fb.group({
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
@@ -42,9 +56,52 @@ export class ProfileComponent implements OnInit {
     this.addressForm = this.fb.group({
       street: ['', Validators.required],
       city: ['', Validators.required],
-      postalCode: ['', Validators.required],
-      country: ['Tunisie', Validators.required],
-      defaultAddress: [false]
+      postalCode: [''],
+      country: ['', Validators.required]
+    });
+
+    // When Country changes, fetch Cities
+    this.addressForm.get('country')?.valueChanges.subscribe(country => {
+      this.addressForm.patchValue({ city: '', street: '', postalCode: '' }, { emitEvent: false });
+      if (country) {
+        this.isCitiesLoading = true;
+        this.cities$ = this.addressAutocompleteService.getCitiesByCountry(country).pipe(
+          tap(() => this.isCitiesLoading = false)
+        );
+      } else {
+        this.cities$ = of([]);
+      }
+    });
+
+    // When City changes, fetch Streets
+    this.addressForm.get('city')?.valueChanges.subscribe(city => {
+      this.addressForm.patchValue({ street: '', postalCode: '' }, { emitEvent: false });
+      const country = this.addressForm.get('country')?.value;
+      if (country && city) {
+        this.isStreetsLoading = true;
+        this.streets$ = this.addressAutocompleteService.getStreetsByCity(country, city).pipe(
+          tap(() => this.isStreetsLoading = false)
+        );
+      } else {
+        this.streets$ = of([]);
+      }
+    });
+  }
+
+  onStreetChange(street: string) {
+    if (!street) return;
+    const country = this.addressForm.get('country')?.value || '';
+    const city = this.addressForm.get('city')?.value || '';
+    this.isStreetsLoading = true;
+    this.addressAutocompleteService.searchStreet(street, country, city).pipe(
+      tap(() => this.isStreetsLoading = false)
+    ).subscribe(results => {
+      if (results.length > 0) {
+        this.addressForm.patchValue({ postalCode: results[0].postalCode });
+      } else {
+        // No results, keep entered street and clear postal code
+        this.addressForm.patchValue({ postalCode: '' });
+      }
     });
   }
 
@@ -101,7 +158,7 @@ export class ProfileComponent implements OnInit {
   saveAddress(): void {
     if (this.addressForm.valid) {
       const request: AddressRequest = this.addressForm.value;
-      const operation = this.editingAddressId 
+      const operation = this.editingAddressId
         ? this.addressService.updateAddress(this.editingAddressId, request)
         : this.addressService.addAddress(request);
 
@@ -169,12 +226,12 @@ export class ProfileComponent implements OnInit {
   onSubmit(): void {
     if (this.profileForm.valid) {
       const updatedUser = this.profileForm.getRawValue();
-      
+
       // Update personal profile
       this.authService.updateProfile(updatedUser).subscribe({
         next: (user) => {
           this.user = user;
-          
+
           // If seller and logo/shop info needs update via Multipart
           if (this.user.role === 'SELLER' && (this.selectedFile || updatedUser.shopName)) {
             const formData = new FormData();

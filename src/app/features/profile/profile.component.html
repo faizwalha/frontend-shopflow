@@ -159,25 +159,47 @@
             <div *ngIf="showAddressForm" class="bg-gray-50 rounded-2xl p-6 mb-8 border-2 border-dashed border-gray-200">
               <form [formGroup]="addressForm" (ngSubmit)="saveAddress()" class="space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <!-- 1. Country Selection -->
                   <div class="space-y-1.5 md:col-span-2">
-                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Street</label>
-                    <input type="text" formControlName="street" placeholder="e.g. 123 Main St"
-                           class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-indigo-500 outline-none font-bold text-sm bg-white">
+                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Country</label>
+                    <input formControlName="country" type="text" list="countryOptionsProfile"
+                            class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-indigo-500 outline-none font-bold text-sm bg-white"
+                            placeholder="Type or select country">
+                    <datalist id="countryOptionsProfile">
+                      <option *ngFor="let country of countries$ | async" [value]="country"></option>
+                    </datalist>
                   </div>
-                  <div class="space-y-1.5">
+
+                  <!-- 2. City & Postal Code -->
+                  <div class="relative space-y-1.5">
                     <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">City</label>
-                    <input type="text" formControlName="city" placeholder="e.g. Tunis"
-                           class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-indigo-500 outline-none font-bold text-sm bg-white">
+                    <input formControlName="city" type="text" list="cityOptionsProfile"
+                            [disabled]="!(addressForm.get('country')?.value)"
+                            class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-indigo-500 outline-none font-bold text-sm bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
+                            placeholder="Type or select city">
+                    <datalist id="cityOptionsProfile">
+                      <option *ngFor="let city of cities$ | async" [value]="city"></option>
+                    </datalist>
+                    <div *ngIf="isCitiesLoading" class="absolute right-3 top-[32px]">
+                      <div class="animate-spin h-3 w-3 border-2 border-indigo-500 border-t-transparent rounded-full"></div>
+                    </div>
                   </div>
                   <div class="space-y-1.5">
                     <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Postal Code</label>
                     <input type="text" formControlName="postalCode" placeholder="e.g. 1000"
                            class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-indigo-500 outline-none font-bold text-sm bg-white">
                   </div>
-                  <div class="space-y-1.5">
-                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Country</label>
-                    <input type="text" formControlName="country" 
-                           class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-indigo-500 outline-none font-bold text-sm bg-white">
+
+                  <!-- 3. Street Selection -->
+                  <div class="space-y-1.5 md:col-span-2 relative">
+                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Street</label>
+                    <input id="street" formControlName="street" type="text" list="streetOptions" (input)="onStreetChange($any($event.target).value)" [disabled]="!(addressForm.get('city')?.value)" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-indigo-500 outline-none font-bold text-sm bg-white disabled:bg-gray-100 disabled:cursor-not-allowed" placeholder="Type street or select from suggestions"/>
+                    <datalist id="streetOptions">
+                      <option *ngFor="let street of streets$ | async" [value]="street"></option>
+                    </datalist>
+                    <div *ngIf="isStreetsLoading" class="absolute right-3 top-[38px]">
+                      <div class="animate-spin h-4 w-4 border-2 border-indigo-500 border-t-transparent rounded-full"></div>
+                    </div>
                   </div>
                   <div class="flex items-center gap-3 py-2">
                     <input type="checkbox" formControlName="defaultAddress" id="isDefault" class="w-4 h-4 text-indigo-600 rounded">

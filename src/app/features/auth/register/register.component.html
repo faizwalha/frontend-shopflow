@@ -39,6 +39,53 @@
 					<input id="password" formControlName="password" type="password" autocomplete="new-password" required class="appearance-none relative block w-full px-4 py-3 placeholder-gray-400 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500 sm:text-sm font-medium transition-shadow shadow-sm" placeholder="••••••••">
 				</div>
 
+				<!-- 1. Country Selection -->
+				<div>
+					<label class="block text-sm font-semibold text-gray-700 mb-1" for="country">Country</label>
+					<input id="country" formControlName="country" type="text" list="countryOptions"
+							class="appearance-none relative block w-full px-4 py-3 placeholder-gray-400 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500 sm:text-sm font-medium transition-shadow shadow-sm"
+							placeholder="Type or select country">
+					<datalist id="countryOptions">
+						<option *ngFor="let country of countries$ | async" [value]="country"></option>
+					</datalist>
+				</div>
+
+				<!-- 2. City & Postal Code -->
+				<div class="grid grid-cols-2 gap-4">
+					<div class="relative">
+						<label class="block text-sm font-semibold text-gray-700 mb-1" for="city">City</label>
+						<input id="city" formControlName="city" type="text" list="cityOptions"
+								[disabled]="!(registerForm.get('country')?.value)"
+								class="appearance-none relative block w-full px-4 py-3 placeholder-gray-400 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500 sm:text-sm font-medium transition-shadow shadow-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
+								placeholder="Type or select city">
+						<datalist id="cityOptions">
+							<option *ngFor="let city of cities$ | async" [value]="city"></option>
+						</datalist>
+						<div *ngIf="isCitiesLoading" class="absolute right-3 top-[38px]">
+							<div class="animate-spin h-4 w-4 border-2 border-violet-500 border-t-transparent rounded-full"></div>
+						</div>
+					</div>
+					<div>
+						<label class="block text-sm font-semibold text-gray-700 mb-1" for="postalCode">Postal Code</label>
+						<input id="postalCode" formControlName="postalCode" type="text" required class="appearance-none relative block w-full px-4 py-3 placeholder-gray-400 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500 sm:text-sm font-medium transition-shadow shadow-sm" placeholder="e.g. 10001">
+					</div>
+				</div>
+
+				<div class="relative">
+					<label class="block text-sm font-semibold text-gray-700 mb-1" for="street">Street Address</label>
+					<input id="street" formControlName="street" type="text" list="streetOptions"
+							(input)="onStreetChange($any($event.target).value)"
+							[disabled]="!(registerForm.get('city')?.value)"
+							class="appearance-none relative block w-full px-4 py-3 placeholder-gray-400 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500 sm:text-sm font-medium transition-shadow shadow-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
+							placeholder="Type your street address">
+					<datalist id="streetOptions">
+						<option *ngFor="let street of streets$ | async" [value]="street"></option>
+					</datalist>
+					<div *ngIf="isStreetsLoading" class="absolute right-3 top-[38px]">
+						<div class="animate-spin h-4 w-4 border-2 border-violet-500 border-t-transparent rounded-full"></div>
+					</div>
+				</div>
+
 				<div>
 					<label class="block text-sm font-semibold text-gray-700 mb-1" for="role">Account type</label>
 					<select id="role" formControlName="role" class="appearance-none relative block w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500 sm:text-sm font-medium transition-shadow shadow-sm">
