@@ -43,7 +43,7 @@ export const routes: Routes = [
       {
         path: 'profile',
         canActivate: [authGuard],
-        loadComponent: () => import('./features/dashboard/dashboard.component').then(c => c.DashboardComponent),
+        loadComponent: () => import('./features/profile/profile.component').then(c => c.ProfileComponent),
         title: 'Profile - ShopFlow'
       },
       {

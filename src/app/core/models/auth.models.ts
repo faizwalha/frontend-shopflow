@@ -26,3 +26,13 @@ export interface RegisterRequest {
   lastName: string;
   role?: 'ADMIN' | 'SELLER' | 'CUSTOMER';
 }
+
+export interface User {
+  id: number;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: 'ADMIN' | 'SELLER' | 'CUSTOMER';
+  phoneNumber?: string;
+  address?: string;
+}

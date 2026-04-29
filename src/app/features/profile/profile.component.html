@@ -1,0 +1,100 @@
+<div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-4xl mx-auto">
+    <!-- Header/Banner Profile -->
+
+
+    <!-- Main Content -->
+    <div class="grid grid-cols-1 gap-8">
+      <div class="bg-white rounded-[32px] border border-gray-100 p-6 sm:p-8 shadow-[0_18px_50px_rgba(15,23,42,0.08)] backdrop-blur-xl">
+        <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-50">
+          <h2 class="text-xl font-black text-slate-950 tracking-tight">Personal Information</h2>
+        </div>
+
+        <div *ngIf="isLoading" class="py-12 flex flex-col items-center justify-center">
+          <div class="inline-block animate-spin rounded-full h-10 w-10 border-t-4 border-b-4 border-indigo-600 mb-4"></div>
+          <p class="text-slate-500 font-bold animate-pulse">Synchronizing your details...</p>
+        </div>
+
+        <form *ngIf="!isLoading" [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
+            <!-- First Name -->
+            <div class="space-y-1.5">
+              <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">First Name</label>
+              <input type="text" formControlName="firstName" 
+                     [readonly]="!isEditing"
+                     class="w-full px-5 py-3 rounded-xl border-2 transition-all duration-200 outline-none font-bold text-sm"
+                     [ngClass]="isEditing ? 'border-indigo-100 focus:border-indigo-500 bg-white' : 'border-transparent bg-gray-50 text-slate-600'">
+            </div>
+
+            <!-- Last Name -->
+            <div class="space-y-1.5">
+              <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Last Name</label>
+              <input type="text" formControlName="lastName" 
+                     [readonly]="!isEditing"
+                     class="w-full px-5 py-3 rounded-xl border-2 transition-all duration-200 outline-none font-bold text-sm"
+                     [ngClass]="isEditing ? 'border-indigo-100 focus:border-indigo-500 bg-white' : 'border-transparent bg-gray-50 text-slate-600'">
+            </div>
+
+            <!-- Email (Permanent) -->
+            <div class="md:col-span-2 space-y-1.5">
+              <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Email Address</label>
+              <div class="relative group">
+                <input type="email" formControlName="email" 
+                       class="w-full px-5 py-3 rounded-xl border-2 border-transparent bg-gray-100 text-slate-400 font-bold text-sm cursor-not-allowed">
+                <div class="absolute right-5 top-1/2 -translate-y-1/2 text-slate-300">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <!-- Phone Number -->
+            <div class="space-y-1.5">
+              <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Phone Number</label>
+              <input type="text" formControlName="phoneNumber" 
+                     [readonly]="!isEditing"
+                     placeholder="Not provided"
+                     class="w-full px-5 py-3 rounded-xl border-2 transition-all duration-200 outline-none font-bold text-sm placeholder:text-gray-300 placeholder:font-medium"
+                     [ngClass]="isEditing ? 'border-indigo-100 focus:border-indigo-500 bg-white' : 'border-transparent bg-gray-50 text-slate-600'">
+            </div>
+
+            <!-- Address -->
+            <div class="md:col-span-2 space-y-1.5">
+              <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Shipping Address</label>
+              <textarea formControlName="address" 
+                        [readonly]="!isEditing"
+                        rows="3"
+                        placeholder="Provide your full delivery address"
+                        class="w-full px-5 py-3 rounded-xl border-2 transition-all duration-200 outline-none font-bold text-sm resize-none placeholder:text-gray-300 placeholder:font-medium"
+                        [ngClass]="isEditing ? 'border-indigo-100 focus:border-indigo-500 bg-white' : 'border-transparent bg-gray-50 text-slate-600'"></textarea>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="mt-8 flex flex-col sm:flex-row justify-end gap-4 pt-6 border-t border-gray-50">
+            <button type="button" *ngIf="!isEditing" (click)="toggleEdit()"
+                    class="bg-indigo-600 hover:bg-indigo-700 text-white px-10 py-3.5 rounded-full font-bold text-base transition duration-300 shadow-xl shadow-indigo-100 flex items-center justify-center">
+              Edit Profile
+            </button>
+
+            <ng-container *ngIf="isEditing">
+              <button type="button" (click)="toggleEdit()"
+                      class="order-2 sm:order-1 px-8 py-3 rounded-full font-black text-slate-500 hover:bg-gray-100 transition-all border border-transparent">
+                Discard Changes
+              </button>
+              <button type="submit" [disabled]="profileForm.invalid"
+                      class="order-1 sm:order-2 bg-green-600 hover:bg-green-700 text-white px-10 py-3 rounded-full font-black transition duration-300 shadow-xl shadow-green-100 disabled:opacity-50 disabled:shadow-none flex items-center justify-center gap-2">
+                 Save Profile
+                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                   <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                 </svg>
+              </button>
+            </ng-container>
+          </div>
+        </form>
+      </div>
+
+        </div>
+  </div>
+</div>

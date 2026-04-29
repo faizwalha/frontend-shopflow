@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';
-import { AuthResponse, AuthSession, LoginRequest, RegisterRequest } from '../models/auth.models';
+import { AuthResponse, AuthSession, LoginRequest, RegisterRequest, User } from '../models/auth.models';
 
 @Injectable({
   providedIn: 'root'
@@ -126,5 +126,13 @@ export class AuthService {
 
   getCurrentUser(): AuthSession | null {
     return this.currentUserSubject.value;
+  }
+
+  getProfile(): Observable<User> {
+    return this.http.get<User>(`${this.apiUrl}/profile`);
+  }
+
+  updateProfile(user: Partial<User>): Observable<User> {
+    return this.http.put<User>(`${this.apiUrl}/profile`, user);
   }
 }
