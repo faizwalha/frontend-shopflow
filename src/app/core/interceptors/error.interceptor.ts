@@ -9,9 +9,11 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((err: HttpErrorResponse) => {
-      const isAuthEndpoint = req.url.includes('/api/auth/');
+      const isExcludedEndpoint = req.url.includes('/api/auth/login') || 
+                                req.url.includes('/api/auth/register') || 
+                                req.url.includes('/api/auth/refresh');
       
-      if (err.status === 401 && !isAuthEndpoint) {
+      if (err.status === 401 && !isExcludedEndpoint) {
         return authService.refreshToken().pipe(
           switchMap((authRes) => {
             const clonedReq = req.clone({

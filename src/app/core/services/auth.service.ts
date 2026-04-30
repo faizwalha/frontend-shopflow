@@ -15,6 +15,7 @@ export class AuthService {
   private refreshTokenKey = 'shopflow_refresh_token';
   private roleKey = 'shopflow_role';
   private userIdKey = 'shopflow_user_id';
+  private userProfileKey = 'shopflow_user_profile';
 
   private currentUserSubject = new BehaviorSubject<AuthSession | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
@@ -43,6 +44,17 @@ export class AuthService {
       role,
       userId: Number.isFinite(userId as number) ? userId : undefined
     });
+
+    const userProfileJson = localStorage.getItem(this.userProfileKey);
+    if (userProfileJson) {
+      try {
+        this.userProfileSubject.next(JSON.parse(userProfileJson));
+      } catch (e) {
+        localStorage.removeItem(this.userProfileKey);
+      }
+    }
+
+    this.refreshProfile().subscribe();
   }
 
   private persistSession(response: AuthResponse): void {
@@ -108,6 +120,7 @@ export class AuthService {
     localStorage.removeItem(this.refreshTokenKey);
     localStorage.removeItem(this.roleKey);
     localStorage.removeItem(this.userIdKey);
+    localStorage.removeItem(this.userProfileKey);
     this.currentUserSubject.next(null);
     this.userProfileSubject.next(null);
     this.router.navigate(['/']);
@@ -144,7 +157,10 @@ export class AuthService {
 
   updateProfile(user: Partial<User>): Observable<User> {
     return this.http.put<User>(`${this.apiUrl}/profile`, user).pipe(
-      tap(updatedUser => this.userProfileSubject.next(updatedUser))
+      tap(updatedUser => {
+        this.userProfileSubject.next(updatedUser);
+        localStorage.setItem(this.userProfileKey, JSON.stringify(updatedUser));
+      })
     );
   }
 
@@ -153,12 +169,14 @@ export class AuthService {
       tap(response => {
         const currentUser = this.userProfileSubject.value;
         if (currentUser) {
-          this.userProfileSubject.next({
+          const updatedUser = {
             ...currentUser,
             shopName: response.shopName,
             description: response.description,
             logo: response.logo
-          });
+          };
+          this.userProfileSubject.next(updatedUser);
+          localStorage.setItem(this.userProfileKey, JSON.stringify(updatedUser));
         }
       })
     );
@@ -166,7 +184,10 @@ export class AuthService {
 
   refreshProfile(): Observable<User> {
     return this.getProfile().pipe(
-      tap(user => this.userProfileSubject.next(user))
+      tap(user => {
+        this.userProfileSubject.next(user);
+        localStorage.setItem(this.userProfileKey, JSON.stringify(user));
+      })
     );
   }
 
