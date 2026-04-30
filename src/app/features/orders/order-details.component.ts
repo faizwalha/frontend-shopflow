@@ -44,12 +44,7 @@ export class OrderDetailsComponent implements OnInit {
 
     this.orderService.getOrderById(id).subscribe({
       next: (response: any) => {
-        // Map orderId to id if needed (backend returns orderId)
-        const order = {
-          ...response,
-          id: response.id ?? response.orderId
-        };
-        this.order = order;
+        this.order = this.normalizeOrder(response);
         this.loading = false;
       },
       error: (err) => {
@@ -61,8 +56,8 @@ export class OrderDetailsComponent implements OnInit {
 
   canCancelOrder(): boolean {
     if (!this.order) return false;
-    // Cannot cancel if order is already shipped, delivered, confirmed, cancelled, or refunded
-    const nonCancellableStatuses = ['SHIPPING', 'SHIPPED', 'DELIVERED', 'CONFIRMED', 'CANCELLED', 'REFUNDED'];
+    // Cannot cancel if order is already processing, shipped, delivered, confirmed, cancelled, or refunded
+    const nonCancellableStatuses = ['PROCESSING', 'SHIPPING', 'SHIPPED', 'DELIVERED', 'CONFIRMED', 'CANCELLED', 'REFUNDED'];
     return !nonCancellableStatuses.includes(this.order.status);
   }
 
@@ -83,7 +78,7 @@ export class OrderDetailsComponent implements OnInit {
 
         this.orderService.cancelOrder(this.order!.id).subscribe({
           next: (updatedOrder) => {
-            this.order = updatedOrder;
+            this.order = this.normalizeOrder(updatedOrder);
             this.toastService.success('Order cancelled successfully.');
             this.isCancelling = false;
           },
@@ -102,5 +97,13 @@ export class OrderDetailsComponent implements OnInit {
 
   goBack(): void {
     this.router.navigate(['/orders']);
+  }
+
+  private normalizeOrder(order: any): Order {
+    return {
+      ...order,
+      id: order.id ?? order.orderId,
+      createdAt: order.createdAt ?? order.orderDate
+    };
   }
 }
