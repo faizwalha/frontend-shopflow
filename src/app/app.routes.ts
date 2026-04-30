@@ -72,6 +72,13 @@ export const routes: Routes = [
         title: 'Manage Categories - ShopFlow'
       },
       {
+        path: 'coupons',
+        canActivate: [authGuard, roleGuard],
+        data: { expectedRoles: ['ADMIN'] },
+        loadComponent: () => import('./features/coupons/admin-coupons.component').then(c => c.AdminCouponsComponent),
+        title: 'Manage Coupons - ShopFlow'
+      },
+      {
         path: 'inventory',
         canActivate: [authGuard, roleGuard],
         data: { expectedRoles: ['SELLER', 'ADMIN'] },

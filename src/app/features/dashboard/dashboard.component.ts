@@ -15,8 +15,9 @@ import { CategoryRequest, CategoryResponse } from '../../core/models/category.mo
 import { ProductRequest, ProductResponse } from '../../core/models/product.models';
 import { AdminDashboardResponse, SellerDashboardResponse } from '../../core/models/dashboard.models';
 import { AdminOrderResponse, Order, OrderStatus, UserSummaryResponse } from '../../core/models/order.models';
+import { AdminCouponsComponent } from '../coupons/admin-coupons.component';
 
-type DashboardSection = 'overview' | 'products' | 'categories' | 'customers' | 'orders';
+type DashboardSection = 'overview' | 'products' | 'categories' | 'customers' | 'orders' | 'coupons';
 type ChartPeriod = 'daily' | 'weekly' | 'monthly';
 type NotificationTone = 'info' | 'success' | 'warning';
 
@@ -24,7 +25,7 @@ interface DashboardNavItem {
   section: DashboardSection;
   label: string;
   description: string;
-  icon: 'overview' | 'products' | 'categories' | 'customers';
+  icon: 'overview' | 'products' | 'categories' | 'customers' | 'discount';
   adminOnly?: boolean;
 }
 
@@ -68,7 +69,7 @@ interface AdminOrderWithDetails {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, AdminCouponsComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
@@ -89,7 +90,8 @@ export class DashboardComponent implements OnInit {
     { section: 'products', label: 'Products', description: 'Catalog and merchandising', icon: 'products' },
     { section: 'categories', label: 'Categories', description: 'Collection structure', icon: 'categories', adminOnly: true },
     { section: 'orders', label: 'Orders', description: 'All orders, customers and sellers', icon: 'customers' },
-    { section: 'customers', label: 'Customers', description: 'Buyer activity summary', icon: 'customers', adminOnly: true }
+    { section: 'customers', label: 'Customers', description: 'Buyer activity summary', icon: 'customers', adminOnly: true },
+    { section: 'coupons', label: 'Coupons', description: 'Manage promotional coupons', icon: 'discount', adminOnly: true }
   ];
 
   readonly orderStatuses: OrderStatus[] = ['PENDING', 'PAID', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'REFUNDED'];
@@ -114,6 +116,11 @@ export class DashboardComponent implements OnInit {
     customers: {
       title: 'Customers',
       description: 'Review purchasing activity and high-value buyers.'
+    }
+    ,
+    coupons: {
+      title: 'Coupons',
+      description: 'Create and manage promotional coupons.'
     }
   };
 

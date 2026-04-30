@@ -670,6 +670,10 @@
             </article>
           </section>
 
+          <section *ngIf="activeSection === 'coupons' && isAdmin(user.role)" class="space-y-6">
+            <app-admin-coupons></app-admin-coupons>
+          </section>
+
           <section *ngIf="loadingStats || loadingCategories || loadingProducts || loadingOrders"
             class="rounded-[28px] border border-slate-200/80 bg-white p-5 shadow-[0_18px_50px_rgba(15,23,42,0.08)] text-sm text-slate-500">
             Loading dashboard data...
