@@ -91,6 +91,21 @@ export const routes: Routes = [
     title: 'Register - ShopFlow'
   },
   {
+    path: 'forgot-password',
+    loadComponent: () => import('./features/auth/forgot-password/forgot-password.component').then(c => c.ForgotPasswordComponent),
+    title: 'Forgot Password - ShopFlow'
+  },
+  {
+    path: 'reset-password',
+    loadComponent: () => import('./features/auth/reset-password/reset-password.component').then(c => c.ResetPasswordComponent),
+    title: 'Reset Password - ShopFlow'
+  },
+  {
+    path: 'verify-email',
+    loadComponent: () => import('./features/auth/verify-email/verify-email.component').then(c => c.VerifyEmailComponent),
+    title: 'Verify Email - ShopFlow'
+  },
+  {
     path: '**',
     redirectTo: ''
   }

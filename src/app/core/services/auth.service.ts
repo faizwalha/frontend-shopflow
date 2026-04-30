@@ -171,4 +171,16 @@ export class AuthService {
       tap(user => this.userProfileSubject.next(user))
     );
   }
+
+  forgotPassword(email: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/forgot-password`, { email });
+  }
+
+  resetPassword(token: string, newPassword: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/reset-password`, { token, newPassword });
+  }
+
+  verifyEmail(token: string): Observable<AuthResponse> {
+    return this.http.get<AuthResponse>(`${this.apiUrl}/verify-email`, { params: { token } });
+  }
 }

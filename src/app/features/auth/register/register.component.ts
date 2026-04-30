@@ -34,6 +34,7 @@ export class RegisterComponent {
 
   isLoading = false;
   errorMessage = '';
+  successMessage = '';
   suggestions: AddressSuggestion[] = [];
   countries$: Observable<string[]>;
   cities$: Observable<string[]>;
@@ -104,12 +105,10 @@ export class RegisterComponent {
     this.authService.register(payload).subscribe({
       next: (response) => {
         this.isLoading = false;
-        if (response.role === 'SELLER') {
-          this.router.navigate(['/seller-setup']);
-        } else {
-          const targetRoute = response.role === 'ADMIN' ? '/dashboard' : '/';
-          this.router.navigate([targetRoute]);
-        }
+        this.successMessage = response.message || 'Inscription réussie. Veuillez vérifier votre email.';
+        this.registerForm.reset();
+        // Optionnel: Rediriger vers login après 5 secondes
+        setTimeout(() => this.router.navigate(['/login']), 5000);
       },
       error: (err) => {
         this.isLoading = false;
