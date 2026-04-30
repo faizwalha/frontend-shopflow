@@ -181,6 +181,13 @@ export class AuthService {
   }
 
   verifyEmail(token: string): Observable<AuthResponse> {
-    return this.http.get<AuthResponse>(`${this.apiUrl}/verify-email`, { params: { token } });
+    return this.http.get<AuthResponse>(`${this.apiUrl}/verify-email`, { params: { token } }).pipe(
+      tap(response => {
+        if (response.accessToken && response.role) {
+          this.persistSession(response);
+          this.refreshProfile().subscribe();
+        }
+      })
+    );
   }
 }
