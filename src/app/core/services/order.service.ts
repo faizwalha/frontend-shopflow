@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Order, PlaceOrderRequest, OrderListResponse, OrderStatusUpdate } from '../models/order.models';
+import { AdminOrderResponse, Order, PlaceOrderRequest, OrderListResponse, OrderStatusUpdate, UserSummaryResponse } from '../models/order.models';
 
 @Injectable({
   providedIn: 'root'
@@ -9,6 +9,7 @@ import { Order, PlaceOrderRequest, OrderListResponse, OrderStatusUpdate } from '
 export class OrderService {
   private http = inject(HttpClient);
   private apiUrl = '/api/orders';
+  private adminApiUrl = '/api/admin/orders';
 
   placeOrder(request: PlaceOrderRequest): Observable<Order> {
     return this.http.post<Order>(this.apiUrl, request);
@@ -34,13 +35,21 @@ export class OrderService {
   }
 
   getAllOrders(page = 0, size = 10): Observable<OrderListResponse> {
+    return this.getAdminOrders(page, size) as unknown as Observable<OrderListResponse>;
+  }
+
+  getAdminOrders(page = 0, size = 10): Observable<AdminOrderResponse[]> {
     const params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString());
-    return this.http.get<OrderListResponse>(this.apiUrl, { params });
+    return this.http.get<AdminOrderResponse[]>(this.adminApiUrl, { params });
   }
 
   updateOrderStatus(id: number, status: string): Observable<Order> {
     return this.http.put<Order>(`${this.apiUrl}/${id}/status`, { status });
+  }
+
+  getUserDetails(userId: number): Observable<UserSummaryResponse> {
+    return this.http.get<UserSummaryResponse>(`/api/users/${userId}`);
   }
 }

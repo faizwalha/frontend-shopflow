@@ -43,8 +43,6 @@ export class AuthService {
       role,
       userId: Number.isFinite(userId as number) ? userId : undefined
     });
-
-    this.refreshProfile().subscribe();
   }
 
   private persistSession(response: AuthResponse): void {

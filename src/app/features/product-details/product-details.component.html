@@ -9,7 +9,7 @@
 
 	<div *ngIf="product && !loading" class="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] items-start">
 		<div class="rounded-3xl overflow-hidden bg-gray-100 border border-gray-100 shadow-sm">
-			<img [src]="product.images[0] || 'https://via.placeholder.com/900'" [alt]="product.name" class="w-full h-[460px] object-cover">
+			<img [src]="product.images[0] || '/assets/placeholder-product.svg'" [alt]="product.name" class="w-full h-[460px] object-cover">
 		</div>
 
 		<div class="bg-white rounded-3xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.08)] p-8">

@@ -1,7 +1,7 @@
 <div class="bg-white rounded-2xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] transition-shadow duration-300 overflow-hidden flex flex-col h-full border border-gray-50">
   <div class="relative group aspect-[4/3] bg-gray-50 overflow-hidden shrink-0">
     <!-- Object fit cover to make image responsive -->
-    <img [src]="product.imageUrl || 'https://via.placeholder.com/300'" [alt]="product.name" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
+    <img [src]="product.imageUrl || '/assets/placeholder-product.svg'" [alt]="product.name" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
     <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
       <button class="bg-white/90 backdrop-blur-sm p-2 rounded-full text-gray-500 hover:text-red-500 transition-colors shadow-sm">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

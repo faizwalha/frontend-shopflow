@@ -193,7 +193,7 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   getProductImage(item: CartItem): string {
-    return item.product?.images?.[0] || item.productImage || item.imageUrl || 'https://via.placeholder.com/100';
+    return item.product?.images?.[0] || item.productImage || item.imageUrl || '/assets/placeholder-product.svg';
   }
 
   ngOnDestroy() {

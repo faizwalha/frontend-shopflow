@@ -14,9 +14,9 @@ import { ConfirmService } from '../../core/services/confirm.service';
 import { CategoryRequest, CategoryResponse } from '../../core/models/category.models';
 import { ProductRequest, ProductResponse } from '../../core/models/product.models';
 import { AdminDashboardResponse, SellerDashboardResponse } from '../../core/models/dashboard.models';
-import { Order, OrderStatus } from '../../core/models/order.models';
+import { AdminOrderResponse, Order, OrderStatus, UserSummaryResponse } from '../../core/models/order.models';
 
-type DashboardSection = 'overview' | 'products' | 'categories' | 'customers';
+type DashboardSection = 'overview' | 'products' | 'categories' | 'customers' | 'orders';
 type ChartPeriod = 'daily' | 'weekly' | 'monthly';
 type NotificationTone = 'info' | 'success' | 'warning';
 
@@ -59,6 +59,12 @@ interface CustomerSummary {
   lastStatus: OrderStatus;
 }
 
+interface AdminOrderWithDetails {
+  order: AdminOrderResponse;
+  customerName: string;
+  sellerName: string;
+}
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
@@ -82,6 +88,7 @@ export class DashboardComponent implements OnInit {
     { section: 'overview', label: 'Overview', description: 'Daily performance snapshot', icon: 'overview' },
     { section: 'products', label: 'Products', description: 'Catalog and merchandising', icon: 'products' },
     { section: 'categories', label: 'Categories', description: 'Collection structure', icon: 'categories', adminOnly: true },
+    { section: 'orders', label: 'Orders', description: 'All orders, customers and sellers', icon: 'customers' },
     { section: 'customers', label: 'Customers', description: 'Buyer activity summary', icon: 'customers', adminOnly: true }
   ];
 
@@ -100,6 +107,10 @@ export class DashboardComponent implements OnInit {
       title: 'Category Management',
       description: 'Keep the catalog structure clean and easy to navigate.'
     },
+    orders: {
+      title: 'Orders Management',
+      description: 'View all orders with detailed customer and seller information.'
+    },
     customers: {
       title: 'Customers',
       description: 'Review purchasing activity and high-value buyers.'
@@ -109,9 +120,10 @@ export class DashboardComponent implements OnInit {
   categories: CategoryResponse[] = [];
   products: ProductResponse[] = [];
   orders: Order[] = [];
+  adminOrders: AdminOrderResponse[] = [];
   selectedCategory: CategoryResponse | null = null;
   selectedProduct: ProductResponse | null = null;
-  selectedOrder: Order | null = null;
+  selectedOrder: AdminOrderResponse | null = null;
   selectedOrderStatus: OrderStatus = 'PENDING';
   isProductModalOpen = false;
   isCategoryModalOpen = false;
@@ -270,6 +282,10 @@ export class DashboardComponent implements OnInit {
     return role === 'ADMIN';
   }
 
+  isSeller(role: string | null | undefined): boolean {
+    return role === 'SELLER';
+  }
+
   canAccessSection(section: DashboardSection, role: string | null | undefined): boolean {
     if (section === 'customers') {
       return this.isAdmin(role);
@@ -357,21 +373,42 @@ export class DashboardComponent implements OnInit {
     this.loadingOrders = true;
     const user = this.authService.getCurrentUser();
 
-    // Use /api/orders for Admin, but /api/orders/seller for Sellers (avoids empty list)
-    const request$ = ((user?.role === 'ADMIN')
-      ? this.orderService.getAllOrders(0, 50)
-      : this.orderService.getSellerOrders()) as any;
+    if (user?.role === 'ADMIN') {
+      this.orderService.getAdminOrders(0, 50).subscribe({
+        next: (response) => {
+          const adminOrders = this.extractAdminOrders(response)
+            .slice()
+            .sort((left, right) => this.toTime(right.orderDate) - this.toTime(left.orderDate));
 
-    request$.subscribe({
-      next: (response: any) => {
-        let orderList: Order[] = [];
-        if (Array.isArray(response)) {
-          orderList = response;
-        } else if (response && response.content) {
-          orderList = response.content;
+          this.adminOrders = adminOrders;
+          this.orders = adminOrders.map(order => this.toLegacyOrder(order));
+          this.loadingOrders = false;
+          this.refreshNotifications();
+        },
+        error: () => {
+          this.toastService.error('Unable to load orders.');
+          this.loadingOrders = false;
         }
+      });
+      return;
+    }
 
-        this.orders = orderList.slice().sort((left, right) => this.toTime(right.createdAt) - this.toTime(left.createdAt));
+    this.orderService.getSellerOrders().subscribe({
+      next: (response: any) => {
+        const orderList: Order[] = Array.isArray(response)
+          ? response as Order[]
+          : (response?.content ?? []) as Order[];
+        
+        // Backend now returns customer info directly, just ensure dates are mapped
+        const enrichedOrders = orderList.map(order => {
+          // Map orderDate to createdAt if createdAt is missing
+          if (!order.createdAt && (order as any).orderDate) {
+            order.createdAt = (order as any).orderDate;
+          }
+          return order;
+        });
+        
+        this.orders = enrichedOrders.slice().sort((left, right) => this.toTime(right.createdAt) - this.toTime(left.createdAt));
         this.loadingOrders = false;
         this.refreshNotifications();
       },
@@ -665,7 +702,7 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  openOrderDetails(order: Order): void {
+  openOrderDetails(order: AdminOrderResponse): void {
     this.selectedOrder = order;
     this.selectedOrderStatus = order.status;
     this.isNotificationsOpen = false;
@@ -680,11 +717,11 @@ export class DashboardComponent implements OnInit {
       return;
     }
 
-    this.orderService.updateOrderStatus(this.selectedOrder.id, this.selectedOrderStatus).subscribe({
-      next: (updatedOrder) => {
-        this.selectedOrder = updatedOrder;
-        this.orders = this.orders.map(order => order.id === updatedOrder.id ? updatedOrder : order);
-        this.toastService.success(`Order ${updatedOrder.orderNumber} updated.`);
+    this.orderService.updateOrderStatus(this.selectedOrder.orderId, this.selectedOrderStatus).subscribe({
+      next: () => {
+        this.toastService.success(`Order ${this.selectedOrder?.orderNumber} updated.`);
+        this.closeOrderDetails();
+        this.loadOrders();
         this.refreshNotifications();
       },
       error: (err) => {
@@ -693,10 +730,87 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  setOrderStatus(order: Order, status: OrderStatus): void {
+  setOrderStatus(order: AdminOrderResponse, status: OrderStatus): void {
     this.selectedOrder = order;
     this.selectedOrderStatus = status;
     this.updateSelectedOrderStatus();
+  }
+
+  updateSellerOrderStatus(order: Order, status: OrderStatus): void {
+    this.orderService.updateOrderStatus(order.id, status).subscribe({
+      next: () => {
+        this.toastService.success(`Order ${order.orderNumber} updated.`);
+        this.loadOrders();
+        this.refreshNotifications();
+      },
+      error: (err) => {
+        this.toastService.error(err?.error?.message || err?.message || 'Order update failed.');
+      }
+    });
+  }
+
+  getCustomerDisplayName(order: Order): string {
+    // Try to get customer name from customer object if available
+    if (order.customer) {
+      const firstName = order.customer.firstName || '';
+      const lastName = order.customer.lastName || '';
+      const fullName = `${firstName} ${lastName}`.trim();
+      if (fullName) {
+        return fullName;
+      }
+    }
+    
+    // Try to get customer name from customerName field if available
+    if (order.customerName) {
+      return order.customerName;
+    }
+    
+    // Fallback to customer ID
+    return `Customer #${order.customerId}`;
+  }
+
+  private extractAdminOrders(response: any): AdminOrderResponse[] {
+    if (Array.isArray(response)) {
+      return response;
+    }
+
+    return response?.content ?? [];
+  }
+
+  private toLegacyOrder(order: AdminOrderResponse): Order {
+    return {
+      id: order.orderId,
+      customerId: order.customer?.id ?? 0,
+      customer: order.customer,
+      customerName: this.formatUserName(order.customer),
+      orderNumber: order.orderNumber,
+      status: order.status,
+      subtotal: Number(order.subtotal),
+      shippingFee: Number(order.shippingFee),
+      totalTTC: Number(order.totalTTC),
+      items: (order.items ?? []).map(item => ({
+        id: item.productId,
+        productId: item.productId,
+        product: {
+          id: item.productId,
+          name: item.productName,
+          images: []
+        },
+        quantity: item.quantity,
+        unitPrice: Number(item.unitPrice)
+      })),
+      addressId: 0,
+      address: order.shippingAddress ? {
+        id: 0,
+        street: order.shippingAddress,
+        city: '',
+        postalCode: '',
+        country: '',
+        isDefault: false
+      } : undefined,
+      createdAt: order.orderDate,
+      updatedAt: order.orderDate
+    };
   }
 
   get overviewMetrics(): OverviewMetric[] {
@@ -898,6 +1012,33 @@ export class DashboardComponent implements OnInit {
 
   get visibleCustomers(): CustomerSummary[] {
     return this.paginate(this.filteredCustomerSummaries, this.customerPageIndex, 8);
+  }
+
+  get adminOrdersWithDetails(): AdminOrderWithDetails[] {
+    return this.adminOrders.map(order => ({
+      order,
+      customerName: this.formatUserName(order.customer),
+      sellerName: this.getSellerNames(order)
+    }));
+  }
+
+  get filteredAdminOrdersWithDetails(): AdminOrderWithDetails[] {
+    const query = this.searchQuery.trim().toLowerCase();
+    if (!query) {
+      return this.adminOrdersWithDetails;
+    }
+    
+    return this.adminOrdersWithDetails.filter(item =>
+      item.order.orderNumber.toLowerCase().includes(query) ||
+      item.order.status.toLowerCase().includes(query) ||
+      item.customerName.toLowerCase().includes(query) ||
+      item.sellerName.toLowerCase().includes(query) ||
+      item.order.totalTTC.toString().includes(query)
+    );
+  }
+
+  get visibleAdminOrdersWithDetails(): AdminOrderWithDetails[] {
+    return this.paginate(this.filteredAdminOrdersWithDetails, this.orderPageIndex, 6);
   }
 
   get chartSeries(): ChartPoint[] {
@@ -1143,5 +1284,22 @@ export class DashboardComponent implements OnInit {
 
   private toTime(value: string | undefined): number {
     return value ? new Date(value).getTime() : 0;
+  }
+
+  formatUserName(user: UserSummaryResponse | null | undefined): string {
+    if (!user) {
+      return 'Unknown customer';
+    }
+
+    const nameParts = [user.firstName, user.lastName].filter(Boolean).map(value => value.trim());
+    return nameParts.length > 0 ? nameParts.join(' ') : user.email || `User #${user.id}`;
+  }
+
+  getSellerNames(order: AdminOrderResponse): string {
+    const names = (order.items ?? [])
+      .map(item => this.formatUserName(item.seller))
+      .filter(name => name && name !== 'Unknown customer');
+
+    return names.length > 0 ? Array.from(new Set(names)).join(' · ') : 'Unknown seller';
   }
 }
