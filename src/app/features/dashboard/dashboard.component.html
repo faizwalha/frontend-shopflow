@@ -23,7 +23,7 @@
                   [class.dashboard-nav-item-active]="activeSection === item.section"
                   (click)="setActiveSection(item.section)">
                   <div class="flex flex-1 flex-col items-start">
-                    <span class="text-sm font-semibold text-slate-950">{{ item.label }}</span>
+                    <span class="text-sm font-semibold text-slate-950">{{ item.section === 'orders' && isSeller(user.role) ? 'My Orders' : item.label }}</span>
                     <span class="text-xs text-slate-500">{{ item.description }}</span>
                   </div>
                 </button>
@@ -416,6 +416,136 @@
             </article>
           </section>
 
+          <section *ngIf="activeSection === 'orders' && (isAdmin(user.role) || isSeller(user.role))" class="space-y-6">
+            <article
+              class="rounded-[28px] border border-slate-200/80 bg-white p-5 shadow-[0_18px_50px_rgba(15,23,42,0.08)]">
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p class="text-xs font-semibold uppercase tracking-[0.24em] text-violet-700">Orders</p>
+                  <h2 class="mt-1 text-xl font-black text-slate-950">{{ isSeller(user.role) ? 'My orders' : 'Orders management' }}</h2>
+                </div>
+
+                <div class="flex-1 max-w-sm mx-4">
+                  <div class="relative">
+                    <input type="text" [value]="searchQuery" (input)="onSearchChange($event)"
+                      placeholder="Search orders..." class="dashboard-input !py-2 !pl-10 !rounded-full">
+                    <div class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                      <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8" />
+                        <path d="m21 21-4.3-4.3" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                <span class="rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-600">{{
+                  orders.length }} orders</span>
+              </div>
+
+              <div *ngIf="loadingOrders"
+                class="mt-5 rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-6 text-sm text-slate-500">
+                Loading orders...</div>
+
+              <div class="mt-5 overflow-hidden rounded-[24px] border border-slate-200" *ngIf="!loadingOrders && isAdmin(user.role)">
+                <table class="dashboard-table dashboard-table-compact">
+                  <thead>
+                    <tr>
+                      <th>Order Number</th>
+                      <th>Customer</th>
+                      <th>Seller</th>
+                      <th>Amount</th>
+                      <th>Status</th>
+                      <th>Date</th>
+                      <th class="text-center">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of visibleAdminOrdersWithDetails">
+                      <td class="font-semibold text-slate-950">{{ item.order.orderNumber }}</td>
+                      <td class="text-slate-600">{{ item.customerName }}</td>
+                      <td class="text-slate-600">{{ item.sellerName }}</td>
+                      <td class="font-semibold text-slate-950">${{ item.order.totalTTC | number:'1.2-2' }}</td>
+                      <td>
+                        <span class="status-chip" [ngClass]="'status-' + item.order.status.toLowerCase()">
+                          {{ item.order.status }}
+                        </span>
+                      </td>
+                      <td class="text-slate-600">{{ item.order.orderDate | date:'MMM d, y' }}</td>
+                      <td class="text-center">
+                        <button type="button" class="dashboard-table-icon-button dashboard-table-icon-button-edit"
+                          aria-label="View order details" (click)="openOrderDetails(item.order)">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                            <circle cx="12" cy="12" r="3" />
+                          </svg>
+                        </button>
+                      </td>
+                    </tr>
+                    <tr *ngIf="visibleAdminOrdersWithDetails.length === 0">
+                      <td colspan="7" class="px-6 py-10 text-center text-sm text-slate-500">No orders found.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="mt-5 overflow-hidden rounded-[24px] border border-slate-200" *ngIf="!loadingOrders && isSeller(user.role)">
+                <table class="dashboard-table dashboard-table-compact">
+                  <thead>
+                    <tr>
+                      <th>Order Number</th>
+                      <th>Customer</th>
+                      <th>Date</th>
+                      <th>Status</th>
+                      <th>Amount</th>
+                      <th class="text-center">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let order of visibleOrders">
+                      <td class="font-semibold text-slate-950">{{ order.orderNumber }}</td>
+                      <td class="text-slate-600">{{ getCustomerDisplayName(order) }}</td>
+                      <td class="text-slate-600">{{ order.createdAt | date:'MMM d, y' }}</td>
+                      <td>
+                        <span class="status-chip" [ngClass]="'status-' + order.status.toLowerCase()">
+                          {{ order.status }}
+                        </span>
+                      </td>
+                      <td class="font-semibold text-slate-950">${{ order.totalTTC | number:'1.2-2' }}</td>
+                      <td class="text-center">
+                        <div class="flex items-center justify-center gap-2">
+                          <select class="dashboard-input !w-auto !min-w-[140px] !py-2 !px-3"
+                            [(ngModel)]="order.status"
+                            (ngModelChange)="updateSellerOrderStatus(order, $event)">
+                            <option *ngFor="let status of orderStatuses" [ngValue]="status">{{ status }}</option>
+                          </select>
+                          <button type="button" class="dashboard-secondary-button !px-4 !py-2"
+                            (click)="updateSellerOrderStatus(order, order.status)">
+                            Save
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr *ngIf="visibleOrders.length === 0">
+                      <td colspan="6" class="px-6 py-10 text-center text-sm text-slate-500">No orders found.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div
+                class="mt-5 flex items-center justify-between gap-3 rounded-[20px] bg-slate-50 px-4 py-3 text-sm text-slate-600">
+                <span>Page {{ orderPageIndex + 1 }} of {{ orderPageCount }}</span>
+                <div class="flex items-center gap-2">
+                  <button type="button" class="dashboard-secondary-button" (click)="previousPage('orders')"
+                    [disabled]="orderPageIndex === 0">Previous</button>
+                  <button type="button" class="dashboard-secondary-button" (click)="nextPage('orders')"
+                    [disabled]="orderPageIndex >= orderPageCount - 1">Next</button>
+                </div>
+              </div>
+            </article>
+          </section>
+
           <section *ngIf="activeSection === 'customers' && isAdmin(user.role)" class="space-y-6">
             <article
               class="rounded-[28px] border border-slate-200/80 bg-white p-5 shadow-[0_18px_50px_rgba(15,23,42,0.08)]">
@@ -559,8 +689,7 @@
             <div>
               <p class="text-xs font-semibold uppercase tracking-[0.24em] text-violet-700">Order details</p>
               <h3 class="mt-1 text-2xl font-black text-slate-950">{{ selectedOrder.orderNumber }}</h3>
-              <p class="mt-1 text-sm text-slate-500">Order #{{ selectedOrder.id }} · Customer #{{
-                selectedOrder.customerId }}</p>
+              <p class="mt-1 text-sm text-slate-500">Order #{{ selectedOrder.orderId }} · {{ formatUserName(selectedOrder.customer) }}</p>
             </div>
             <button type="button" class="dashboard-icon-button" (click)="closeOrderDetails()">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -583,11 +712,10 @@
                   </thead>
                   <tbody>
                     <tr *ngFor="let item of (selectedOrder.items || [])">
-                      <td class="font-semibold text-slate-950">{{ item.product?.name || 'Product #' + item.productId }}
-                      </td>
+                      <td class="font-semibold text-slate-950">{{ item.productName }}</td>
                       <td>{{ item.quantity }}</td>
                       <td>${{ item.unitPrice | number:'1.2-2' }}</td>
-                      <td>${{ (item.unitPrice * item.quantity) | number:'1.2-2' }}</td>
+                      <td>${{ item.totalPrice | number:'1.2-2' }}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -604,14 +732,11 @@
               <button type="button" class="dashboard-primary-button w-full" (click)="updateSelectedOrderStatus()">Save
                 status</button>
               <div class="space-y-2 text-sm text-slate-600">
-                <p><span class="font-semibold text-slate-950">Total:</span> ${{ selectedOrder.totalTTC | number:'1.2-2'
-                  }}</p>
-                <p><span class="font-semibold text-slate-950">Shipping:</span> ${{ selectedOrder.shippingFee |
-                  number:'1.2-2' }}</p>
-                <p><span class="font-semibold text-slate-950">Discount:</span> ${{ (selectedOrder.discount || 0) |
-                  number:'1.2-2' }}</p>
-                <p><span class="font-semibold text-slate-950">Placed:</span> {{ selectedOrder.createdAt | date:'MMM d,
-                  y, h:mm a' }}</p>
+                <p><span class="font-semibold text-slate-950">Customer:</span> {{ formatUserName(selectedOrder.customer) }}</p>
+                <p><span class="font-semibold text-slate-950">Seller(s):</span> {{ getSellerNames(selectedOrder) }}</p>
+                <p><span class="font-semibold text-slate-950">Shipping:</span> {{ selectedOrder.shippingAddress }}</p>
+                <p><span class="font-semibold text-slate-950">Total:</span> ${{ selectedOrder.totalTTC | number:'1.2-2' }}</p>
+                <p><span class="font-semibold text-slate-950">Placed:</span> {{ selectedOrder.orderDate | date:'MMM d, y, h:mm a' }}</p>
               </div>
             </div>
           </div>

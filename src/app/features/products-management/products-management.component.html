@@ -92,7 +92,7 @@
           <tr *ngFor="let product of products" class="hover:bg-gray-50/50 transition-colors">
             <td class="px-8 py-6">
               <div class="flex items-center gap-4">
-                <img [src]="product.images[0] || 'https://via.placeholder.com/64'" class="h-16 w-16 rounded-2xl object-cover bg-gray-100">
+                <img [src]="product.images[0] || '/assets/placeholder-product.svg'" class="h-16 w-16 rounded-2xl object-cover bg-gray-100">
                 <span class="font-bold text-gray-900">{{product.name}}</span>
               </div>
             </td>
