@@ -399,11 +399,15 @@ export class DashboardComponent implements OnInit {
           ? response as Order[]
           : (response?.content ?? []) as Order[];
         
-        // Backend now returns customer info directly, just ensure dates are mapped
-        const enrichedOrders = orderList.map(order => {
+        // Backend now returns customer info directly, just ensure dates and IDs are mapped
+        const enrichedOrders = orderList.map((order: any) => {
+          // Map orderId to id if needed (backend returns orderId)
+          if (!order.id && order.orderId) {
+            order.id = order.orderId;
+          }
           // Map orderDate to createdAt if createdAt is missing
-          if (!order.createdAt && (order as any).orderDate) {
-            order.createdAt = (order as any).orderDate;
+          if (!order.createdAt && order.orderDate) {
+            order.createdAt = order.orderDate;
           }
           return order;
         });

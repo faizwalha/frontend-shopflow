@@ -43,7 +43,12 @@ export class OrderDetailsComponent implements OnInit {
     this.successMessage = '';
 
     this.orderService.getOrderById(id).subscribe({
-      next: (order) => {
+      next: (response: any) => {
+        // Map orderId to id if needed (backend returns orderId)
+        const order = {
+          ...response,
+          id: response.id ?? response.orderId
+        };
         this.order = order;
         this.loading = false;
       },
@@ -54,8 +59,16 @@ export class OrderDetailsComponent implements OnInit {
     });
   }
 
+  canCancelOrder(): boolean {
+    if (!this.order) return false;
+    // Cannot cancel if order is already shipped, delivered, confirmed, cancelled, or refunded
+    const nonCancellableStatuses = ['SHIPPING', 'SHIPPED', 'DELIVERED', 'CONFIRMED', 'CANCELLED', 'REFUNDED'];
+    return !nonCancellableStatuses.includes(this.order.status);
+  }
+
   cancelOrder(): void {
-    if (!this.order || this.order.status !== 'PENDING') {
+    if (!this.order || !this.canCancelOrder()) {
+      this.toastService.error(`Cannot cancel orders with status: ${this.order?.status}`);
       return;
     }
 

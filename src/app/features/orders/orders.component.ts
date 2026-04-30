@@ -41,13 +41,21 @@ export class OrdersComponent implements OnInit {
     this.orderService.getMyOrders(page, this.pageSize).subscribe({
       next: (response: any) => {
         // Handle both paginated (response.content) and simple array responses
+        let ordersList: Order[] = [];
         if (Array.isArray(response)) {
-          this.orders = response;
+          ordersList = response;
           this.totalPages = 1;
         } else {
-          this.orders = response.content ?? [];
+          ordersList = response.content ?? [];
           this.totalPages = response.totalPages ?? 0;
         }
+        
+        // Map orderId to id if needed (backend returns orderId)
+        this.orders = ordersList.map((order: any) => ({
+          ...order,
+          id: order.id ?? order.orderId
+        }));
+        
         this.currentPage = page;
         this.loading = false;
       },
@@ -59,7 +67,8 @@ export class OrdersComponent implements OnInit {
   }
 
   cancelOrder(order: Order): void {
-    if (order.status !== 'PENDING') {
+    if (!this.canCancelOrder(order)) {
+      this.toastService.error(`Cannot cancel orders with status: ${order.status}`);
       return;
     }
 
@@ -88,6 +97,12 @@ export class OrdersComponent implements OnInit {
         });
       }
     });
+  }
+
+  canCancelOrder(order: Order): boolean {
+    // Cannot cancel if order is already shipped, delivered, confirmed, cancelled, or refunded
+    const nonCancellableStatuses = ['SHIPPING', 'SHIPPED', 'DELIVERED', 'CONFIRMED', 'CANCELLED', 'REFUNDED'];
+    return !nonCancellableStatuses.includes(order.status);
   }
 
   formatCurrency(value: number | undefined | null): string {

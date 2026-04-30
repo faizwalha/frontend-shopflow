@@ -46,7 +46,7 @@
       <div class="mt-6 flex flex-wrap gap-3 items-center">
         <a [routerLink]="['/orders', order.id]" class="inline-flex items-center rounded-full bg-black text-white px-5 py-3 text-sm font-semibold hover:bg-gray-900 transition-colors">View details</a>
 
-        <button *ngIf="order.status === 'PENDING'" (click)="cancelOrder(order)" class="inline-flex items-center rounded-full border border-red-200 text-red-600 px-5 py-3 text-sm font-semibold hover:bg-red-50 transition-colors"
+        <button *ngIf="canCancelOrder(order)" (click)="cancelOrder(order)" class="inline-flex items-center rounded-full border border-red-200 text-red-600 px-5 py-3 text-sm font-semibold hover:bg-red-50 transition-colors"
           [disabled]="isCancelling && cancellingOrderId === order.id">
           {{ isCancelling && cancellingOrderId === order.id ? 'Cancelling...' : 'Cancel order' }}
         </button>

@@ -35,7 +35,7 @@
       </div>
 
       <!-- Action buttons -->
-      <div *ngIf="order.status === 'PENDING'" class="mt-8 flex justify-end">
+      <div *ngIf="canCancelOrder()" class="mt-8 flex justify-end">
         <button 
           (click)="cancelOrder()" 
           [disabled]="isCancelling"
