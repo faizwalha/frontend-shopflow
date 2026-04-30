@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Review, PostReviewRequest, ReviewResponse, ReviewListResponse, ApproveReviewRequest } from '../models/review.models';
+import { Review, PostReviewRequest, ReviewResponse, ReviewListResponse } from '../models/review.models';
 
 @Injectable({
   providedIn: 'root'
@@ -21,7 +21,18 @@ export class ReviewService {
     return this.http.get<ReviewListResponse>(`${this.apiUrl}/product/${productId}`, { params });
   }
 
-  approveReview(id: number, approved: boolean): Observable<ReviewResponse> {
-    return this.http.put<ReviewResponse>(`${this.apiUrl}/${id}/approve`, { approved });
+  getUnapprovedReviews(page = 0, size = 10): Observable<ReviewListResponse> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
+    return this.http.get<ReviewListResponse>(`${this.apiUrl}/unapproved`, { params });
+  }
+
+  approveReview(id: number): Observable<ReviewResponse> {
+    return this.http.put<ReviewResponse>(`${this.apiUrl}/${id}/approve`, {});
+  }
+
+  deleteReview(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 }
