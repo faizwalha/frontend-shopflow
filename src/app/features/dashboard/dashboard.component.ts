@@ -9,14 +9,17 @@ import { OrderService } from '../../core/services/order.service';
 import { DashboardService } from '../../core/services/dashboard.service';
 import { ToastService } from '../../core/services/toast.service';
 import { AdminUserService } from '../../core/services/admin-user.service';
+import { UploadService } from '../../core/services/upload.service';
 import { AdminUser } from '../../core/models/user.models';
 import { ConfirmService } from '../../core/services/confirm.service';
 import { CategoryRequest, CategoryResponse } from '../../core/models/category.models';
 import { ProductRequest, ProductResponse } from '../../core/models/product.models';
 import { AdminDashboardResponse, SellerDashboardResponse } from '../../core/models/dashboard.models';
 import { AdminOrderResponse, Order, OrderStatus, UserSummaryResponse } from '../../core/models/order.models';
+import { ReviewService } from '../../core/services/review.service';
+import { Review } from '../../core/models/review.models';
 
-type DashboardSection = 'overview' | 'products' | 'categories' | 'customers' | 'orders';
+type DashboardSection = 'overview' | 'products' | 'categories' | 'customers' | 'orders' | 'reviews';
 type ChartPeriod = 'daily' | 'weekly' | 'monthly';
 type NotificationTone = 'info' | 'success' | 'warning';
 
@@ -82,6 +85,8 @@ export class DashboardComponent implements OnInit {
   private toastService = inject(ToastService);
   private adminUserService = inject(AdminUserService);
   private confirmService = inject(ConfirmService);
+  private reviewService = inject(ReviewService);
+  private uploadService = inject(UploadService);
 
   readonly currentUser$ = this.authService.currentUser$;
   readonly navItems: DashboardNavItem[] = [
@@ -89,7 +94,8 @@ export class DashboardComponent implements OnInit {
     { section: 'products', label: 'Products', description: 'Catalog and merchandising', icon: 'products' },
     { section: 'categories', label: 'Categories', description: 'Collection structure', icon: 'categories', adminOnly: true },
     { section: 'orders', label: 'Orders', description: 'All orders, customers and sellers', icon: 'customers' },
-    { section: 'customers', label: 'Customers', description: 'Buyer activity summary', icon: 'customers', adminOnly: true }
+    { section: 'customers', label: 'Customers', description: 'Buyer activity summary', icon: 'customers', adminOnly: true },
+    { section: 'reviews', label: 'Reviews', description: 'Review moderation', icon: 'categories', adminOnly: true }
   ];
 
   readonly orderStatuses: OrderStatus[] = ['PENDING', 'PAID', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'REFUNDED'];
@@ -114,6 +120,10 @@ export class DashboardComponent implements OnInit {
     customers: {
       title: 'Customers',
       description: 'Review purchasing activity and high-value buyers.'
+    },
+    reviews: {
+      title: 'Review Moderation',
+      description: 'Approve or reject customer product reviews.'
     }
   };
 
@@ -140,6 +150,7 @@ export class DashboardComponent implements OnInit {
   categoryPageIndex = 0;
   orderPageIndex = 0;
   customerPageIndex = 0;
+  reviewPageIndex = 0;
   selectedRoleFilter: string | null = null;
 
   notifications: DashboardNotification[] = [];
@@ -149,6 +160,7 @@ export class DashboardComponent implements OnInit {
   loadingProducts = false;
   loadingOrders = false;
   loadingUsers = false;
+  loadingReviews = false;
 
   statsError = '';
   categoryError = '';
@@ -157,6 +169,7 @@ export class DashboardComponent implements OnInit {
   successMessage = '';
 
   adminUsers: AdminUser[] = [];
+  pendingReviews: Review[] = [];
 
   categoryForm = this.fb.nonNullable.group({
     name: ['', [Validators.required]],
@@ -210,6 +223,7 @@ export class DashboardComponent implements OnInit {
         this.loadOrders();
         if (this.isAdmin(user.role)) {
           this.loadAdminUsers();
+          this.loadPendingReviews();
         }
       } else if (user && user.role === 'CUSTOMER') {
         // For customers, we might only want to load their stats or orders if the dashboard is used as profile
@@ -297,6 +311,9 @@ export class DashboardComponent implements OnInit {
   setActiveSection(section: DashboardSection): void {
     this.activeSection = section;
     this.isNotificationsOpen = false;
+    if (section === 'reviews') {
+      this.loadPendingReviews();
+    }
   }
 
   setChartPeriod(period: ChartPeriod): void {
@@ -1112,7 +1129,7 @@ export class DashboardComponent implements OnInit {
     return this.adminStats?.topSellers ?? [];
   }
 
-  nextPage(target: 'products' | 'categories' | 'orders' | 'customers'): void {
+  nextPage(target: 'products' | 'categories' | 'orders' | 'customers' | 'reviews'): void {
     if (target === 'products' && this.productPageIndex < this.productPageCount - 1) {
       this.productPageIndex += 1;
     }
@@ -1128,9 +1145,14 @@ export class DashboardComponent implements OnInit {
     if (target === 'customers' && this.customerPageIndex < this.customerPageCount - 1) {
       this.customerPageIndex += 1;
     }
+
+    if (target === 'reviews' && this.reviewPageIndex < this.reviewPageCount - 1) {
+      this.reviewPageIndex += 1;
+      this.loadPendingReviews();
+    }
   }
 
-  previousPage(target: 'products' | 'categories' | 'orders' | 'customers'): void {
+  previousPage(target: 'products' | 'categories' | 'orders' | 'customers' | 'reviews'): void {
     if (target === 'products' && this.productPageIndex > 0) {
       this.productPageIndex -= 1;
     }
@@ -1145,6 +1167,11 @@ export class DashboardComponent implements OnInit {
 
     if (target === 'customers' && this.customerPageIndex > 0) {
       this.customerPageIndex -= 1;
+    }
+
+    if (target === 'reviews' && this.reviewPageIndex > 0) {
+      this.reviewPageIndex -= 1;
+      this.loadPendingReviews();
     }
   }
 
@@ -1305,5 +1332,67 @@ export class DashboardComponent implements OnInit {
       .filter(name => name && name !== 'Unknown customer');
 
     return names.length > 0 ? Array.from(new Set(names)).join(' · ') : 'Unknown seller';
+  }
+
+  loadPendingReviews(): void {
+    this.loadingReviews = true;
+    this.reviewService.getUnapprovedReviews(this.reviewPageIndex, 10).subscribe({
+      next: (response) => {
+        this.pendingReviews = response.content ?? [];
+        this.loadingReviews = false;
+      },
+      error: () => {
+        this.toastService.error('Unable to load pending reviews.');
+        this.loadingReviews = false;
+      }
+    });
+  }
+
+  approveReview(review: Review): void {
+    this.reviewService.approveReview(review.id).subscribe({
+      next: () => {
+        this.toastService.success('Review approved.');
+        this.loadPendingReviews();
+        this.loadStats();
+      },
+      error: () => this.toastService.error('Failed to approve review.')
+    });
+  }
+
+  rejectReview(review: Review): void {
+    this.confirmService.confirm({
+      title: 'Reject Review',
+      message: `Are you sure you want to delete this review?`,
+      confirmText: 'Reject',
+      type: 'danger'
+    }).pipe(take(1)).subscribe(confirmed => {
+      if (!confirmed) return;
+      this.reviewService.deleteReview(review.id).subscribe({
+        next: () => {
+          this.toastService.success('Review rejected and deleted.');
+          this.loadPendingReviews();
+        },
+        error: () => this.toastService.error('Failed to delete review.')
+      });
+    });
+  }
+
+  get reviewPageCount(): number {
+    return Math.ceil(this.pendingReviews.length / 10) || 1;
+  }
+
+  onFileSelected(event: any): void {
+    const file: File = event.target.files[0];
+    if (file) {
+      this.uploadService.uploadImage(file).subscribe({
+        next: (response) => {
+          const currentImages = this.productForm.getRawValue().images;
+          const newImages = currentImages ? `${currentImages}, ${response.url}` : response.url;
+          this.productForm.patchValue({ images: newImages });
+          this.toastService.success('Image uploaded successfully.');
+        },
+        error: () => this.toastService.error('Failed to upload image.')
+      });
+    }
   }
 }

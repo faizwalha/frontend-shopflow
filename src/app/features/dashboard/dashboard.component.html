@@ -247,8 +247,19 @@
 
                     <div class="sm:col-span-2">
                       <label class="dashboard-label" for="product-images">Images</label>
-                      <input id="product-images" formControlName="images" type="text" class="dashboard-input"
-                        placeholder="Comma-separated URLs">
+                      <div class="flex gap-2">
+                        <input id="product-images" formControlName="images" type="text" class="dashboard-input flex-1"
+                          placeholder="Comma-separated URLs or upload locally">
+                        <button type="button" class="dashboard-secondary-button !py-2 !px-4" (click)="fileInput.click()">
+                          <svg viewBox="0 0 24 24" class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="17 8 12 3 7 8" />
+                            <line x1="12" y1="3" x2="12" y2="15" />
+                          </svg>
+                          Import
+                        </button>
+                        <input #fileInput type="file" (change)="onFileSelected($event)" accept="image/*" class="hidden">
+                      </div>
                     </div>
                   </div>
 
@@ -665,6 +676,73 @@
                     [disabled]="customerPageIndex === 0">Previous</button>
                   <button type="button" class="dashboard-secondary-button" (click)="nextPage('customers')"
                     [disabled]="customerPageIndex >= customerPageCount - 1">Next</button>
+                </div>
+              </div>
+            </article>
+          </section>
+
+          <section *ngIf="activeSection === 'reviews' && isAdmin(user.role)" class="space-y-6">
+            <article
+              class="rounded-[28px] border border-slate-200/80 bg-white p-5 shadow-[0_18px_50px_rgba(15,23,42,0.08)]">
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p class="text-xs font-semibold uppercase tracking-[0.24em] text-violet-700">Reviews</p>
+                  <h2 class="mt-1 text-xl font-black text-slate-950">Review moderation</h2>
+                </div>
+
+                <span class="rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-600">{{
+                  pendingReviews.length }} pending reviews</span>
+              </div>
+
+              <div *ngIf="loadingReviews"
+                class="mt-5 rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-6 text-sm text-slate-500">
+                Loading pending reviews...</div>
+
+              <div class="mt-5 overflow-hidden rounded-[24px] border border-slate-200" *ngIf="!loadingReviews">
+                <table class="dashboard-table dashboard-table-compact">
+                  <thead>
+                    <tr>
+                      <th>Product ID</th>
+                      <th>Customer</th>
+                      <th>Rating</th>
+                      <th>Comment</th>
+                      <th class="text-center">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let review of pendingReviews">
+                      <td class="font-semibold text-slate-950">#{{ review.productId }}</td>
+                      <td class="text-slate-600">{{ review.customerName || 'Anonymous' }}</td>
+                      <td>
+                        <div class="flex text-amber-400">
+                          <ng-container *ngFor="let i of [1,2,3,4,5]">
+                            <span [class.opacity-30]="i > review.rating">★</span>
+                          </ng-container>
+                        </div>
+                      </td>
+                      <td class="text-slate-600 max-w-xs truncate">{{ review.comment }}</td>
+                      <td class="text-center">
+                        <div class="flex items-center justify-center gap-2">
+                          <button type="button" class="dashboard-primary-button !px-3 !py-1.5 !text-xs" (click)="approveReview(review)">Approve</button>
+                          <button type="button" class="dashboard-secondary-button !px-3 !py-1.5 !text-xs !text-rose-600 !border-rose-100 hover:!bg-rose-50" (click)="rejectReview(review)">Reject</button>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr *ngIf="pendingReviews.length === 0">
+                      <td colspan="5" class="px-6 py-10 text-center text-sm text-slate-500">No pending reviews.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div
+                class="mt-5 flex items-center justify-between gap-3 rounded-[20px] bg-slate-50 px-4 py-3 text-sm text-slate-600">
+                <span>Page {{ reviewPageIndex + 1 }} of {{ reviewPageCount }}</span>
+                <div class="flex items-center gap-2">
+                  <button type="button" class="dashboard-secondary-button" (click)="previousPage('reviews')"
+                    [disabled]="reviewPageIndex === 0">Previous</button>
+                  <button type="button" class="dashboard-secondary-button" (click)="nextPage('reviews')"
+                    [disabled]="reviewPageIndex >= reviewPageCount - 1">Next</button>
                 </div>
               </div>
             </article>
