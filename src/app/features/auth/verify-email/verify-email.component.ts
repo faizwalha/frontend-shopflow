@@ -26,8 +26,16 @@ import { ToastService } from '../../../core/services/toast.service';
             </svg>
           </div>
           <h2 class="text-3xl font-black text-slate-900 tracking-tight">Compte Activé !</h2>
-          <p class="text-slate-500 font-medium mt-4 mb-8">Votre email a été vérifié avec succès. Vous pouvez maintenant vous connecter.</p>
-          <a routerLink="/login" class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white px-10 py-3.5 rounded-xl font-black transition-all shadow-xl shadow-indigo-100">
+          <p class="text-slate-500 font-medium mt-4 mb-8">Votre email a été vérifié avec succès.</p>
+          
+          <div *ngIf="authService.getRole() === 'SELLER'" class="space-y-4">
+            <p class="text-indigo-600 font-bold animate-pulse">Redirection vers la configuration de votre boutique...</p>
+            <div class="w-full bg-gray-200 rounded-full h-1.5 max-w-[200px] mx-auto">
+              <div class="bg-indigo-600 h-1.5 rounded-full animate-[progress_2s_ease-in-out]"></div>
+            </div>
+          </div>
+
+          <a *ngIf="authService.getRole() !== 'SELLER'" routerLink="/login" class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white px-10 py-3.5 rounded-xl font-black transition-all shadow-xl shadow-indigo-100">
             Se Connecter
           </a>
         </div>
@@ -48,7 +56,8 @@ import { ToastService } from '../../../core/services/toast.service';
 })
 export class VerifyEmailComponent implements OnInit {
   private route = inject(ActivatedRoute);
-  private authService = inject(AuthService);
+  private router = inject(Router);
+  public authService = inject(AuthService);
   private toastService = inject(ToastService);
 
   status: 'verifying' | 'success' | 'error' = 'verifying';
@@ -58,9 +67,16 @@ export class VerifyEmailComponent implements OnInit {
     const token = this.route.snapshot.queryParamMap.get('token');
     if (token) {
       this.authService.verifyEmail(token).subscribe({
-        next: () => {
+        next: (response) => {
           this.status = 'success';
           this.toastService.success('Compte activé avec succès !');
+          
+          if (response.role === 'SELLER') {
+            // Redirect to seller setup after a short delay to show success message
+            setTimeout(() => {
+              this.router.navigate(['/seller-setup']);
+            }, 2000);
+          }
         },
         error: (err) => {
           this.status = 'error';
