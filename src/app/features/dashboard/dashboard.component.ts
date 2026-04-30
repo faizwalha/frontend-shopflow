@@ -128,6 +128,7 @@ export class DashboardComponent implements OnInit {
   categoryPageIndex = 0;
   orderPageIndex = 0;
   customerPageIndex = 0;
+  selectedRoleFilter: string | null = null;
 
   notifications: DashboardNotification[] = [];
 
@@ -295,6 +296,10 @@ export class DashboardComponent implements OnInit {
     this.customerPageIndex = 0;
   }
 
+  onRoleFilterChange(): void {
+    this.customerPageIndex = 0;
+  }
+
   clearSearch(): void {
     this.searchQuery = '';
   }
@@ -381,7 +386,25 @@ export class DashboardComponent implements OnInit {
     this.loadingUsers = true;
     this.adminUserService.listUsers().subscribe({
       next: (users) => {
-        this.adminUsers = users;
+        this.adminUsers = users.map(user => {
+          // Build displayName from available fields
+          if (!user.displayName) {
+            if (user.firstName && user.lastName) {
+              user.displayName = `${user.firstName} ${user.lastName}`;
+            } else {
+              user.displayName = `User #${user.id}`;
+            }
+          }
+          
+          // Ensure roles is an array
+          if (!user.roles && user.role) {
+            user.roles = [user.role];
+          } else if (!user.roles) {
+            user.roles = [];
+          }
+          
+          return user;
+        });
         this.loadingUsers = false;
       },
       error: () => {
@@ -790,6 +813,33 @@ export class DashboardComponent implements OnInit {
     );
   }
 
+  get filteredAdminUsers(): AdminUser[] {
+    const query = this.searchQuery.trim().toLowerCase();
+    let filtered = this.adminUsers;
+
+    // Filter by role if selected
+    if (this.selectedRoleFilter) {
+      filtered = filtered.filter(user =>
+        user.roles?.some(role => role.toUpperCase() === this.selectedRoleFilter?.toUpperCase())
+      );
+    }
+
+    // Filter by search query
+    if (!query) {
+      return filtered;
+    }
+
+    return filtered.filter(user =>
+      (user.displayName?.toLowerCase() ?? '').includes(query) ||
+      user.email.toLowerCase().includes(query) ||
+      user.id.toString().includes(query)
+    );
+  }
+
+  get visibleAdminUsers(): AdminUser[] {
+    return this.paginate(this.filteredAdminUsers, this.customerPageIndex, 8);
+  }
+
   get lowStockProducts(): ProductResponse[] {
     const user = this.authService.getCurrentUser();
     let list = this.products.filter(product =>
@@ -828,7 +878,10 @@ export class DashboardComponent implements OnInit {
   }
 
   get customerPageCount(): number {
-    return Math.max(1, Math.ceil(this.filteredCustomerSummaries.length / 8));
+    const user = this.authService.getCurrentUser();
+    const isAdmin = this.isAdmin(user?.role);
+    const itemCount = isAdmin ? this.filteredAdminUsers.length : this.filteredCustomerSummaries.length;
+    return Math.max(1, Math.ceil(itemCount / 8));
   }
 
   get visibleProducts(): ProductResponse[] {

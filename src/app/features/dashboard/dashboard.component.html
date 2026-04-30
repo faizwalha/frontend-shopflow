@@ -439,7 +439,18 @@
                 </div>
 
                 <span class="rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-600">{{
-                  customerSummaries.length }} buyers</span>
+                  adminUsers.length }} users</span>
+              </div>
+
+              <!-- Role Filter -->
+              <div class="mt-4 flex items-center gap-3">
+                <label for="roleFilter" class="text-sm font-semibold text-slate-700">Filter by role:</label>
+                <select id="roleFilter" [(ngModel)]="selectedRoleFilter" (change)="onRoleFilterChange()"
+                  class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500">
+                  <option [value]="null">All Roles</option>
+                  <option value="CUSTOMER">Customer</option>
+                  <option value="SELLER">Seller</option>
+                </select>
               </div>
 
               <div class="mt-5 overflow-hidden rounded-[24px] border border-slate-200">
@@ -448,32 +459,40 @@
                     <thead>
                       <tr>
                         <th>Name / Email</th>
-                        <th>Roles</th>
-                        <th>Active</th>
+                        <th>Role</th>
+                        <th>Status</th>
                         <th>Created</th>
                         <th class="text-center">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
-                      <tr *ngFor="let u of adminUsers">
+                      <tr *ngFor="let u of visibleAdminUsers">
                         <td>
                           <div class="font-semibold text-slate-950">{{ u.displayName || ('User #' + u.id) }}</div>
                           <div class="text-xs text-slate-500">{{ u.email }}</div>
                         </td>
                         <td class="text-slate-600">{{ (u.roles || []).join(', ') }}</td>
-                        <td class="font-semibold text-slate-950">{{ u.active ? 'Active' : 'Disabled' }}</td>
+                        <td>
+                          <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold"
+                            [ngClass]="u.active ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'">
+                            <span class="inline-block h-2 w-2 rounded-full" [ngClass]="u.active ? 'bg-emerald-500' : 'bg-rose-500'"></span>
+                            {{ u.active ? 'Active' : 'Inactive' }}
+                          </span>
+                        </td>
                         <td class="text-slate-600">{{ u.createdAt ? (u.createdAt | date:'MMM d, y') : '—' }}</td>
                         <td class="text-center">
                           <div class="flex items-center justify-center gap-2">
                             <button *ngIf="!u.active" type="button" class="dashboard-secondary-button" (click)="setUserActive(u, true)">Activate</button>
                             <button *ngIf="u.active" type="button" class="dashboard-secondary-button" (click)="setUserActive(u, false)">Deactivate</button>
-                            <button type="button" class="dashboard-table-icon-button dashboard-table-icon-button-danger" aria-label="Delete user" (click)="removeUser(u)">
-                              Delete
+                            <button type="button" class="dashboard-table-icon-button dashboard-table-icon-button-danger" aria-label="Delete user" (click)="removeUser(u)" title="Delete user">
+                              <svg viewBox="0 0 24 24" class="w-4 h-4" fill="currentColor">
+                                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-9l-1 1H5v2h14V4z" />
+                              </svg>
                             </button>
                           </div>
                         </td>
                       </tr>
-                      <tr *ngIf="adminUsers.length === 0">
+                      <tr *ngIf="visibleAdminUsers.length === 0">
                         <td colspan="5" class="px-6 py-10 text-center text-sm text-slate-500">No users found.</td>
                       </tr>
                     </tbody>
