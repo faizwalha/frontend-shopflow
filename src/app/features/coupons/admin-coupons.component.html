@@ -1,60 +1,115 @@
-<div class="max-w-6xl mx-auto px-4 py-8">
-  <div *ngIf="error" class="mb-4 p-4 bg-rose-100 border border-rose-300 text-rose-700 rounded-lg">
+<div class="coupon-catalog">
+  <div *ngIf="error" class="coupon-error">
     {{ error }}
   </div>
 
-  <div *ngIf="loading" class="text-center py-8">Loading coupons...</div>
-
-  <div *ngIf="!loading" class="flex items-center justify-between mb-6">
-    <h1 class="text-2xl font-bold">Coupons</h1>
-    <button class="rounded-full bg-black text-white px-4 py-2" (click)="openCreate()">New Coupon</button>
+  <div class="coupon-header">
+    <div>
+      <h3 class="coupon-title">Coupons</h3>
+      <p class="coupon-subtitle">Manage discount codes and activation rules.</p>
+    </div>
+    <button type="button" class="dashboard-primary-button px-4 py-2" (click)="openCreate()">
+      + Create coupon
+    </button>
   </div>
 
-  <div *ngIf="formOpen" [formGroup]="form" class="mb-6 p-4 border rounded-lg bg-white">
-    <div class="grid gap-3 sm:grid-cols-3">
-      <input class="input" placeholder="Code" formControlName="code" />
-      <select class="input" formControlName="type">
-        <option value="FIXED">Fixed</option>
-        <option value="PERCENTAGE">Percentage</option>
-      </select>
-      <input type="number" class="input" placeholder="Value" formControlName="value" step="0.01" />
-      <input type="datetime-local" class="input" placeholder="Expiry date" formControlName="expiryDate" />
-      <input type="number" class="input" placeholder="Max usages (optional)" formControlName="maxUsages" />
-      <label class="flex items-center gap-2"><input type="checkbox" formControlName="active" /> Active</label>
+  <div *ngIf="formOpen" [formGroup]="form" class="coupon-form">
+    <div class="coupon-grid">
+      <div>
+        <label class="dashboard-label" for="coupon-code">Code</label>
+        <input id="coupon-code" class="dashboard-input" placeholder="SUMMER25" formControlName="code" />
+      </div>
+      <div>
+        <label class="dashboard-label" for="coupon-type">Type</label>
+        <select id="coupon-type" class="dashboard-input" formControlName="type">
+          <option value="FIXED">Fixed</option>
+          <option value="PERCENTAGE">Percentage</option>
+        </select>
+      </div>
+      <div>
+        <label class="dashboard-label" for="coupon-value">Value</label>
+        <input
+          id="coupon-value"
+          type="number"
+          class="dashboard-input"
+          [attr.min]="isPercentageType ? 1 : 0.01"
+          [attr.max]="isPercentageType ? 100 : null"
+          [placeholder]="isPercentageType ? '0-100' : '0.00'"
+          formControlName="value"
+          step="0.01" />
+        <p class="mt-1 text-xs text-slate-500" *ngIf="isPercentageType">Percentage coupons use a value between 1 and 100.</p>
+      </div>
+      <div>
+        <label class="dashboard-label" for="coupon-expiry">Expiry date</label>
+        <input id="coupon-expiry" type="datetime-local" class="dashboard-input" placeholder="Expiry date" formControlName="expiryDate" />
+      </div>
+      <div>
+        <label class="dashboard-label" for="coupon-max-usages">Max usages</label>
+        <input id="coupon-max-usages" type="number" class="dashboard-input" placeholder="Optional" formControlName="maxUsages" />
+      </div>
+      <div class="flex items-center gap-2 pt-6">
+        <input id="coupon-active" type="checkbox" formControlName="active" class="h-4 w-4 rounded border-slate-300 text-violet-600 focus:ring-violet-500" />
+        <label for="coupon-active" class="text-sm font-medium text-slate-700">Active</label>
+      </div>
     </div>
-    <div class="mt-4 flex gap-2">
-      <button class="btn btn-primary" (click)="save()">Save</button>
-      <button class="btn" (click)="cancel()">Cancel</button>
+
+    <div class="mt-4 flex gap-2 justify-end">
+      <button type="button" class="dashboard-secondary-button" (click)="cancel()">Cancel</button>
+      <button type="button" class="dashboard-primary-button" (click)="save()">Save</button>
     </div>
   </div>
 
-  <div class="bg-white border rounded-lg p-4">
-    <table class="w-full table-auto">
-      <thead>
-        <tr class="text-left">
-          <th>Code</th>
-          <th>Type</th>
-          <th>Value</th>
-          <th>Expiry</th>
-          <th>Usages</th>
-          <th>Active</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let c of coupons">
-          <td class="font-semibold">{{ c.code }}</td>
-          <td>{{ c.type }}</td>
-          <td>{{ c.value }}</td>
-          <td>{{ c.expiryDate | date:'medium' }}</td>
-          <td>{{ c.currentUsages ?? 0 }} / {{ c.maxUsages ?? '∞' }}</td>
-          <td>{{ c.active ? 'Yes' : 'No' }}</td>
-          <td>
-            <button class="btn" (click)="edit(c)">Edit</button>
-            <button class="btn btn-danger" (click)="remove(c.id)">Delete</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <div *ngIf="loading" class="coupon-loading">Loading coupons...</div>
+
+  <div *ngIf="!loading" class="coupon-card">
+    <div class="overflow-x-auto">
+      <table class="dashboard-table dashboard-table-compact">
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Type</th>
+            <th>Value</th>
+            <th>Expiry</th>
+            <th>Usages</th>
+            <th>Active</th>
+            <th class="text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let c of coupons">
+            <td class="font-semibold text-slate-950">{{ c.code }}</td>
+            <td>{{ formatCouponType(c.type) }}</td>
+            <td>{{ formatCouponValue(c) }}</td>
+            <td>{{ c.expiryDate | date:'medium' }}</td>
+            <td>{{ c.currentUsages ?? 0 }} / {{ c.maxUsages ?? '∞' }}</td>
+            <td>{{ c.active ? 'Yes' : 'No' }}</td>
+            <td class="text-center">
+              <div class="flex items-center justify-center gap-2">
+                <button type="button" class="dashboard-table-icon-button dashboard-table-icon-button-edit" aria-label="Edit coupon" (click)="edit(c)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M12 20h9" />
+                    <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+                  </svg>
+                </button>
+                <button type="button" class="dashboard-table-icon-button dashboard-table-icon-button-danger" aria-label="Delete coupon" (click)="remove(c.id)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M3 6h18" />
+                    <path d="M8 6V4h8v2" />
+                    <path d="M6 6l1 14h10l1-14" />
+                    <path d="M10 11v5" />
+                    <path d="M14 11v5" />
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="coupons.length === 0">
+            <td colspan="7" class="px-6 py-10 text-center text-sm text-slate-500">No coupons found.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
