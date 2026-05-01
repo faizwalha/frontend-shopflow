@@ -16,11 +16,12 @@ import { CategoryRequest, CategoryResponse } from '../../core/models/category.mo
 import { ProductRequest, ProductResponse } from '../../core/models/product.models';
 import { AdminDashboardResponse, SellerDashboardResponse } from '../../core/models/dashboard.models';
 import { AdminOrderResponse, Order, OrderStatus, UserSummaryResponse } from '../../core/models/order.models';
+import { AdminCouponsComponent } from '../coupons/admin-coupons.component';
 
 import { ReviewService } from '../../core/services/review.service';
 import { Review } from '../../core/models/review.models';
 
-type DashboardSection = 'overview' | 'products' | 'categories' | 'customers' | 'orders' | 'reviews';
+type DashboardSection = 'overview' | 'products' | 'categories' | 'customers' | 'orders' | 'reviews' | 'coupons';
 
 type ChartPeriod = 'daily' | 'weekly' | 'monthly';
 type NotificationTone = 'info' | 'success' | 'warning';
@@ -98,7 +99,8 @@ export class DashboardComponent implements OnInit {
     { section: 'orders', label: 'Orders', description: 'All orders, customers and sellers', icon: 'customers' },
     { section: 'customers', label: 'Customers', description: 'Buyer activity summary', icon: 'customers', adminOnly: true },
 
-    { section: 'reviews', label: 'Reviews', description: 'Review moderation', icon: 'categories', adminOnly: true }
+    { section: 'reviews', label: 'Reviews', description: 'Review moderation', icon: 'categories', adminOnly: true },
+    { section: 'coupons', label: 'Coupons', description: 'Promo codes and discounts', icon: 'discount', adminOnly: true }
   ];
 
   readonly orderStatuses: OrderStatus[] = ['PENDING', 'PAID', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'REFUNDED'];
@@ -127,11 +129,10 @@ export class DashboardComponent implements OnInit {
     reviews: {
       title: 'Review Moderation',
       description: 'Approve or reject customer product reviews.'
-    }
-    ,
+    },
     coupons: {
-      title: 'Coupons',
-      description: 'Create and manage promotional coupons.'
+      title: 'Coupons Management',
+      description: 'Create, update, and remove discount coupons.'
     }
   };
 
@@ -309,7 +310,7 @@ export class DashboardComponent implements OnInit {
   }
 
   canAccessSection(section: DashboardSection, role: string | null | undefined): boolean {
-    if (section === 'customers') {
+    if (section === 'customers' || section === 'reviews' || section === 'categories' || section === 'coupons') {
       return this.isAdmin(role);
     }
 
