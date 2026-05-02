@@ -34,6 +34,13 @@ export const routes: Routes = [
         title: 'Checkout - ShopFlow'
       },
       {
+        path: 'customer-dashboard',
+        canActivate: [authGuard, roleGuard],
+        data: { expectedRoles: ['CUSTOMER'] },
+        loadComponent: () => import('./features/customer-dashboard/customer-dashboard.component').then(c => c.CustomerDashboardComponent),
+        title: 'Customer Dashboard - ShopFlow'
+      },
+      {
         path: 'dashboard',
         canActivate: [authGuard, roleGuard],
         data: { expectedRoles: ['ADMIN', 'SELLER'] },
