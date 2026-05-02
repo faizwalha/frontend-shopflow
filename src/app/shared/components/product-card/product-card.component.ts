@@ -26,13 +26,6 @@ export class ProductCardComponent {
   successMessage = '';
   errorMessage = '';
 
-  getDiscountPercentage(): number {
-    if (!this.product.promoPrice) {
-      return 0;
-    }
-    return Math.round(((this.product.price - this.product.promoPrice) / this.product.price) * 100);
-  }
-
   addToCart(): void {
     if (!this.product) {
       return;
@@ -70,5 +63,17 @@ export class ProductCardComponent {
         this.errorMessage = err?.error?.message || err?.message || 'Unable to add item to cart.';
       }
     });
+  }
+
+  getDiscountPercentage(): number {
+    if (!this.product || this.product.promoPrice == null) {
+      return 0;
+    }
+    const original = Number(this.product.price ?? 0);
+    const promo = Number(this.product.promoPrice ?? 0);
+    if (!original || promo >= original) {
+      return 0;
+    }
+    return Math.round(((original - promo) / original) * 100);
   }
 }

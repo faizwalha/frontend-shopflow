@@ -25,7 +25,11 @@ export class CatalogComponent implements OnInit {
   selectedCategory = 'All';
   searchQuery = '';
   selectedSort = 'latest';
-  selectedPriceMax = 1000;
+  // start unset so we can initialize to the discovered global/page max
+  selectedPriceMax = 0;
+  priceRangeMax = 1000;
+  // Best-effort global maximum across the entire catalogue
+  globalPriceRangeMax?: number;
   loadingCategories = false;
   categoryError = '';
   loadingProducts = false;
@@ -39,6 +43,9 @@ export class CatalogComponent implements OnInit {
   private rootCategories: CategoryResponse[] = [];
 
   ngOnInit() {
+    // Try to determine global max price for the price range slider (best-effort).
+    this.fetchGlobalMaxPrice();
+
     this.loadProducts();
 
     this.loadingCategories = true;
@@ -65,6 +72,31 @@ export class CatalogComponent implements OnInit {
          this.loadProducts();
        }
     });
+  }
+
+  // Best-effort: fetch a large page to compute a global max price for the slider.
+  // If backend limits the page size this may not return every product; it's non-blocking.
+  private fetchGlobalMaxPrice(): void {
+    try {
+      this.productService.getAllProducts(0, 100000).subscribe({
+        next: (page) => {
+          const products = (page.content ?? []).map(p => this.mapProduct(p));
+          const maxPrice = products.reduce((m, p) => Math.max(m, Number(p.price ?? 0)), 0);
+          if (maxPrice > 0) {
+            this.globalPriceRangeMax = Math.max(Math.ceil(maxPrice), 1);
+            this.priceRangeMax = Math.max(this.priceRangeMax, this.globalPriceRangeMax);
+            if (!this.selectedPriceMax) {
+              this.selectedPriceMax = this.priceRangeMax;
+            }
+          }
+        },
+        error: () => {
+          // ignore — keep defaults
+        }
+      });
+    } catch {
+      // ignore errors from attempt
+    }
   }
 
   private resolveCategoryLabel(categoryParam: string): string {
@@ -107,17 +139,18 @@ export class CatalogComponent implements OnInit {
         this.pageNumbers = Array.from({ length: this.totalPages }, (_, index) => index);
         this.totalElements = page.totalElements ?? products.length;
         this.allLoadedProducts = products.map(product => this.mapProduct(product));
+        const pageMax = this.allLoadedProducts.reduce((m, p) => Math.max(m, Number(p.price ?? 0)), 0);
+        this.priceRangeMax = Math.max(Math.ceil(pageMax), 1, this.globalPriceRangeMax ?? 0);
+        if (!this.selectedPriceMax) {
+          this.selectedPriceMax = this.priceRangeMax;
+        }
         this.applyFilters();
         this.loadingProducts = false;
       },
       error: () => {
         this.loadingProducts = false;
         this.productError = 'Unable to load products from the backend.';
-        this.allLoadedProducts = this.getFallbackProducts();
-        this.totalPages = 1;
-        this.pageNumbers = [0];
-        this.totalElements = this.allLoadedProducts.length;
-        this.applyFilters();
+        this.filteredProducts = [];
       }
     });
   }
@@ -127,8 +160,7 @@ export class CatalogComponent implements OnInit {
       id: product.id,
       name: product.name,
       description: product.description ?? '',
-      price: product.price,
-      promoPrice: product.promoPrice,
+      price: product.displayPrice ?? product.promoPrice ?? product.price,
       imageUrl: product.images?.[0] ?? '/assets/placeholder-product.svg',
       category: product.categories?.[0] ?? 'Uncategorized',
       rating: product.averageRating ?? 0,
@@ -161,111 +193,19 @@ export class CatalogComponent implements OnInit {
           return 0;
       }
     });
-
+    // When using server-side paging, `allLoadedProducts` contains the current page.
+    // Keep server-provided `totalPages` and `totalElements` and only filter/sort the current page contents.
     this.filteredProducts = sorted;
   }
 
   onPriceRangeChange(event: Event): void {
     const value = Number((event.target as HTMLInputElement).value);
-    this.selectedPriceMax = Number.isFinite(value) ? value : 1000;
+    this.selectedPriceMax = Number.isFinite(value) ? value : this.priceRangeMax;
     this.applyFilters();
   }
 
   onSortChange(event: Event): void {
     this.selectedSort = (event.target as HTMLSelectElement).value || 'latest';
     this.applyFilters();
-  }
-
-  private getFallbackProducts(): Product[] {
-    return [
-      {
-        id: 1,
-        name: 'Wireless Noise-Cancelling Headphones',
-        description: 'Premium headphones with active noise cancellation.',
-        price: 299.99,
-        promoPrice: 199.99,
-        imageUrl: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=2070&auto=format&fit=crop',
-        category: 'Electronics',
-        rating: 4.8,
-        reviewsCount: 124
-      },
-      {
-        id: 2,
-        name: 'Minimalist Mechanical Keyboard',
-        description: 'Tenkeyless layout with tactile switches.',
-        price: 129.50,
-        promoPrice: 99.99,
-        imageUrl: 'https://images.unsplash.com/photo-1595225476474-87563907a212?q=80&w=2071&auto=format&fit=crop',
-        category: 'Peripherals',
-        rating: 4.5,
-        reviewsCount: 89
-      },
-      {
-        id: 3,
-        name: 'Ergonomic Office Chair',
-        description: 'Adjustable lumbar support and breathable mesh.',
-        price: 450.00,
-        promoPrice: 349.99,
-        imageUrl: 'https://images.unsplash.com/photo-1505843490538-5133c6c7d0e1?q=80&w=2069&auto=format&fit=crop',
-        category: 'Furniture',
-        rating: 4.9,
-        reviewsCount: 302
-      },
-      {
-        id: 4,
-        name: '4K Ultra HD Smart Monitor',
-        description: '32-inch display perfect for creative professionals.',
-        price: 599.99,
-        promoPrice: 449.99,
-        imageUrl: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?q=80&w=2070&auto=format&fit=crop',
-        category: 'Screens',
-        rating: 4.7,
-        reviewsCount: 56
-      },
-      {
-        id: 5,
-        name: 'Premium Wireless Mouse',
-        description: 'Ergonomic design with precision tracking.',
-        price: 79.99,
-        promoPrice: 59.99,
-        imageUrl: 'https://images.unsplash.com/photo-1527814050087-3793815479db?q=80&w=2070&auto=format&fit=crop',
-        category: 'Peripherals',
-        rating: 4.6,
-        reviewsCount: 178
-      },
-      {
-        id: 6,
-        name: 'Standing Desk Converter',
-        description: 'Adjustable height with cable management.',
-        price: 349.99,
-        promoPrice: 279.99,
-        imageUrl: 'https://images.unsplash.com/photo-1593062096033-9a26b09da705?q=80&w=2070&auto=format&fit=crop',
-        category: 'Furniture',
-        rating: 4.7,
-        reviewsCount: 92
-      },
-      {
-        id: 7,
-        name: '27" Gaming Monitor',
-        description: '165Hz refresh rate, 1ms response time.',
-        price: 349.99,
-        promoPrice: 299.99,
-        imageUrl: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?q=80&w=2070&auto=format&fit=crop',
-        category: 'Screens',
-        rating: 4.9,
-        reviewsCount: 234
-      },
-      {
-        id: 8,
-        name: 'Laptop Stand',
-        description: 'Aluminum construction with adjustable angles.',
-        price: 89.99,
-        promoPrice: 69.99,
-        imageUrl: 'https://images.unsplash.com/photo-1559056199-641a0ac8b3f4?q=80&w=2070&auto=format&fit=crop',
-        category: 'Accessories',
-        rating: 4.4,
-        reviewsCount: 45
-      }
-    ];
   }
 }
