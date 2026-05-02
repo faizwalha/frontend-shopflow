@@ -221,6 +221,16 @@ export class CustomerDashboardComponent implements OnInit {
     return (value ?? 0).toFixed(2);
   }
 
+  getOrderItemName(item: any): string {
+    return item.product?.name || item.productName || `Product #${item.productId}`;
+  }
+
+  getOrderItemLineTotal(item: any): number {
+    const quantity = Number(item.quantity ?? 0);
+    const unitPrice = Number(item.unitPrice ?? 0);
+    return quantity * unitPrice;
+  }
+
   get pagedReviews(): Review[] {
     const start = this.reviewsPage * this.reviewsPageSize;
     return this.reviews.slice(start, start + this.reviewsPageSize);

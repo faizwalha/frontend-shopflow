@@ -28,9 +28,9 @@
         <!-- Shipping Address -->
         <div class="rounded-2xl bg-gray-50 border border-gray-100 p-5">
           <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Shipping Address</p>
-          <p class="text-gray-900 font-medium">{{ order.address?.street }}</p>
-          <p class="text-gray-600 text-sm mt-1">{{ order.address?.city }}, {{ order.address?.postalCode }}</p>
-          <p class="text-gray-600 text-sm">{{ order.address?.country }}</p>
+          <div class="space-y-1">
+            <p *ngFor="let line of getOrderAddressLines()" class="text-gray-900 text-sm font-medium">{{ line }}</p>
+          </div>
         </div>
       </div>
 
@@ -57,11 +57,12 @@
           </div>
           <div class="flex-grow min-w-0">
             <a [routerLink]="['/products', item.productId]" class="font-bold text-gray-900 hover:text-indigo-600 transition-colors truncate block">
-              {{ item.product?.name || 'Unknown Product' }}
+              {{ getOrderItemName(item) }}
             </a>
             <p class="text-sm text-gray-500 mt-0.5" *ngIf="item.variant">
               {{ item.variant.attribute }}: {{ item.variant.value }}
             </p>
+            <p class="text-sm text-gray-500 mt-0.5">{{ getOrderItemSellerName(item) }}</p>
           </div>
           <div class="text-right">
             <p class="font-bold text-gray-900">${{ formatCurrency(item.unitPrice) }}</p>
