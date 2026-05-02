@@ -14,9 +14,7 @@ import { ConfirmService } from '../../../core/services/confirm.service';
         <div class="flex flex-col items-center text-center">
           <!-- Icon circle -->
           <div [ngClass]="{
-            'bg-rose-100 text-rose-600': data.type === 'danger',
-            'bg-amber-100 text-amber-600': data.type === 'warning',
-            'bg-indigo-100 text-indigo-600': !data.type || data.type === 'info'
+            'bg-blue-100 text-blue-600': true
           }" class="w-16 h-16 rounded-full flex items-center justify-center mb-5">
             <svg *ngIf="data.type === 'danger'" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -35,17 +33,15 @@ import { ConfirmService } from '../../../core/services/confirm.service';
 
         <div class="mt-8 grid grid-cols-2 gap-3">
           <button (click)="confirmService.handleAction(false)" 
-                  class="px-5 py-3 rounded-2xl bg-slate-100 text-slate-600 font-bold hover:bg-slate-200 transition-colors">
-            {{ data.cancelText || 'Cancel' }}
+                  class="px-5 py-3 rounded-2xl bg-blue-50 text-blue-700 font-bold hover:bg-blue-100 transition-colors">
+            {{ data.cancelText || 'No' }}
           </button>
           <button (click)="confirmService.handleAction(true)" 
                   [ngClass]="{
-                    'bg-rose-600 hover:bg-rose-700': data.type === 'danger',
-                    'bg-amber-600 hover:bg-amber-700': data.type === 'warning',
-                    'bg-indigo-600 hover:bg-indigo-700': !data.type || data.type === 'info'
+                    'bg-blue-600 hover:bg-blue-700': true
                   }"
                   class="px-5 py-3 rounded-2xl text-white font-bold shadow-lg shadow-indigo-500/20 transition-all">
-            {{ data.confirmText || 'Confirm' }}
+            {{ data.confirmText || 'Yes' }}
           </button>
         </div>
       </div>

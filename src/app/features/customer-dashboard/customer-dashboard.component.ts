@@ -186,7 +186,8 @@ export class CustomerDashboardComponent implements OnInit {
     this.confirmService.confirm({
       title: 'Cancel Order',
       message: `Are you sure you want to cancel order ${order.orderNumber}?`,
-      confirmText: 'Yes, Cancel',
+      confirmText: 'Yes',
+      cancelText: 'No',
       type: 'warning'
     }).pipe(take(1)).subscribe(confirmed => {
       if (confirmed) {
