@@ -96,7 +96,7 @@ export class HomeComponent implements OnInit {
       imageUrl: product.images?.[0] ?? '/assets/placeholder-product.svg',
       category: product.categories?.[0] ?? 'Uncategorized',
       rating: product.averageRating ?? 0,
-      reviewsCount: 0
+      reviewsCount: product.reviewCount ?? 0
     };
   }
 
