@@ -25,6 +25,13 @@ export interface ProductResponse {
   variants?: ProductVariant[];
 }
 
+export interface ProductVariantRequest {
+  attribute: string;
+  value: string;
+  additionalStock: number;
+  priceDelta?: number;
+}
+
 export interface ProductRequest {
   name: string;
   description: string;
@@ -34,6 +41,7 @@ export interface ProductRequest {
   active?: boolean;
   images?: string[];
   categoryIds?: number[];
+  variants?: ProductVariantRequest[];
 }
 
 export interface PageResponse<T> {

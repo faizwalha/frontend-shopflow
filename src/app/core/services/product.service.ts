@@ -10,8 +10,8 @@ export class ProductService {
   private http = inject(HttpClient);
   private apiUrl = '/api/products';
 
-  getAllProducts(page = 0, size = 12): Observable<PageResponse<ProductResponse>> {
-    const params = new HttpParams().set('page', page).set('size', size);
+  getAllProducts(page = 0, size = 12, sort = 'createdAt,desc'): Observable<PageResponse<ProductResponse>> {
+    const params = new HttpParams().set('page', page).set('size', size).set('sort', sort);
     return this.http.get<PageResponse<ProductResponse>>(this.apiUrl, { params });
   }
 
@@ -19,13 +19,18 @@ export class ProductService {
     return this.http.get<ProductResponse>(`${this.apiUrl}/${id}`);
   }
 
-  searchProducts(q: string, page = 0, size = 12): Observable<PageResponse<ProductResponse>> {
-    const params = new HttpParams().set('q', q).set('page', page).set('size', size);
+  searchProducts(q: string, page = 0, size = 12, sort = 'createdAt,desc'): Observable<PageResponse<ProductResponse>> {
+    const params = new HttpParams().set('q', q).set('page', page).set('size', size).set('sort', sort);
     return this.http.get<PageResponse<ProductResponse>>(`${this.apiUrl}/search`, { params });
   }
 
   getTopSellingProducts(): Observable<ProductResponse[]> {
     return this.http.get<ProductResponse[]>(`${this.apiUrl}/top-selling`);
+  }
+
+  getProductsBySellerId(sellerId: number, page = 0, size = 12, sort = 'createdAt,desc'): Observable<PageResponse<ProductResponse>> {
+    const params = new HttpParams().set('page', page).set('size', size).set('sort', sort);
+    return this.http.get<PageResponse<ProductResponse>>(`${this.apiUrl}/seller/${sellerId}`, { params });
   }
 
   createProduct(request: ProductRequest): Observable<ProductResponse> {
