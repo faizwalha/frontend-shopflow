@@ -41,6 +41,11 @@ export class ProductService {
     return this.http.put<ProductResponse>(`${this.apiUrl}/${id}`, request);
   }
 
+  getInventoryProducts(page = 0, size = 12, sort = 'createdAt,desc'): Observable<PageResponse<ProductResponse>> {
+    const params = new HttpParams().set('page', page).set('size', size).set('sort', sort);
+    return this.http.get<PageResponse<ProductResponse>>(`${this.apiUrl}/inventory`, { params });
+  }
+
   deleteProduct(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }

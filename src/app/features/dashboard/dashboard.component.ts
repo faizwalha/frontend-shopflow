@@ -401,7 +401,7 @@ export class DashboardComponent implements OnInit {
 
   loadProducts(): void {
     this.loadingProducts = true;
-    this.productService.getAllProducts(0, 50).subscribe({
+    this.productService.getInventoryProducts(0, 50).subscribe({
       next: (page) => {
         this.products = (page.content ?? []).sort((left, right) => left.name.localeCompare(right.name));
         this.loadingProducts = false;

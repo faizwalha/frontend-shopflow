@@ -85,10 +85,8 @@ export class ProductsManagementComponent implements OnInit {
 
     if (this.searchTerm) {
       productRequest$ = this.productService.searchProducts(this.searchTerm, this.currentPage, this.pageSize, sort);
-    } else if (role === 'SELLER' && userId) {
-      productRequest$ = this.productService.getProductsBySellerId(userId, this.currentPage, this.pageSize, sort);
     } else {
-      productRequest$ = this.productService.getAllProducts(this.currentPage, this.pageSize, sort);
+      productRequest$ = this.productService.getInventoryProducts(this.currentPage, this.pageSize, sort);
     }
 
     productRequest$.subscribe({
@@ -202,11 +200,44 @@ export class ProductsManagementComponent implements OnInit {
 
     this.productService.deleteProduct(id).subscribe({
       next: () => {
-        this.successMessage = 'Product deleted successfully';
-        this.loadData();
+        this.successMessage = 'Product deactivated successfully';
+        this.loadData(this.currentPage);
         setTimeout(() => this.successMessage = '', 3000);
       },
-      error: () => this.errorMessage = 'Failed to delete product'
+      error: () => this.errorMessage = 'Failed to deactivate product'
+    });
+  }
+
+  toggleProductActive(product: ProductResponse): void {
+    const payload: ProductRequest = {
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      promoPrice: product.promoPrice ?? undefined,
+      stock: product.stock,
+      active: !product.active,
+      images: product.images,
+      categoryIds: product.categories.map(name => this.categories.find(c => c.name === name)?.id).filter(id => id !== undefined) as number[],
+      variants: product.variants?.map(v => ({
+        attribute: v.attribute,
+        value: v.value,
+        additionalStock: v.additionalStock,
+        priceDelta: v.priceDelta
+      }))
+    };
+
+    this.loading = true;
+    this.productService.updateProduct(product.id, payload).subscribe({
+      next: () => {
+        this.successMessage = `Product ${!product.active ? 'activated' : 'deactivated'} successfully!`;
+        this.loadData(this.currentPage);
+        setTimeout(() => this.successMessage = '', 3000);
+      },
+      error: (err) => {
+        this.errorMessage = err?.error?.message || 'Failed to update product status';
+        this.loading = false;
+        setTimeout(() => this.errorMessage = '', 3000);
+      }
     });
   }
 
