@@ -91,7 +91,7 @@ export class HomeComponent implements OnInit {
       id: product.id,
       name: product.name,
       description: product.description ?? '',
-      price: product.displayPrice ?? product.price,
+      price: product.price,
       promoPrice: product.promoPrice,
       imageUrl: product.images?.[0] ?? '/assets/placeholder-product.svg',
       category: product.categories?.[0] ?? 'Uncategorized',
