@@ -160,9 +160,7 @@ export class CatalogComponent implements OnInit {
       id: product.id,
       name: product.name,
       description: product.description ?? '',
-
-      price: product.price,
-      promoPrice: product.promoPrice,
+      price: product.displayPrice ?? product.promoPrice ?? product.price,
       imageUrl: product.images?.[0] ?? '/assets/placeholder-product.svg',
       category: product.categories?.[0] ?? 'Uncategorized',
       rating: product.averageRating ?? 0,

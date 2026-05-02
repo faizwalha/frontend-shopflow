@@ -64,4 +64,16 @@ export class ProductCardComponent {
       }
     });
   }
+
+  getDiscountPercentage(): number {
+    if (!this.product || this.product.promoPrice == null) {
+      return 0;
+    }
+    const original = Number(this.product.price ?? 0);
+    const promo = Number(this.product.promoPrice ?? 0);
+    if (!original || promo >= original) {
+      return 0;
+    }
+    return Math.round(((original - promo) / original) * 100);
+  }
 }
