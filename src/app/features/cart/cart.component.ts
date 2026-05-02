@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { CartService } from '../../core/services/cart.service';
+import { ProductService } from '../../core/services/product.service';
 import { Cart, CartItem } from '../../core/models/cart.models';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -16,6 +17,7 @@ import { takeUntil } from 'rxjs/operators';
 })
 export class CartComponent implements OnInit, OnDestroy {
   private cartService = inject(CartService);
+  private productService = inject(ProductService);
   private router = inject(Router);
   private destroy$ = new Subject<void>();
 
@@ -70,7 +72,27 @@ export class CartComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.updateQuantity(item, quantity, idCandidates);
+    // Fetch product stock to validate quantity
+    const productId = item.productId;
+    if (!productId) {
+      this.errorMessage = 'Invalid product identifier';
+      return;
+    }
+
+    this.productService.getProductById(productId).subscribe({
+      next: (response) => {
+        const availableStock = response.stock || 0;
+        if (quantity > availableStock) {
+          this.errorMessage = `Stock insuffisant. Stock disponible: ${availableStock}`;
+          return;
+        }
+        this.updateQuantity(item, quantity, idCandidates);
+      },
+      error: () => {
+        // If we can't fetch stock info, allow the update (backend will validate)
+        this.updateQuantity(item, quantity, idCandidates);
+      }
+    });
   }
 
   updateQuantity(item: CartItem, quantity: number, idCandidates = this.getCartItemIdCandidates(item)) {

@@ -16,6 +16,7 @@ export interface CartItem {
     price: number;
     promotionalPrice?: number;
     images?: string[];
+    stock?: number;
   };
   variant?: {
     id: number;
