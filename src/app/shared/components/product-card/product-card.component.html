@@ -20,11 +20,7 @@
     </div>
     
     <div class="flex items-center justify-between mt-auto">
-      <div class="flex flex-col gap-1">
-        <span *ngIf="product.promoPrice && product.promoPrice < product.price" class="text-[16px] font-semibold text-gray-400 line-through">${{product.price.toFixed(2)}}</span>
-        <span class="text-[22px] font-bold text-gray-900 tracking-tight">${{(product.promoPrice && product.promoPrice < product.price ? product.promoPrice : product.price).toFixed(2)}}</span>
-        <span *ngIf="product.promoPrice && product.promoPrice < product.price" class="text-[13px] font-bold text-red-600">-{{getDiscountPercentage()}}%</span>
-      </div>
+      <span class="text-[22px] font-bold text-gray-900 tracking-tight">${{product.price.toFixed(2)}}</span>
       <button
         type="button"
         (click)="addToCart()"

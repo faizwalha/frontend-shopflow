@@ -11,7 +11,6 @@ export interface Product {
   name: string;
   description: string;
   price: number;
-  promoPrice?: number;
   imageUrl: string;
   category: string;
   rating: number;

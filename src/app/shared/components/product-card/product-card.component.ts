@@ -26,13 +26,6 @@ export class ProductCardComponent {
   successMessage = '';
   errorMessage = '';
 
-  getDiscountPercentage(): number {
-    if (!this.product.promoPrice) {
-      return 0;
-    }
-    return Math.round(((this.product.price - this.product.promoPrice) / this.product.price) * 100);
-  }
-
   addToCart(): void {
     if (!this.product) {
       return;
