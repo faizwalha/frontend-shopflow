@@ -115,6 +115,13 @@ export class ProductDetailsComponent implements OnInit {
     return this.selectedVariant ? basePrice + this.selectedVariant.priceDelta : basePrice;
   }
 
+  getDiscountPercentage(): number {
+    if (!this.product || !this.product.promoPrice) {
+      return 0;
+    }
+    return Math.round(((this.product.price - this.product.promoPrice) / this.product.price) * 100);
+  }
+
   getDisplayStock(): number {
     if (!this.product) return 0;
     return this.selectedVariant ? this.selectedVariant.additionalStock : this.product.stock;
