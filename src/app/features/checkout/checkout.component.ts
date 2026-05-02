@@ -51,7 +51,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     // Load cart
     this.cartService.getCart().subscribe({
       next: (cart) => {
-        this.cart = cart;
+        this.cart = this.ensureShippingFee(cart);
         this.isLoadingCart = false;
         if (!cart.items || cart.items.length === 0) {
           this.errorMessage = 'Your cart is empty. Redirecting...';
@@ -79,6 +79,44 @@ export class CheckoutComponent implements OnInit, OnDestroy {
         this.isLoadingAddresses = false;
       }
     });
+  }
+
+  // Ensure cart contains a shipping fee (default $10) when backend doesn't provide one
+  private ensureShippingFee(cart: Cart | null): Cart | null {
+    if (!cart) return cart;
+    if (cart.shippingFee == null || cart.shippingFee === 0) {
+      const shipping = 10;
+      const total = (cart.total ?? 0) + shipping;
+      const totalTTC = (cart.totalTTC ?? 0) + shipping;
+      return { ...cart, shippingFee: shipping, total, totalTTC };
+    }
+    return cart;
+  }
+
+  getShippingFee(): number {
+    return this.cart?.shippingFee ?? 10;
+  }
+
+  getCalculatedTotal(): number {
+    if (!this.cart) return 0;
+    const subtotal = this.cart.subtotal ?? 0;
+    const discount = this.cart.discount ?? 0;
+    const shipping = this.getShippingFee();
+    return subtotal - discount + shipping;
+  }
+
+  getItemName(item: any): string {
+    return item.product?.name || item.productName || 'Product';
+  }
+
+  getItemPrice(item: any): number {
+    return item.product?.price ?? item.unitPrice ?? item.price ?? 0;
+  }
+
+  getItemLineTotal(item: any): number {
+    const price = this.getItemPrice(item);
+    const quantity = item.quantity ?? 1;
+    return price * quantity;
   }
 
   openAddressModal() {
