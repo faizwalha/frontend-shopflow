@@ -21,6 +21,7 @@ export interface ProductResponse {
   images: string[];
   categories: string[];
   averageRating: number;
+  reviewCount: number;
   variants?: ProductVariant[];
 }
 
