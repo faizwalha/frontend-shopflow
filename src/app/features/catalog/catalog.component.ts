@@ -113,7 +113,11 @@ export class CatalogComponent implements OnInit {
       error: () => {
         this.loadingProducts = false;
         this.productError = 'Unable to load products from the backend.';
-        this.filteredProducts = [];
+        this.allLoadedProducts = this.getFallbackProducts();
+        this.totalPages = 1;
+        this.pageNumbers = [0];
+        this.totalElements = this.allLoadedProducts.length;
+        this.applyFilters();
       }
     });
   }
@@ -124,6 +128,7 @@ export class CatalogComponent implements OnInit {
       name: product.name,
       description: product.description ?? '',
       price: product.displayPrice ?? product.price,
+      promoPrice: product.promoPrice,
       imageUrl: product.images?.[0] ?? '/assets/placeholder-product.svg',
       category: product.categories?.[0] ?? 'Uncategorized',
       rating: product.averageRating ?? 0,
@@ -169,5 +174,98 @@ export class CatalogComponent implements OnInit {
   onSortChange(event: Event): void {
     this.selectedSort = (event.target as HTMLSelectElement).value || 'latest';
     this.applyFilters();
+  }
+
+  private getFallbackProducts(): Product[] {
+    return [
+      {
+        id: 1,
+        name: 'Wireless Noise-Cancelling Headphones',
+        description: 'Premium headphones with active noise cancellation.',
+        price: 299.99,
+        promoPrice: 199.99,
+        imageUrl: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=2070&auto=format&fit=crop',
+        category: 'Electronics',
+        rating: 4.8,
+        reviewsCount: 124
+      },
+      {
+        id: 2,
+        name: 'Minimalist Mechanical Keyboard',
+        description: 'Tenkeyless layout with tactile switches.',
+        price: 129.50,
+        promoPrice: 99.99,
+        imageUrl: 'https://images.unsplash.com/photo-1595225476474-87563907a212?q=80&w=2071&auto=format&fit=crop',
+        category: 'Peripherals',
+        rating: 4.5,
+        reviewsCount: 89
+      },
+      {
+        id: 3,
+        name: 'Ergonomic Office Chair',
+        description: 'Adjustable lumbar support and breathable mesh.',
+        price: 450.00,
+        promoPrice: 349.99,
+        imageUrl: 'https://images.unsplash.com/photo-1505843490538-5133c6c7d0e1?q=80&w=2069&auto=format&fit=crop',
+        category: 'Furniture',
+        rating: 4.9,
+        reviewsCount: 302
+      },
+      {
+        id: 4,
+        name: '4K Ultra HD Smart Monitor',
+        description: '32-inch display perfect for creative professionals.',
+        price: 599.99,
+        promoPrice: 449.99,
+        imageUrl: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?q=80&w=2070&auto=format&fit=crop',
+        category: 'Screens',
+        rating: 4.7,
+        reviewsCount: 56
+      },
+      {
+        id: 5,
+        name: 'Premium Wireless Mouse',
+        description: 'Ergonomic design with precision tracking.',
+        price: 79.99,
+        promoPrice: 59.99,
+        imageUrl: 'https://images.unsplash.com/photo-1527814050087-3793815479db?q=80&w=2070&auto=format&fit=crop',
+        category: 'Peripherals',
+        rating: 4.6,
+        reviewsCount: 178
+      },
+      {
+        id: 6,
+        name: 'Standing Desk Converter',
+        description: 'Adjustable height with cable management.',
+        price: 349.99,
+        promoPrice: 279.99,
+        imageUrl: 'https://images.unsplash.com/photo-1593062096033-9a26b09da705?q=80&w=2070&auto=format&fit=crop',
+        category: 'Furniture',
+        rating: 4.7,
+        reviewsCount: 92
+      },
+      {
+        id: 7,
+        name: '27" Gaming Monitor',
+        description: '165Hz refresh rate, 1ms response time.',
+        price: 349.99,
+        promoPrice: 299.99,
+        imageUrl: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?q=80&w=2070&auto=format&fit=crop',
+        category: 'Screens',
+        rating: 4.9,
+        reviewsCount: 234
+      },
+      {
+        id: 8,
+        name: 'Laptop Stand',
+        description: 'Aluminum construction with adjustable angles.',
+        price: 89.99,
+        promoPrice: 69.99,
+        imageUrl: 'https://images.unsplash.com/photo-1559056199-641a0ac8b3f4?q=80&w=2070&auto=format&fit=crop',
+        category: 'Accessories',
+        rating: 4.4,
+        reviewsCount: 45
+      }
+    ];
   }
 }

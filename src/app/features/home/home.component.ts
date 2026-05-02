@@ -22,7 +22,7 @@ export class HomeComponent implements OnInit {
   allFeaturedProducts: Product[] = [];
   featuredProducts: Product[] = [];
   featuredProductsPageIndex = 0;
-  readonly featuredProductsPageSize = 4;
+  readonly featuredProductsPageSize = 8;
 
   featuredCategories: CategoryResponse[] = [];
 
@@ -92,6 +92,7 @@ export class HomeComponent implements OnInit {
       name: product.name,
       description: product.description ?? '',
       price: product.displayPrice ?? product.price,
+      promoPrice: product.promoPrice,
       imageUrl: product.images?.[0] ?? '/assets/placeholder-product.svg',
       category: product.categories?.[0] ?? 'Uncategorized',
       rating: product.averageRating ?? 0,
@@ -112,6 +113,7 @@ export class HomeComponent implements OnInit {
         name: 'Wireless Noise-Cancelling Headphones',
         description: 'Premium headphones with active noise cancellation.',
         price: 299.99,
+        promoPrice: 199.99,
         imageUrl: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=2070&auto=format&fit=crop',
         category: 'Electronics',
         rating: 4.8,
@@ -122,6 +124,7 @@ export class HomeComponent implements OnInit {
         name: 'Minimalist Mechanical Keyboard',
         description: 'Tenkeyless layout with tactile switches.',
         price: 129.50,
+        promoPrice: 99.99,
         imageUrl: 'https://images.unsplash.com/photo-1595225476474-87563907a212?q=80&w=2071&auto=format&fit=crop',
         category: 'Peripherals',
         rating: 4.5,
@@ -132,6 +135,7 @@ export class HomeComponent implements OnInit {
         name: 'Ergonomic Office Chair',
         description: 'Adjustable lumbar support and breathable mesh.',
         price: 450.00,
+        promoPrice: 349.99,
         imageUrl: 'https://images.unsplash.com/photo-1505843490538-5133c6c7d0e1?q=80&w=2069&auto=format&fit=crop',
         category: 'Furniture',
         rating: 4.9,
@@ -142,6 +146,7 @@ export class HomeComponent implements OnInit {
         name: '4K Ultra HD Smart Monitor',
         description: '32-inch display perfect for creative professionals.',
         price: 599.99,
+        promoPrice: 449.99,
         imageUrl: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?q=80&w=2070&auto=format&fit=crop',
         category: 'Screens',
         rating: 4.7,

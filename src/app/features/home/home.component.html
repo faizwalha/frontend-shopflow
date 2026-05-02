@@ -9,7 +9,7 @@
       <p class="text-xl md:text-2xl text-gray-300 mb-10 max-w-2xl mx-auto font-light">Elevate your lifestyle with our curated collection of extraordinary items designed for modern living.</p>
       <div class="flex flex-col sm:flex-row gap-4 justify-center">
         <a routerLink="/products" class="bg-white text-black px-8 py-4 rounded-full font-bold text-lg hover:bg-gray-100 transition-colors shadow-[0_0_40px_rgba(255,255,255,0.3)]">Shop Collection</a>
-        <a routerLink="/products" class="bg-transparent border border-white/30 text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-white/10 transition-colors backdrop-blur-sm">View Categories</a>
+        <a href="#categories" class="bg-transparent border border-white/30 text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-white/10 transition-colors backdrop-blur-sm">View Categories</a>
       </div>
     </div>
   </section>
@@ -34,31 +34,25 @@
     </div>
 
     <div class="mt-12 flex justify-center" *ngIf="featuredProductsPageCount > 1">
-      <nav class="relative z-0 inline-flex shadow-sm rounded-md bg-white border border-gray-200 p-1">
+      <div class="inline-flex items-center gap-8">
         <button (click)="previousFeaturedProductsPage()" [disabled]="featuredProductsPageIndex === 0"
-          class="relative inline-flex items-center px-3 py-2 rounded-l-md bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors disabled:opacity-40">
+          class="px-6 py-2 rounded-full border border-gray-300 bg-white text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
           Previous
         </button>
-        <button *ngFor="let page of [].constructor(featuredProductsPageCount); let index = index"
-          (click)="goToFeaturedProductsPage(index)"
-          [class.bg-indigo-50]="featuredProductsPageIndex === index"
-          [class.text-indigo-600]="featuredProductsPageIndex === index"
-          [class.bg-white]="featuredProductsPageIndex !== index"
-          [class.text-gray-700]="featuredProductsPageIndex !== index"
-          class="relative inline-flex items-center px-4 py-2 text-sm font-semibold hover:bg-gray-50 rounded-md mx-1 transition-colors">
-          {{ index + 1 }}
-        </button>
+        <span class="text-gray-600 font-medium text-sm whitespace-nowrap">
+          Page {{ featuredProductsPageIndex + 1 }} of {{ featuredProductsPageCount }}
+        </span>
         <button (click)="nextFeaturedProductsPage()"
           [disabled]="featuredProductsPageIndex >= featuredProductsPageCount - 1"
-          class="relative inline-flex items-center px-3 py-2 rounded-r-md bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors disabled:opacity-40">
+          class="px-6 py-2 rounded-full border border-gray-300 bg-white text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
           Next
         </button>
-      </nav>
+      </div>
     </div>
   </section>
   
   <!-- Categories -->
-  <section class="py-20 bg-white border-y border-gray-100">
+  <section id="categories" class="py-20 bg-white border-y border-gray-100 scroll-mt-24">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <h2 class="text-3xl font-black mb-12 text-center">Shop by Category</h2>
       <div *ngIf="featuredCategories.length > 0; else fallbackCategories" class="grid grid-cols-2 md:grid-cols-4 gap-6">
