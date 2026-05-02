@@ -32,7 +32,7 @@ export class CartComponent implements OnInit, OnDestroy {
     this.cartService.cart$
       .pipe(takeUntil(this.destroy$))
       .subscribe(cart => {
-        this.cart = cart;
+        this.cart = this.ensureShippingFee(cart);
         this.isLoadingCart = false;
       });
   }
@@ -40,7 +40,7 @@ export class CartComponent implements OnInit, OnDestroy {
   private loadCart() {
     this.cartService.getCart().subscribe({
       next: (cart) => {
-        this.cart = cart;
+        this.cart = this.ensureShippingFee(cart);
         this.isLoadingCart = false;
       },
       error: (err) => {
@@ -48,6 +48,16 @@ export class CartComponent implements OnInit, OnDestroy {
         this.isLoadingCart = false;
       }
     });
+  }
+
+  // Ensure cart contains a shipping fee (default £10) when backend doesn't provide one
+  private ensureShippingFee(cart: Cart | null): Cart | null {
+    if (!cart) return cart;
+    // If shippingFee is null/undefined or equals 0, set default to 10
+    if (cart.shippingFee == null || cart.shippingFee === 0) {
+      return { ...cart, shippingFee: 10, total: (cart.total ?? 0) + 10 };
+    }
+    return cart;
   }
 
   onQuantityChange(item: CartItem, event: Event) {
