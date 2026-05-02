@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
-import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormsModule, ReactiveFormsModule, Validators, FormArray } from '@angular/forms';
 import { take } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { CategoryService } from '../../core/services/category.service';
@@ -13,7 +13,7 @@ import { UploadService } from '../../core/services/upload.service';
 import { AdminUser } from '../../core/models/user.models';
 import { ConfirmService } from '../../core/services/confirm.service';
 import { CategoryRequest, CategoryResponse } from '../../core/models/category.models';
-import { ProductRequest, ProductResponse } from '../../core/models/product.models';
+import { ProductRequest, ProductResponse, ProductVariantRequest } from '../../core/models/product.models';
 import { AdminDashboardResponse, SellerDashboardResponse } from '../../core/models/dashboard.models';
 import { AdminOrderResponse, Order, OrderStatus, UserSummaryResponse } from '../../core/models/order.models';
 import { AdminCouponsComponent } from '../coupons/admin-coupons.component';
@@ -193,8 +193,27 @@ export class DashboardComponent implements OnInit {
     promoPrice: [null as number | null],
     stock: [0, [Validators.required, Validators.min(0)]],
     images: [''],
-    categoryId: [null as number | null]
+    categoryIds: [[] as number[]],
+    variants: this.fb.array([])
   });
+
+  get variants(): FormArray {
+    return this.productForm.get('variants') as FormArray;
+  }
+
+  addVariant(): void {
+    const variantGroup = this.fb.group({
+      attribute: ['', Validators.required],
+      value: ['', Validators.required],
+      additionalStock: [0, [Validators.required, Validators.min(0)]],
+      priceDelta: [0, Validators.required]
+    });
+    this.variants.push(variantGroup);
+  }
+
+  removeVariant(index: number): void {
+    this.variants.removeAt(index);
+  }
 
   private readonly chartTemplates: Record<ChartPeriod, ChartPoint[]> = {
     daily: [
@@ -560,8 +579,25 @@ export class DashboardComponent implements OnInit {
       promoPrice: product.promoPrice ?? null,
       stock: product.stock ?? 0,
       images: product.images?.join(', ') ?? '',
-      categoryId
+      categoryIds: product.categories ? this.categories.filter(c => product.categories.includes(c.name)).map(c => c.id) : []
     });
+
+    // Clear and populate variants
+    while (this.variants.length) {
+      this.variants.removeAt(0);
+    }
+
+    if (product.variants) {
+      product.variants.forEach(v => {
+        this.variants.push(this.fb.group({
+          attribute: [v.attribute, Validators.required],
+          value: [v.value, Validators.required],
+          additionalStock: [v.additionalStock, [Validators.required, Validators.min(0)]],
+          priceDelta: [v.priceDelta, Validators.required]
+        }));
+      });
+    }
+
     this.isProductModalOpen = true;
     this.setActiveSection('products');
   }
@@ -581,8 +617,11 @@ export class DashboardComponent implements OnInit {
       promoPrice: null,
       stock: 0,
       images: '',
-      categoryId: null
+      categoryIds: []
     });
+    while (this.variants.length) {
+      this.variants.removeAt(0);
+    }
     this.isProductModalOpen = false;
   }
 
@@ -602,7 +641,8 @@ export class DashboardComponent implements OnInit {
       images: formValue.images
         ? formValue.images.split(',').map((image: string) => image.trim()).filter((image: string) => image)
         : undefined,
-      categoryIds: formValue.categoryId ? [formValue.categoryId] : undefined
+      categoryIds: formValue.categoryIds && formValue.categoryIds.length > 0 ? formValue.categoryIds : undefined,
+      variants: formValue.variants as ProductVariantRequest[]
     };
 
     const request$ = this.selectedProduct

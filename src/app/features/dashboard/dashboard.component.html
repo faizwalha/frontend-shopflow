@@ -238,27 +238,66 @@
                         placeholder="0">
                     </div>
                     <div>
-                      <label class="dashboard-label" for="product-category">Category</label>
-                      <select id="product-category" formControlName="categoryId" class="dashboard-input">
-                        <option [ngValue]="null">Select category</option>
+                      <label class="dashboard-label" for="product-category">Categories</label>
+                      <select id="product-category" multiple formControlName="categoryIds" class="dashboard-input min-h-[100px]">
                         <option *ngFor="let category of categories" [ngValue]="category.id">{{ category.name }}</option>
                       </select>
+                      <p class="mt-1 text-[10px] text-slate-400 italic">Hold Ctrl/Cmd to select multiple</p>
                     </div>
 
                     <div class="sm:col-span-2">
                       <label class="dashboard-label" for="product-images">Images</label>
                       <div class="flex gap-2">
                         <input id="product-images" formControlName="images" type="text" class="dashboard-input flex-1"
-                          placeholder="Comma-separated URLs or upload locally">
+                          placeholder="Comma-separated URLs">
                         <button type="button" class="dashboard-secondary-button !py-2 !px-4" (click)="fileInput.click()">
-                          <svg viewBox="0 0 24 24" class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                            <polyline points="17 8 12 3 7 8" />
-                            <line x1="12" y1="3" x2="12" y2="15" />
-                          </svg>
                           Import
                         </button>
                         <input #fileInput type="file" (change)="onFileSelected($event)" accept="image/*" class="hidden">
+                      </div>
+                    </div>
+
+                    <!-- Variants Section -->
+                    <div class="sm:col-span-2 border-t border-slate-100 pt-5 mt-2">
+                      <div class="flex items-center justify-between mb-4">
+                        <h4 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Product Variants</h4>
+                        <button type="button" (click)="addVariant()" 
+                                class="text-xs font-bold text-violet-600 hover:text-violet-700 flex items-center gap-1">
+                          <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+                          </svg>
+                          Add Variant
+                        </button>
+                      </div>
+
+                      <div formArrayName="variants" class="space-y-3">
+                        <div *ngFor="let v of variants.controls; let i=index" [formGroupName]="i" 
+                             class="grid grid-cols-[1fr_1fr_80px_80px_40px] gap-3 p-3 bg-slate-50 rounded-2xl border border-slate-100 items-end">
+                          <div>
+                            <label class="text-[10px] font-bold text-slate-400 uppercase mb-1 block">Attr</label>
+                            <input type="text" formControlName="attribute" placeholder="Size" class="dashboard-input !py-2 !px-3 !text-sm">
+                          </div>
+                          <div>
+                            <label class="text-[10px] font-bold text-slate-400 uppercase mb-1 block">Value</label>
+                            <input type="text" formControlName="value" placeholder="M" class="dashboard-input !py-2 !px-3 !text-sm">
+                          </div>
+                          <div>
+                            <label class="text-[10px] font-bold text-slate-400 uppercase mb-1 block">Stock</label>
+                            <input type="number" formControlName="additionalStock" class="dashboard-input !py-2 !px-3 !text-sm">
+                          </div>
+                          <div>
+                            <label class="text-[10px] font-bold text-slate-400 uppercase mb-1 block">Price +/-</label>
+                            <input type="number" formControlName="priceDelta" class="dashboard-input !py-2 !px-3 !text-sm">
+                          </div>
+                          <button type="button" (click)="removeVariant(i)" class="h-10 flex items-center justify-center text-rose-500 hover:bg-rose-50 rounded-xl transition-all">
+                            <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2">
+                              <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                            </svg>
+                          </button>
+                        </div>
+                        <div *ngIf="variants.length === 0" class="text-center py-6 border border-dashed border-slate-200 rounded-2xl text-xs text-slate-400 italic">
+                          No variants added.
+                        </div>
                       </div>
                     </div>
                   </div>
