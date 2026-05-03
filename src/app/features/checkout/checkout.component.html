@@ -1,9 +1,9 @@
-<div class="checkout-shell min-h-[calc(100vh-8rem)] bg-gradient-to-b from-slate-50 via-white to-slate-100 py-10">
+<div class="checkout-shell min-h-[calc(100vh-8rem)] py-10" style="background: linear-gradient(180deg, var(--app-bg) 0%, var(--app-bg) 100%); color: var(--app-text);">
   <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
     <div class="mb-8 flex flex-col gap-3">
-      <p class="text-sm font-semibold uppercase tracking-[0.3em] text-indigo-600">Secure checkout</p>
-      <h1 class="text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">Checkout</h1>
-      <p class="max-w-2xl text-sm text-slate-500 sm:text-base">Confirm your address and review the order to complete checkout.</p>
+      <p class="text-sm font-semibold uppercase tracking-[0.3em] text-indigo-400">Secure checkout</p>
+      <h1 class="text-3xl font-black tracking-tight sm:text-4xl" style="color: var(--app-text);">Checkout</h1>
+      <p class="max-w-2xl text-sm" style="color: var(--app-text-muted);">Confirm your address and review the order to complete checkout.</p>
     </div>
 
     <div *ngIf="errorMessage" class="mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 shadow-sm">
@@ -13,7 +13,7 @@
       {{ successMessage }}
     </div>
 
-    <div *ngIf="isLoadingCart || isLoadingAddresses" class="flex min-h-[320px] items-center justify-center rounded-3xl border border-slate-200 bg-white shadow-sm">
+    <div *ngIf="isLoadingCart || isLoadingAddresses" class="flex min-h-[320px] items-center justify-center rounded-3xl shadow-sm" style="border-color: var(--app-border); background: var(--app-surface); color: var(--app-text);">
       <div class="text-center">
         <div class="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-slate-200 border-t-indigo-600"></div>
         <p class="text-sm font-medium text-slate-500">Loading checkout...</p>
@@ -22,33 +22,34 @@
 
     <div *ngIf="!isLoadingCart && !isLoadingAddresses && cart" class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
       <section class="space-y-6">
-        <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+        <div class="rounded-3xl p-6 shadow-sm sm:p-8" style="border-color: var(--app-border); background: var(--app-surface-solid); color: var(--app-text);">
           <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <h2 class="text-2xl font-bold text-slate-900">Complete your order</h2>
-              <p class="mt-1 text-sm text-slate-500">Step {{ currentStep === 'address' ? '1' : currentStep === 'review' ? '2' : '3' }} of 3</p>
+              <h2 class="text-2xl font-bold" style="color: var(--app-text);">Complete your order</h2>
+              <p class="mt-1 text-sm" style="color: var(--app-text-muted);">Step {{ currentStep === 'address' ? '1' : currentStep === 'review' ? '2' : '3' }} of 3</p>
             </div>
 
             <div class="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:justify-end">
-              <div [class.bg-indigo-600]="currentStep === 'address'" [class.text-white]="currentStep === 'address'" class="rounded-full border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600">1. Address</div>
-              <div [class.bg-indigo-600]="currentStep === 'review'" [class.text-white]="currentStep === 'review'" class="rounded-full border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600">2. Review</div>
-              <div [class.bg-indigo-600]="currentStep === 'confirmation'" [class.text-white]="currentStep === 'confirmation'" class="rounded-full border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600">3. Confirmation</div>
+              <div [class.bg-indigo-600]="currentStep === 'address'" [class.text-white]="currentStep === 'address'" [class.text-indigo-400]="currentStep !== 'address'" class="rounded-full border px-3 py-2 text-xs font-semibold" style="border-color: var(--app-border);">1. Address</div>
+              <div [class.bg-indigo-600]="currentStep === 'review'" [class.text-white]="currentStep === 'review'" [class.text-indigo-400]="currentStep !== 'review'" class="rounded-full border px-3 py-2 text-xs font-semibold" style="border-color: var(--app-border);">2. Review</div>
+              <div [class.bg-indigo-600]="currentStep === 'confirmation'" [class.text-white]="currentStep === 'confirmation'" [class.text-indigo-400]="currentStep !== 'confirmation'" class="rounded-full border px-3 py-2 text-xs font-semibold" style="border-color: var(--app-border);">3. Confirmation</div>
             </div>
           </div>
 
           <div *ngIf="currentStep === 'address'" class="space-y-8">
             <div>
-              <h3 class="text-lg font-bold text-slate-900">Shipping address</h3>
-              <p class="mt-1 text-sm text-slate-500">Choose an existing address or add a new one.</p>
+              <h3 class="text-lg font-bold" style="color: var(--app-text);">Shipping address</h3>
+              <p class="mt-1 text-sm" style="color: var(--app-text-muted);">Choose an existing address or add a new one.</p>
             </div>
 
             <div *ngIf="addresses && addresses.length > 0" class="space-y-4">
               <div class="flex items-center justify-between">
-                <h4 class="text-sm font-semibold uppercase tracking-[0.2em] text-slate-400">Saved addresses</h4>
+                <h4 class="text-sm font-semibold uppercase tracking-[0.2em]" style="color: var(--app-text-muted);">Saved addresses</h4>
                 <button
                   type="button"
                   (click)="openAddressModal()"
-                  class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-700 transition hover:bg-slate-50 hover:border-indigo-300">
+                  class="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-bold transition"
+                  style="border-color: var(--app-border); background: var(--app-surface-solid); color: var(--app-text);">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
                   </svg>
@@ -60,10 +61,12 @@
                 <button
                   *ngFor="let address of addresses"
                   type="button"
-                  class="group flex w-full items-start gap-4 rounded-2xl border p-4 text-left transition hover:border-indigo-300 hover:bg-indigo-50/50"
+                  class="group flex w-full items-start gap-4 rounded-2xl border p-4 text-left transition"
                   [class.border-indigo-500]="selectedAddressId === address.id"
-                  [class.bg-indigo-50]="selectedAddressId === address.id"
-                  [class.border-slate-200]="selectedAddressId !== address.id"
+                  [ngStyle]="{
+                    'border-color': selectedAddressId === address.id ? 'rgb(99, 102, 241)' : 'var(--app-border)',
+                    'background': selectedAddressId === address.id ? 'rgba(99, 102, 241, 0.08)' : 'transparent'
+                  }"
                   (click)="selectAddress(address.id)">
                   <div class="mt-1 flex h-5 w-5 items-center justify-center rounded-full border"
                        [class.border-indigo-500]="selectedAddressId === address.id"
@@ -73,18 +76,19 @@
 
                   <div class="min-w-0 flex-1">
                     <div class="flex flex-wrap items-center gap-2">
-                      <p class="font-semibold text-slate-900">{{ address.street }}</p>
+                      <p class="font-semibold" style="color: var(--app-text);">{{ address.street }}</p>
                       <span *ngIf="address.defaultAddress" class="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-600">Default</span>
                     </div>
-                    <p class="mt-1 text-sm text-slate-500">{{ address.city }}, {{ address.postalCode }}, {{ address.country }}</p>
+                    <p class="mt-1 text-sm" style="color: var(--app-text-muted);">{{ address.city }}, {{ address.postalCode }}, {{ address.country }}</p>
                   </div>
                 </button>
               </div>
 
-              <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end pt-6 border-t border-slate-100">
+              <div class="flex flex-col-reverse gap-3 border-t sm:flex-row sm:justify-end pt-6" style="border-color: var(--app-border);">
                 <button 
                   type="button" 
-                  class="rounded-full border border-slate-200 px-8 py-3 text-sm font-bold text-slate-600 transition hover:bg-slate-50" 
+                  class="rounded-full border px-8 py-3 text-sm font-bold transition" 
+                  style="border-color: var(--app-border); background: var(--app-surface-solid); color: var(--app-text);"
                   (click)="cancelCheckout()">
                   Cancel checkout
                 </button>
@@ -101,15 +105,15 @@
             </div>
 
             <!-- Empty State -->
-            <div *ngIf="!addresses || addresses.length === 0" class="flex flex-col items-center justify-center py-12 px-6 rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50/50">
-              <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+            <div *ngIf="!addresses || addresses.length === 0" class="flex flex-col items-center justify-center rounded-3xl border-2 border-dashed py-12 px-6" style="border-color: var(--app-border); background: var(--app-surface-muted);">
+              <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full" style="background: var(--app-surface); color: var(--app-text-muted);">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
               </div>
-              <h4 class="text-lg font-bold text-slate-900">No saved addresses</h4>
-              <p class="text-sm text-slate-500 text-center mt-1 mb-6">You need to add a shipping address to complete your order.</p>
+              <h4 class="text-lg font-bold" style="color: var(--app-text);">No saved addresses</h4>
+              <p class="text-sm text-center mt-1 mb-6" style="color: var(--app-text-muted);">You need to add a shipping address to complete your order.</p>
               <button
                 type="button"
                 (click)="openAddressModal()"
@@ -125,13 +129,13 @@
             <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" (click)="closeAddressModal()"></div>
 
             <!-- Modal Content -->
-            <div class="relative w-full max-w-xl scale-100 transform rounded-3xl bg-white p-6 shadow-2xl transition-all sm:p-10 animate-in fade-in zoom-in duration-300">
+            <div class="relative w-full max-w-xl scale-100 transform rounded-3xl p-6 shadow-2xl transition-all sm:p-10 animate-in fade-in zoom-in duration-300" style="background: var(--app-surface-solid); color: var(--app-text);">
               <div class="mb-8 flex items-center justify-between">
                 <div>
-                  <h3 class="text-2xl font-black text-slate-900">Add New Address</h3>
-                  <p class="mt-1 text-sm text-slate-500">Enter your shipping details below.</p>
+                  <h3 class="text-2xl font-black" style="color: var(--app-text);">Add New Address</h3>
+                  <p class="mt-1 text-sm" style="color: var(--app-text-muted);">Enter your shipping details below.</p>
                 </div>
-                <button (click)="closeAddressModal()" class="rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition">
+                <button (click)="closeAddressModal()" class="rounded-full p-2 transition" style="color: var(--app-text-muted);">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
                   </svg>
@@ -140,28 +144,28 @@
 
               <form [formGroup]="addressForm" (ngSubmit)="addNewAddress()" class="grid gap-5">
                 <div class="space-y-2">
-                  <label for="street" class="text-sm font-bold text-slate-700">Street Address</label>
-                  <input id="street" type="text" formControlName="street" placeholder="e.g. 123 Main St" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-sm outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-100">
+                  <label for="street" class="text-sm font-bold" style="color: var(--app-text);">Street Address</label>
+                  <input id="street" type="text" formControlName="street" placeholder="e.g. 123 Main St" class="w-full rounded-2xl border px-5 py-4 text-sm outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100" style="border-color: var(--app-border); background: var(--app-surface-muted); color: var(--app-text);">
                 </div>
 
                 <div class="grid grid-cols-2 gap-5">
                   <div class="space-y-2">
-                    <label for="city" class="text-sm font-bold text-slate-700">City</label>
-                    <input id="city" type="text" formControlName="city" placeholder="City" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-sm outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-100">
+                    <label for="city" class="text-sm font-bold" style="color: var(--app-text);">City</label>
+                    <input id="city" type="text" formControlName="city" placeholder="City" class="w-full rounded-2xl border px-5 py-4 text-sm outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100" style="border-color: var(--app-border); background: var(--app-surface-muted); color: var(--app-text);">
                   </div>
                   <div class="space-y-2">
-                    <label for="postalCode" class="text-sm font-bold text-slate-700">Postal Code</label>
-                    <input id="postalCode" type="text" formControlName="postalCode" placeholder="Code" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-sm outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-100">
+                    <label for="postalCode" class="text-sm font-bold" style="color: var(--app-text);">Postal Code</label>
+                    <input id="postalCode" type="text" formControlName="postalCode" placeholder="Code" class="w-full rounded-2xl border px-5 py-4 text-sm outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100" style="border-color: var(--app-border); background: var(--app-surface-muted); color: var(--app-text);">
                   </div>
                 </div>
 
                 <div class="space-y-2">
-                  <label for="country" class="text-sm font-bold text-slate-700">Country</label>
-                  <input id="country" type="text" formControlName="country" placeholder="Country" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-sm outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-100">
+                  <label for="country" class="text-sm font-bold" style="color: var(--app-text);">Country</label>
+                  <input id="country" type="text" formControlName="country" placeholder="Country" class="w-full rounded-2xl border px-5 py-4 text-sm outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100" style="border-color: var(--app-border); background: var(--app-surface-muted); color: var(--app-text);">
                 </div>
 
                 <div class="mt-4 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-                  <button type="button" (click)="closeAddressModal()" class="rounded-full border border-slate-200 px-8 py-4 text-sm font-bold text-slate-600 transition hover:bg-slate-50">Cancel</button>
+                  <button type="button" (click)="closeAddressModal()" class="rounded-full border px-8 py-4 text-sm font-bold transition" style="border-color: var(--app-border); background: var(--app-surface-muted); color: var(--app-text);">Cancel</button>
                   <button type="submit" [disabled]="addressForm.invalid" class="rounded-full bg-slate-900 px-8 py-4 text-sm font-bold text-white shadow-lg transition hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed">Save Address</button>
                 </div>
               </form>
@@ -170,50 +174,50 @@
 
           <div *ngIf="currentStep === 'review'" class="space-y-8">
             <div>
-              <h3 class="text-lg font-bold text-slate-900">Review your order</h3>
-              <p class="mt-1 text-sm text-slate-500">Check the address and items before payment.</p>
+              <h3 class="text-lg font-bold" style="color: var(--app-text);">Review your order</h3>
+              <p class="mt-1 text-sm" style="color: var(--app-text-muted);">Check the address and items before payment.</p>
             </div>
 
             <div class="grid gap-4 sm:grid-cols-2">
               <div class="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Shipping address</p>
+                <p class="text-xs font-semibold uppercase tracking-[0.2em]" style="color: var(--app-text-muted);">Shipping address</p>
                 <ng-container *ngFor="let address of addresses">
                   <div *ngIf="address.id === selectedAddressId" class="mt-3 space-y-1">
-                    <p class="font-semibold text-slate-900">{{ address.street }}</p>
-                    <p class="text-sm text-slate-500">{{ address.city }}, {{ address.postalCode }}, {{ address.country }}</p>
+                    <p class="font-semibold" style="color: var(--app-text);">{{ address.street }}</p>
+                    <p class="text-sm" style="color: var(--app-text-muted);">{{ address.city }}, {{ address.postalCode }}, {{ address.country }}</p>
                   </div>
                 </ng-container>
               </div>
 
-              <div class="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Items</p>
+              <div class="rounded-2xl p-5" style="border-color: var(--app-border); background: var(--app-surface-muted);">
+                <p class="text-xs font-semibold uppercase tracking-[0.2em]" style="color: var(--app-text-muted);">Items</p>
                 <div class="mt-3 space-y-3">
-                  <div *ngFor="let item of cart.items" class="flex items-start justify-between gap-3 border-b border-slate-200 pb-3 last:border-0 last:pb-0">
+                  <div *ngFor="let item of cart.items" class="flex items-start justify-between gap-3 pb-3 last:border-0 last:pb-0" style="border-color: var(--app-border);">
                     <div>
-                      <p class="font-semibold text-slate-900">{{ item.product?.name }}</p>
-                      <p class="text-sm text-slate-500">Qty {{ item.quantity }} &#64; ${{ getItemPrice(item) | number: '1.2-2' }}</p>
+                      <p class="font-semibold" style="color: var(--app-text);">{{ item.product?.name }}</p>
+                      <p class="text-sm" style="color: var(--app-text-muted);">Qty {{ item.quantity }} &#64; ${{ getItemPrice(item) | number: '1.2-2' }}</p>
                     </div>
-                    <p class="font-semibold text-slate-900">${{ getItemLineTotal(item) | number: '1.2-2' }}</p>
+                    <p class="font-semibold" style="color: var(--app-text);">{{ '$' + (getItemLineTotal(item) | number: '1.2-2') }}</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div class="rounded-2xl p-5 shadow-sm" style="border-color: var(--app-border); background: var(--app-surface-solid);">
               <div class="space-y-3">
-                <div class="flex items-center justify-between text-sm text-slate-600">
+                <div class="flex items-center justify-between text-sm" style="color: var(--app-text-muted);">
                   <span>Subtotal</span>
-                  <span class="font-semibold text-slate-900">${{ cart.subtotal | number: '1.2-2' }}</span>
+                  <span class="font-semibold" style="color: var(--app-text);">{{ '$' + (cart.subtotal | number: '1.2-2') }}</span>
                 </div>
-                <div class="flex items-center justify-between text-sm text-slate-600" *ngIf="cart.discount && cart.discount > 0">
+                <div class="flex items-center justify-between text-sm" style="color: var(--app-text-muted);" *ngIf="cart.discount && cart.discount > 0">
                   <span>Discount</span>
-                  <span class="font-semibold text-emerald-600">-${{ cart.discount | number: '1.2-2' }}</span>
+                  <span class="font-semibold text-emerald-400">-{{ '$' + (cart.discount | number: '1.2-2') }}</span>
                 </div>
-                <div class="flex items-center justify-between text-sm text-slate-600">
+                <div class="flex items-center justify-between text-sm" style="color: var(--app-text-muted);">
                   <span>Shipping</span>
-                  <span class="font-semibold text-slate-900">${{ getShippingFee() | number: '1.2-2' }}</span>
+                  <span class="font-semibold" style="color: var(--app-text);">{{ '$' + (getShippingFee() | number: '1.2-2') }}</span>
                 </div>
-                <div class="flex items-center justify-between border-t border-slate-200 pt-4 text-base font-black text-slate-900">
+                <div class="flex items-center justify-between pt-4 text-base font-black" style="border-color: var(--app-border); color: var(--app-text);" class="border-t">
                   <span>Total</span>
                   <span>${{ getCalculatedTotal() | number: '1.2-2' }}</span>
                 </div>
@@ -221,7 +225,7 @@
             </div>
 
             <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-              <button type="button" class="inline-flex rounded-full border border-slate-200 bg-white px-8 py-3 text-sm font-bold text-slate-700 transition hover:bg-slate-50" (click)="currentStep = 'address'">Back</button>
+              <button type="button" class="inline-flex rounded-full border px-8 py-3 text-sm font-bold transition" style="border-color: var(--app-border); background: var(--app-surface-solid); color: var(--app-text);" (click)="currentStep = 'address'">Back</button>
               <button type="button" class="inline-flex rounded-full bg-indigo-600 px-8 py-3 text-sm font-bold text-white shadow-lg transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-60" (click)="goToPlaceOrder()" [disabled]="isPlacingOrder">
                 {{ isPlacingOrder ? 'Processing...' : 'Place order' }}
               </button>
@@ -249,39 +253,39 @@
       </section>
 
       <aside *ngIf="currentStep !== 'confirmation'" class="lg:sticky lg:top-28 lg:self-start">
-        <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+        <div class="rounded-3xl p-6 shadow-sm sm:p-8" style="border-color: var(--app-border); background: var(--app-surface-solid); color: var(--app-text);">
           <div class="mb-6">
-            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Order summary</p>
-            <h2 class="mt-2 text-xl font-bold text-slate-900">Review</h2>
+            <p class="text-xs font-semibold uppercase tracking-[0.2em]" style="color: var(--app-text-muted);">Order summary</p>
+            <h2 class="mt-2 text-xl font-bold" style="color: var(--app-text);">Review</h2>
           </div>
 
           <div class="space-y-4">
-            <div *ngFor="let item of cart.items" class="flex items-start justify-between gap-3 border-b border-slate-200 pb-3 last:border-0 last:pb-0">
+            <div *ngFor="let item of cart.items" class="flex items-start justify-between gap-3 pb-3 last:border-0 last:pb-0" style="border-color: var(--app-border);">
               <div class="min-w-0">
-                <p class="truncate font-semibold text-slate-900">{{ getItemName(item) }}</p>
-                <p class="text-sm text-slate-500">Qty {{ item.quantity }}</p>
+                <p class="truncate font-semibold" style="color: var(--app-text);">{{ getItemName(item) }}</p>
+                <p class="text-sm" style="color: var(--app-text-muted);">Qty {{ item.quantity }}</p>
               </div>
-              <p class="font-semibold text-slate-900">${{ getItemLineTotal(item) | number: '1.2-2' }}</p>
+              <p class="font-semibold" style="color: var(--app-text);">{{ '$' + (getItemLineTotal(item) | number: '1.2-2') }}</p>
             </div>
           </div>
 
-          <div class="mt-6 rounded-2xl bg-slate-50 p-4">
+          <div class="mt-6 rounded-2xl p-4" style="background: var(--app-surface-muted);">
             <div class="space-y-3">
-              <div class="flex items-center justify-between text-sm text-slate-600">
+              <div class="flex items-center justify-between text-sm" style="color: var(--app-text-muted);">
                 <span>Subtotal</span>
-                <span class="font-semibold text-slate-900">${{ cart.subtotal | number: '1.2-2' }}</span>
+                <span class="font-semibold" style="color: var(--app-text);">{{ '$' + (cart.subtotal | number: '1.2-2') }}</span>
               </div>
-              <div class="flex items-center justify-between text-sm text-slate-600" *ngIf="cart.discount && cart.discount > 0">
+              <div class="flex items-center justify-between text-sm" style="color: var(--app-text-muted);" *ngIf="cart.discount && cart.discount > 0">
                 <span>Discount</span>
-                <span class="font-semibold text-emerald-600">-${{ cart.discount | number: '1.2-2' }}</span>
+                <span class="font-semibold text-emerald-400">-{{ '$' + (cart.discount | number: '1.2-2') }}</span>
               </div>
-              <div class="flex items-center justify-between text-sm text-slate-600">
+              <div class="flex items-center justify-between text-sm" style="color: var(--app-text-muted);">
                 <span>Shipping</span>
-                <span class="font-semibold text-slate-900">${{ getShippingFee() | number: '1.2-2' }}</span>
+                <span class="font-semibold" style="color: var(--app-text);">{{ '$' + (getShippingFee() | number: '1.2-2') }}</span>
               </div>
-              <div class="flex items-center justify-between border-t border-slate-200 pt-4 text-base font-black text-slate-900">
+              <div class="flex items-center justify-between border-t pt-4 text-base font-black" style="border-color: var(--app-border); color: var(--app-text);">
                 <span>Total</span>
-                <span>${{ getCalculatedTotal() | number: '1.2-2' }}</span>
+                <span>{{ '$' + (getCalculatedTotal() | number: '1.2-2') }}</span>
               </div>
             </div>
           </div>

@@ -6,6 +6,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { CartService } from '../../core/services/cart.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { NotificationResponse } from '../../core/models/notification.models';
+import { ThemeService } from '../../core/services/theme.service';
 import { Observable, map, Subscription } from 'rxjs';
 
 @Component({
@@ -17,12 +18,14 @@ import { Observable, map, Subscription } from 'rxjs';
 export class NavbarComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private cartService = inject(CartService);
+  private themeService = inject(ThemeService);
 
   private router = inject(Router);
 
   private notificationService = inject(NotificationService);
   
   currentUser$ = this.authService.userProfile$;
+  theme$ = this.themeService.theme$;
   searchQuery = '';
   
   cartItemsCount$ = this.cartService.cart$.pipe(
@@ -87,6 +90,10 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   logout() {
     this.authService.logout();
+  }
+
+  toggleTheme(): void {
+    this.themeService.toggle();
   }
 
   searchProducts(): void {
