@@ -91,6 +91,11 @@ export const routes: Routes = [
         data: { expectedRoles: ['SELLER', 'ADMIN'] },
         loadComponent: () => import('./features/products-management/products-management.component').then(c => c.ProductsManagementComponent),
         title: 'Manage Products - ShopFlow'
+      },
+      {
+        path: 'support',
+        loadComponent: () => import('./features/support/support.component').then(c => c.SupportComponent),
+        title: 'Customer Support - ShopFlow'
       }
     ]
   },

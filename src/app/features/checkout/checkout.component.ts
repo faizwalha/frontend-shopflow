@@ -34,7 +34,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   isAddressModalOpen = false;
   errorMessage = '';
   successMessage = '';
-  currentStep: 'address' | 'review' | 'payment' | 'confirmation' = 'address';
+  currentStep: 'address' | 'review' | 'confirmation' = 'address';
 
   addressForm = this.fb.nonNullable.group({
     street: ['', [Validators.required]],
@@ -155,12 +155,12 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     });
   }
 
-  goToPayment() {
+  goToPlaceOrder() {
     if (!this.selectedAddressId) {
       this.errorMessage = 'Please select an address';
       return;
     }
-    this.currentStep = 'payment';
+    this.placeOrder();
   }
 
   placeOrder() {

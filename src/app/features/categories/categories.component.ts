@@ -106,4 +106,10 @@ export class CategoriesComponent implements OnInit {
       }
     });
   }
+
+  getParentName(parentId: number | null | undefined): string {
+    if (!parentId) return '';
+    const parent = this.categories.find(c => c.id === parentId);
+    return parent ? parent.name : `ID: ${parentId}`;
+  }
 }

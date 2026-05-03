@@ -28,6 +28,13 @@ export class ReviewService {
     return this.http.get<ReviewListResponse>(`${this.apiUrl}/unapproved`, { params });
   }
 
+  getAllReviews(page = 0, size = 10): Observable<ReviewListResponse> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
+    return this.http.get<ReviewListResponse>(`${this.apiUrl}/all`, { params });
+  }
+
   approveReview(id: number): Observable<ReviewResponse> {
     return this.http.put<ReviewResponse>(`${this.apiUrl}/${id}/approve`, {});
   }

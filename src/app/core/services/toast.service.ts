@@ -35,6 +35,10 @@ export class ToastService {
     this.show(message, 'error');
   }
 
+  warning(message: string): void {
+    this.show(message, 'warning');
+  }
+
   remove(id: number): void {
     const currentToasts = this.toastsSubject.value;
     this.toastsSubject.next(currentToasts.filter(t => t.id !== id));

@@ -97,7 +97,7 @@ export class DashboardComponent implements OnInit {
     { section: 'products', label: 'Products', description: 'Catalog and merchandising', icon: 'products' },
     { section: 'categories', label: 'Categories', description: 'Collection structure', icon: 'categories', adminOnly: true },
     { section: 'orders', label: 'Orders', description: 'All orders, customers and sellers', icon: 'customers' },
-    { section: 'customers', label: 'Customers', description: 'Buyer activity summary', icon: 'customers', adminOnly: true },
+    { section: 'customers', label: 'Users', description: 'User management and role activity', icon: 'customers', adminOnly: true },
 
     { section: 'reviews', label: 'Reviews', description: 'Review moderation', icon: 'categories', adminOnly: true },
     { section: 'coupons', label: 'Coupons', description: 'Promo codes and discounts', icon: 'discount', adminOnly: true }
@@ -123,8 +123,8 @@ export class DashboardComponent implements OnInit {
       description: 'View all orders with detailed customer and seller information.'
     },
     customers: {
-      title: 'Customers',
-      description: 'Review purchasing activity and high-value buyers.'
+      title: 'Users',
+      description: 'Review user activity, roles, and status across the platform.'
     },
     reviews: {
       title: 'Review Moderation',
@@ -178,7 +178,8 @@ export class DashboardComponent implements OnInit {
   successMessage = '';
 
   adminUsers: AdminUser[] = [];
-  pendingReviews: Review[] = [];
+  allReviews: Review[] = [];
+  pendingReviewCount = 0;
 
   categoryForm = this.fb.nonNullable.group({
     name: ['', [Validators.required]],
@@ -251,7 +252,7 @@ export class DashboardComponent implements OnInit {
         this.loadOrders();
         if (this.isAdmin(user.role)) {
           this.loadAdminUsers();
-          this.loadPendingReviews();
+          this.loadAllReviews();
         }
       } else if (user && user.role === 'CUSTOMER') {
         // For customers, we might only want to load their stats or orders if the dashboard is used as profile
@@ -340,7 +341,7 @@ export class DashboardComponent implements OnInit {
     this.activeSection = section;
     this.isNotificationsOpen = false;
     if (section === 'reviews') {
-      this.loadPendingReviews();
+      this.loadAllReviews();
     }
   }
 
@@ -1197,7 +1198,7 @@ export class DashboardComponent implements OnInit {
 
     if (target === 'reviews' && this.reviewPageIndex < this.reviewPageCount - 1) {
       this.reviewPageIndex += 1;
-      this.loadPendingReviews();
+      this.loadAllReviews();
     }
   }
 
@@ -1220,7 +1221,7 @@ export class DashboardComponent implements OnInit {
 
     if (target === 'reviews' && this.reviewPageIndex > 0) {
       this.reviewPageIndex -= 1;
-      this.loadPendingReviews();
+      this.loadAllReviews();
     }
   }
 
@@ -1383,15 +1384,17 @@ export class DashboardComponent implements OnInit {
     return names.length > 0 ? Array.from(new Set(names)).join(' · ') : 'Unknown seller';
   }
 
-  loadPendingReviews(): void {
+  loadAllReviews(): void {
     this.loadingReviews = true;
-    this.reviewService.getUnapprovedReviews(this.reviewPageIndex, 10).subscribe({
+    this.reviewService.getAllReviews(this.reviewPageIndex, 10).subscribe({
       next: (response) => {
-        this.pendingReviews = response.content ?? [];
+        this.allReviews = response.content ?? [];
         this.loadingReviews = false;
+        // Count pending reviews from the list if possible, or fetch separately
+        this.pendingReviewCount = this.allReviews.filter(r => !r.approved).length;
       },
       error: () => {
-        this.toastService.error('Unable to load pending reviews.');
+        this.toastService.error('Unable to load reviews.');
         this.loadingReviews = false;
       }
     });
@@ -1401,7 +1404,7 @@ export class DashboardComponent implements OnInit {
     this.reviewService.approveReview(review.id).subscribe({
       next: () => {
         this.toastService.success('Review approved.');
-        this.loadPendingReviews();
+        this.loadAllReviews();
         this.loadStats();
       },
       error: () => this.toastService.error('Failed to approve review.')
@@ -1418,8 +1421,8 @@ export class DashboardComponent implements OnInit {
       if (!confirmed) return;
       this.reviewService.deleteReview(review.id).subscribe({
         next: () => {
-          this.toastService.success('Review rejected and deleted.');
-          this.loadPendingReviews();
+          this.toastService.success('Review deleted.');
+          this.loadAllReviews();
         },
         error: () => this.toastService.error('Failed to delete review.')
       });
@@ -1427,7 +1430,7 @@ export class DashboardComponent implements OnInit {
   }
 
   get reviewPageCount(): number {
-    return Math.ceil(this.pendingReviews.length / 10) || 1;
+    return Math.ceil(this.allReviews.length / 10) || 1;
   }
 
   onFileSelected(event: any): void {
@@ -1443,5 +1446,11 @@ export class DashboardComponent implements OnInit {
         error: () => this.toastService.error('Failed to upload image.')
       });
     }
+  }
+
+  getParentName(parentId: number | null | undefined): string {
+    if (!parentId) return '—';
+    const parent = this.categories.find(c => c.id === parentId);
+    return parent ? parent.name : `ID: ${parentId}`;
   }
 }

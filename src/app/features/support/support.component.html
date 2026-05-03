@@ -1,0 +1,107 @@
+<div class="min-h-screen bg-white flex items-center justify-center px-4 py-20">
+  <div class="max-w-2xl w-full">
+    
+    <div *ngIf="!showForm" class="text-center animate-in fade-in zoom-in duration-500">
+      <!-- Icon / Branding -->
+      <div class="mb-10 inline-flex items-center justify-center w-24 h-24 rounded-[40px] bg-slate-50 border border-slate-100 shadow-sm">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-violet-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+        </svg>
+      </div>
+
+      <!-- Content -->
+      <h1 class="text-5xl font-black text-slate-900 tracking-tight mb-6">Direct Support</h1>
+      <p class="text-xl text-slate-500 font-light leading-relaxed mb-12">
+        Need assistance? Start a direct conversation with our lead developer. 
+        Your request will be handled personally via our secure mail service.
+      </p>
+
+      <!-- Action Card -->
+      <div class="bg-slate-50 rounded-[48px] p-12 border border-slate-100 transition-all hover:shadow-[0_40px_100px_rgba(0,0,0,0.05)]">
+        <div class="flex flex-col items-center gap-8">
+          <div class="text-center">
+            <p class="text-xs font-bold uppercase tracking-[0.2em] text-violet-600 mb-2">Recipient</p>
+            <p class="text-2xl font-black text-slate-900">zouariahmed1997&#64;gmail.com</p>
+          </div>
+
+          <button (click)="toggleForm()" 
+             class="inline-flex items-center gap-3 px-10 py-5 bg-slate-900 text-white rounded-full font-bold text-lg hover:bg-violet-600 transition-all shadow-xl hover:shadow-violet-500/30">
+            Start Conversation
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Message Form -->
+    <div *ngIf="showForm" class="animate-in slide-in-from-bottom-8 duration-500">
+      <div class="bg-white rounded-[40px] shadow-[0_30px_80px_rgba(0,0,0,0.08)] border border-slate-100 overflow-hidden">
+        <!-- Form Header -->
+        <div class="bg-slate-900 p-8 text-white flex justify-between items-center">
+          <div>
+            <h2 class="text-2xl font-black">New Message</h2>
+            <p class="text-slate-400 text-sm">To: zouariahmed1997&#64;gmail.com</p>
+          </div>
+          <button (click)="toggleForm()" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Form Body -->
+        <form [formGroup]="supportForm" (ngSubmit)="onSubmit()" class="p-8 space-y-6">
+          <div class="space-y-2">
+            <label class="text-xs font-bold uppercase tracking-widest text-slate-400 px-1">Subject</label>
+            <input type="text" formControlName="subject" placeholder="What's this about?"
+                   class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4 text-slate-900 font-medium focus:border-violet-500 focus:bg-white outline-none transition-all">
+          </div>
+
+          <div class="space-y-2">
+            <label class="text-xs font-bold uppercase tracking-widest text-slate-400 px-1">Your Message</label>
+            <textarea formControlName="description" rows="6" placeholder="Describe your issue in detail..."
+                      class="w-full bg-slate-50 border-2 border-slate-100 rounded-3xl px-6 py-4 text-slate-900 font-medium focus:border-violet-500 focus:bg-white outline-none transition-all resize-none"></textarea>
+          </div>
+
+          <button type="submit" [disabled]="supportForm.invalid || submitting"
+                  class="w-full bg-violet-600 text-white rounded-2xl py-5 font-bold text-lg hover:bg-violet-700 disabled:opacity-50 transition-all shadow-xl shadow-violet-200 flex items-center justify-center gap-3">
+            <span *ngIf="!submitting">Send Message</span>
+            <span *ngIf="submitting">Sending...</span>
+            <svg *ngIf="!submitting" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+            </svg>
+            <svg *ngIf="submitting" class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Help Footer -->
+    <div class="mt-16 flex items-center justify-center gap-12 text-sm font-bold text-slate-400">
+      <div class="flex items-center gap-2">
+        <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
+        Support Active
+      </div>
+      <div class="flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        24h Response
+      </div>
+    </div>
+    
+    <div class="mt-12 text-center">
+      <a routerLink="/" class="text-slate-300 hover:text-slate-900 transition-colors font-bold text-sm flex items-center justify-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Return to Home
+      </a>
+    </div>
+  </div>
+</div>
