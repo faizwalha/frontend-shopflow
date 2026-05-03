@@ -4,6 +4,16 @@ export interface AdminDashboardResponse {
   totalUsers: number;
   totalProducts: number;
   topSellers: string[];
+  topProducts: string[];
+  recentOrders: RecentOrderSummary[];
+}
+
+export interface RecentOrderSummary {
+  orderNumber: string;
+  customerName: string;
+  totalTTC: number;
+  status: string;
+  orderDate: string;
 }
 
 export interface SellerDashboardResponse {

@@ -1179,6 +1179,14 @@ export class DashboardComponent implements OnInit {
     return this.adminStats?.topSellers ?? [];
   }
 
+  get topProducts(): string[] {
+    return this.adminStats?.topProducts ?? [];
+  }
+
+  get recentOrdersAdmin(): any[] {
+    return this.adminStats?.recentOrders ?? [];
+  }
+
   nextPage(target: 'products' | 'categories' | 'orders' | 'customers' | 'reviews'): void {
     if (target === 'products' && this.productPageIndex < this.productPageCount - 1) {
       this.productPageIndex += 1;
