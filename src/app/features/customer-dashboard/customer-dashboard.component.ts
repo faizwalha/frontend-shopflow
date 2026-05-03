@@ -186,7 +186,8 @@ export class CustomerDashboardComponent implements OnInit {
     this.confirmService.confirm({
       title: 'Cancel Order',
       message: `Are you sure you want to cancel order ${order.orderNumber}?`,
-      confirmText: 'Yes, Cancel',
+      confirmText: 'Yes',
+      cancelText: 'No',
       type: 'warning'
     }).pipe(take(1)).subscribe(confirmed => {
       if (confirmed) {
@@ -218,6 +219,16 @@ export class CustomerDashboardComponent implements OnInit {
 
   formatCurrency(value: number | undefined | null): string {
     return (value ?? 0).toFixed(2);
+  }
+
+  getOrderItemName(item: any): string {
+    return item.product?.name || item.productName || `Product #${item.productId}`;
+  }
+
+  getOrderItemLineTotal(item: any): number {
+    const quantity = Number(item.quantity ?? 0);
+    const unitPrice = Number(item.unitPrice ?? 0);
+    return quantity * unitPrice;
   }
 
   get pagedReviews(): Review[] {

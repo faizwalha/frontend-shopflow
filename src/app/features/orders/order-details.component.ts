@@ -95,6 +95,40 @@ export class OrderDetailsComponent implements OnInit {
     return (value ?? 0).toFixed(2);
   }
 
+  getOrderAddressLines(): string[] {
+    if (!this.order?.address) {
+      return ['Address not available'];
+    }
+
+    const address = this.order.address;
+    const lines = [
+      address.street,
+      [address.city, address.postalCode].filter(Boolean).join(', '),
+      address.country
+    ].filter((line): line is string => Boolean(line && line.trim()));
+
+    return lines.length > 0 ? lines : ['Address not available'];
+  }
+
+  getOrderItemName(item: any): string {
+    return item.product?.name || item.productName || 'Unknown Product';
+  }
+
+  getOrderItemSellerName(item: any): string {
+    const seller = item.seller || item.product?.seller || item.product?.sellerName;
+
+    if (!seller) {
+      return 'Seller: not available';
+    }
+
+    if (typeof seller === 'string') {
+      return `Seller: ${seller}`;
+    }
+
+    const fullName = [seller.firstName, seller.lastName].filter(Boolean).join(' ').trim();
+    return `Seller: ${fullName || seller.name || seller.email || 'not available'}`;
+  }
+
   goBack(): void {
     this.router.navigate(['/orders']);
   }
