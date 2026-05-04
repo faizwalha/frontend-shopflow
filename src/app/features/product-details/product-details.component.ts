@@ -29,7 +29,7 @@ export class ProductDetailsComponent implements OnInit {
   currentUser$ = this.authService.currentUser$;
   product: ProductResponse | null = null;
   reviews: Review[] = [];
-  selectedVariant: ProductVariant | null = null;
+  selectedVariants: { [attribute: string]: ProductVariant } = {};
   loading = false;
   loadingReviews = false;
   isAdding = false;
@@ -37,6 +37,19 @@ export class ProductDetailsComponent implements OnInit {
   successMessage = '';
   errorMessage = '';
   reviewError = '';
+
+  get groupedVariants(): { [attribute: string]: ProductVariant[] } {
+    if (!this.product || !this.product.variants) return {};
+    return this.product.variants.reduce((acc, v) => {
+      if (!acc[v.attribute]) acc[v.attribute] = [];
+      acc[v.attribute].push(v);
+      return acc;
+    }, {} as { [attribute: string]: ProductVariant[] });
+  }
+
+  get attributes(): string[] {
+    return Object.keys(this.groupedVariants);
+  }
 
   reviewForm = this.fb.nonNullable.group({
     rating: [5, [Validators.required, Validators.min(1), Validators.max(5)]],
@@ -106,13 +119,26 @@ export class ProductDetailsComponent implements OnInit {
   }
 
   selectVariant(variant: ProductVariant): void {
-    this.selectedVariant = variant;
+    if (this.selectedVariants[variant.attribute]?.id === variant.id) {
+      delete this.selectedVariants[variant.attribute];
+    } else {
+      this.selectedVariants[variant.attribute] = variant;
+    }
+  }
+
+  isSelected(variant: ProductVariant): boolean {
+    return this.selectedVariants[variant.attribute]?.id === variant.id;
   }
 
   getDisplayPrice(): number {
     if (!this.product) return 0;
-    const basePrice = this.product.displayPrice;
-    return this.selectedVariant ? basePrice + this.selectedVariant.priceDelta : basePrice;
+    let price = this.product.displayPrice;
+    
+    Object.values(this.selectedVariants).forEach(v => {
+      price += v.priceDelta || 0;
+    });
+    
+    return price;
   }
 
   getDiscountPercentage(): number {
@@ -124,16 +150,21 @@ export class ProductDetailsComponent implements OnInit {
 
   getDisplayStock(): number {
     if (!this.product) return 0;
-    return this.selectedVariant ? this.selectedVariant.additionalStock : this.product.stock;
+    const selectedValues = Object.values(this.selectedVariants);
+    if (selectedValues.length === 0) return this.product.stock;
+    
+    // On prend le stock minimum parmi les variantes selectionnees
+    return Math.min(...selectedValues.map(v => v.additionalStock));
   }
 
   addToCart(): void {
-    if (!this.product) {
-      return;
-    }
+    if (!this.product) return;
 
-    if (this.product.variants && this.product.variants.length > 0 && !this.selectedVariant) {
-      this.errorMessage = 'Please select a variant.';
+    const attributesCount = this.attributes.length;
+    const selectedCount = Object.keys(this.selectedVariants).length;
+
+    if (attributesCount > 0 && selectedCount < attributesCount) {
+      this.errorMessage = 'Please select all options (e.g., Color and Size).';
       return;
     }
 
@@ -143,7 +174,7 @@ export class ProductDetailsComponent implements OnInit {
 
     const request: AddToCartRequest = {
       productId: this.product.id,
-      variantId: this.selectedVariant?.id ?? null,
+      variantIds: Object.values(this.selectedVariants).map(v => v.id),
       quantity: 1
     };
 

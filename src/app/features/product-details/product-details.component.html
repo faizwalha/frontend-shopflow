@@ -46,21 +46,24 @@
 			</div>
 
 			<!-- Variants Section -->
-			<div *ngIf="product.variants && product.variants.length > 0" class="mt-8">
-				<p class="text-sm font-semibold text-gray-700 mb-3">Available Options</p>
-				<div class="flex flex-wrap gap-2">
-					<button *ngFor="let variant of product.variants" 
-						(click)="selectVariant(variant)"
-						[class.ring-2]="selectedVariant?.id === variant.id"
-						[class.ring-indigo-600]="selectedVariant?.id === variant.id"
-						[class.bg-indigo-50]="selectedVariant?.id === variant.id"
-						[disabled]="variant.additionalStock === 0"
-						[class.opacity-50]="variant.additionalStock === 0"
-						[class.cursor-not-allowed]="variant.additionalStock === 0"
-						class="rounded-xl border border-gray-200 px-4 py-2 text-sm font-medium text-gray-900 hover:border-indigo-600 transition-all">
-						{{ variant.value }} 
-						<span *ngIf="variant.priceDelta > 0" class="text-xs text-gray-500 ml-1">(+${{ variant.priceDelta.toFixed(2) }})</span>
-					</button>
+			<div *ngIf="attributes.length > 0" class="mt-8 space-y-6">
+				<div *ngFor="let attr of attributes">
+					<p class="text-sm font-semibold text-gray-700 mb-3">{{ attr }}</p>
+					<div class="flex flex-wrap gap-2">
+						<button *ngFor="let variant of groupedVariants[attr]" 
+							(click)="selectVariant(variant)"
+							[class.ring-2]="isSelected(variant)"
+							[class.ring-indigo-600]="isSelected(variant)"
+							[class.bg-indigo-50]="isSelected(variant)"
+							[class.border-indigo-600]="isSelected(variant)"
+							[disabled]="variant.additionalStock === 0"
+							[class.opacity-50]="variant.additionalStock === 0"
+							[class.cursor-not-allowed]="variant.additionalStock === 0"
+							class="rounded-xl border border-gray-200 px-4 py-2 text-sm font-medium text-gray-900 hover:border-indigo-600 transition-all">
+							{{ variant.value }} 
+							<span *ngIf="variant.priceDelta > 0" class="text-xs text-gray-500 ml-1">(+${{ variant.priceDelta.toFixed(2) }})</span>
+						</button>
+					</div>
 				</div>
 			</div>
 

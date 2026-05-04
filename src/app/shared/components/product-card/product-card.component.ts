@@ -35,7 +35,7 @@ export class ProductCardComponent {
       // Save pending action to execute after login
       localStorage.setItem('pending_cart_action', JSON.stringify({
         productId: this.product.id,
-        variantId: null,
+        variantIds: [],
         quantity: 1
       }));
       this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
@@ -48,7 +48,7 @@ export class ProductCardComponent {
 
     const request: AddToCartRequest = {
       productId: this.product.id,
-      variantId: null,
+      variantIds: [],
       quantity: 1
     };
 

@@ -41,7 +41,7 @@ export interface Cart {
 
 export interface AddToCartRequest {
   productId: number;
-  variantId?: number | null;
+  variantIds?: number[] | null;
   quantity: number;
 }
 
