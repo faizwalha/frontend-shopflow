@@ -30,7 +30,7 @@
             <div class="flex flex-wrap items-center justify-between gap-4">
               <div>
                 <p class="text-xs font-semibold uppercase tracking-[0.24em] text-violet-700">Customer area</p>
-                <h1 class="mt-1 text-2xl font-black text-slate-950">Welcome back{{ user.userId ? ', customer #' + user.userId : '' }}</h1>
+                <h1 class="mt-1 text-2xl font-black tracking-tight text-slate-950">Welcome back{{ user.userId ? ', customer #' + user.userId : '' }}</h1>
                 <p class="mt-1 text-sm text-slate-500">Manage your orders and track the reviews you posted on products.</p>
               </div>
 
@@ -113,9 +113,9 @@
             <article class="rounded-[28px] border border-slate-200/80 bg-white p-5 shadow-[0_18px_50px_rgba(15,23,42,0.08)]">
               <div class="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <p class="text-xs font-semibold uppercase tracking-[0.24em] text-violet-700">Reviews</p>
-                  <h2 class="mt-1 text-xl font-black text-slate-950">Your product reviews</h2>
-                  <p class="mt-1 text-sm text-slate-500">See the feedback you posted on products from your orders.</p>
+                  <p class="text-xs font-semibold uppercase tracking-[0.24em] text-violet-400\">Reviews</p>
+                  <h2 class="mt-1 text-xl font-black\" style="color: var(--app-text);\">Your product reviews</h2>
+                  <p class="mt-1 text-sm\" style="color: var(--app-text-muted);\">See the feedback you posted on products from your orders.</p>
                 </div>
                 <button type="button" class="dashboard-secondary-button" (click)="loadReviews()">Refresh</button>
               </div>

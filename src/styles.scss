@@ -2,8 +2,116 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom global styles */
-body {
-  @apply bg-gray-50 text-gray-900;
-  background-image: radial-gradient(circle at top, rgba(139, 92, 246, 0.08), transparent 32%);
+@layer base {
+  :root {
+    --app-bg: #f8fafc;
+    --app-surface: rgba(255, 255, 255, 0.9);
+    --app-surface-solid: #ffffff;
+    --app-surface-muted: #f1f5f9;
+    --app-text: #0f172a;
+    --app-text-muted: #64748b;
+    --app-border: rgba(226, 232, 240, 0.95);
+    --app-shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
+    --app-accent: #7c3aed;
+    color-scheme: light;
+  }
+
+  html.theme-dark {
+    --app-bg: #020617;
+    --app-surface: rgba(15, 23, 42, 0.88);
+    --app-surface-solid: #0f172a;
+    --app-surface-muted: #111827;
+    --app-text: #e2e8f0;
+    --app-text-muted: #94a3b8;
+    --app-border: rgba(71, 85, 105, 0.72);
+    --app-shadow: 0 24px 60px rgba(2, 6, 23, 0.38);
+    --app-accent: #c084fc;
+    color-scheme: dark;
+  }
+
+  html,
+  body {
+    min-height: 100%;
+  }
+
+  body {
+    @apply bg-slate-50 text-slate-900 antialiased;
+    background:
+      radial-gradient(circle at top, rgba(139, 92, 246, 0.08), transparent 32%),
+      linear-gradient(180deg, var(--app-bg) 0%, var(--app-bg) 100%);
+    color: var(--app-text);
+    transition: background-color 180ms ease, color 180ms ease;
+  }
+
+  body.theme-dark {
+    background:
+      radial-gradient(circle at top left, rgba(139, 92, 246, 0.16), transparent 34%),
+      radial-gradient(circle at top right, rgba(217, 70, 239, 0.16), transparent 28%),
+      linear-gradient(180deg, #020617 0%, #0f172a 100%);
+  }
+
+  ::selection {
+    background: rgba(196, 181, 253, 0.45);
+    color: #1e1b4b;
+  }
+
+  html.theme-dark ::selection {
+    background: rgba(147, 197, 253, 0.28);
+    color: #eff6ff;
+  }
+}
+
+@layer utilities {
+  html.theme-dark [class*='bg-white'] {
+    background-color: var(--app-surface-solid) !important;
+  }
+
+  html.theme-dark [class*='bg-gray-50'],
+  html.theme-dark [class*='bg-slate-50'] {
+    background-color: var(--app-surface-muted) !important;
+  }
+
+  html.theme-dark [class*='bg-gray-100'],
+  html.theme-dark [class*='bg-slate-100'] {
+    background-color: rgba(30, 41, 59, 0.96) !important;
+  }
+
+  html.theme-dark [class*='text-gray-900'],
+  html.theme-dark [class*='text-slate-950'],
+  html.theme-dark [class*='text-slate-900'] {
+    color: var(--app-text) !important;
+  }
+
+  html.theme-dark [class*='text-gray-700'],
+  html.theme-dark [class*='text-gray-600'],
+  html.theme-dark [class*='text-slate-600'],
+  html.theme-dark [class*='text-slate-500'],
+  html.theme-dark [class*='text-gray-500'],
+  html.theme-dark [class*='text-gray-400'],
+  html.theme-dark [class*='text-slate-400'] {
+    color: var(--app-text-muted) !important;
+  }
+
+  html.theme-dark [class*='border-gray-100'],
+  html.theme-dark [class*='border-gray-200'],
+  html.theme-dark [class*='border-slate-100'],
+  html.theme-dark [class*='border-slate-200'] {
+    border-color: var(--app-border) !important;
+  }
+
+  html.theme-dark [class*='shadow-sm'],
+  html.theme-dark [class*='shadow-md'],
+  html.theme-dark [class*='shadow-lg'],
+  html.theme-dark [class*='shadow-xl'] {
+    box-shadow: var(--app-shadow) !important;
+  }
+
+  html.theme-dark .text-white {
+    color: #f8fafc !important;
+  }
+
+  html.theme-dark .bg-violet-50,
+  html.theme-dark .bg-violet-50\/30 {
+    background-color: rgba(91, 33, 182, 0.18) !important;
+  }
 }

@@ -19,6 +19,12 @@
   color: #e2e8f0;
 }
 
+.dashboard-shell {
+  background: var(--app-bg);
+  color: var(--app-text);
+  transition: background-color 180ms ease, color 180ms ease;
+}
+
 .dashboard-nav-item {
   display: flex;
   width: 100%;

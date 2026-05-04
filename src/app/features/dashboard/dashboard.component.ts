@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators, FormArray } from '@angular/forms';
-import { take } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { CategoryService } from '../../core/services/category.service';
 import { ProductService } from '../../core/services/product.service';
@@ -17,9 +16,11 @@ import { ProductRequest, ProductResponse, ProductVariantRequest } from '../../co
 import { AdminDashboardResponse, SellerDashboardResponse } from '../../core/models/dashboard.models';
 import { AdminOrderResponse, Order, OrderStatus, UserSummaryResponse } from '../../core/models/order.models';
 import { AdminCouponsComponent } from '../coupons/admin-coupons.component';
+import { ThemeService } from '../../core/services/theme.service';
 
 import { ReviewService } from '../../core/services/review.service';
 import { Review } from '../../core/models/review.models';
+import { Subscription, take } from 'rxjs';
 
 type DashboardSection = 'overview' | 'products' | 'categories' | 'customers' | 'orders' | 'reviews' | 'coupons';
 
@@ -90,6 +91,7 @@ export class DashboardComponent implements OnInit {
   private confirmService = inject(ConfirmService);
   private reviewService = inject(ReviewService);
   private uploadService = inject(UploadService);
+  private themeService = inject(ThemeService);
 
   readonly currentUser$ = this.authService.currentUser$;
   readonly navItems: DashboardNavItem[] = [
@@ -154,6 +156,7 @@ export class DashboardComponent implements OnInit {
   selectedChartPeriod: ChartPeriod = 'weekly';
   searchQuery = '';
   isDarkMode = false;
+  private themeSub?: Subscription;
   isNotificationsOpen = false;
   productPageIndex = 0;
   categoryPageIndex = 0;
@@ -243,7 +246,10 @@ export class DashboardComponent implements OnInit {
   };
 
   ngOnInit(): void {
-    this.restoreThemePreference();
+    this.isDarkMode = this.themeService.isDarkMode;
+    this.themeSub = this.themeService.theme$.subscribe(theme => {
+      this.isDarkMode = theme === 'dark';
+    });
     this.currentUser$.pipe(take(1)).subscribe(user => {
       if (user && (user.role === 'ADMIN' || user.role === 'SELLER')) {
         this.loadStats();
@@ -367,8 +373,7 @@ export class DashboardComponent implements OnInit {
   }
 
   toggleTheme(): void {
-    this.isDarkMode = !this.isDarkMode;
-    this.persistThemePreference();
+    this.themeService.toggle();
   }
 
   toggleNotifications(): void {
@@ -1233,6 +1238,10 @@ export class DashboardComponent implements OnInit {
     }
   }
 
+  ngOnDestroy(): void {
+    this.themeSub?.unsubscribe();
+  }
+
   private matchesProductQuery(product: ProductResponse, query: string): boolean {
     if (!query) {
       return true;
@@ -1352,23 +1361,6 @@ export class DashboardComponent implements OnInit {
     }
 
     this.notifications = notifications;
-  }
-
-  private persistThemePreference(): void {
-    try {
-      localStorage.setItem('shopflow-dashboard-theme', this.isDarkMode ? 'dark' : 'light');
-    } catch {
-      // Ignore storage failures.
-    }
-  }
-
-  private restoreThemePreference(): void {
-    try {
-      const storedTheme = localStorage.getItem('shopflow-dashboard-theme');
-      this.isDarkMode = storedTheme === 'dark';
-    } catch {
-      this.isDarkMode = false;
-    }
   }
 
   private toTime(value: string | undefined): number {

@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { ThemeService } from './core/services/theme.service';
 
 @Component({
   selector: 'app-root',
@@ -8,5 +9,6 @@ import { RouterModule } from '@angular/router';
   template: `<router-outlet></router-outlet>`
 })
 export class AppComponent {
+  private readonly themeService = inject(ThemeService);
   title = 'shopflow';
 }

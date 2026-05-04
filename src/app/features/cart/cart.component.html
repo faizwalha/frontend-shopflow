@@ -1,9 +1,9 @@
-<div class="min-h-[calc(100vh-8rem)] bg-gradient-to-b from-slate-50 to-white py-10">
+<div class="min-h-[calc(100vh-8rem)] py-10" style="background: linear-gradient(180deg, var(--app-bg) 0%, var(--app-bg) 100%); color: var(--app-text);">
   <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
     <div class="mb-8 flex flex-col gap-2">
-      <p class="text-sm font-semibold uppercase tracking-[0.28em] text-indigo-600">Shopping</p>
-      <h1 class="text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">Your Cart</h1>
-      <p class="max-w-2xl text-sm text-slate-500 sm:text-base">Review items, adjust quantities, and continue to checkout when you are ready.</p>
+      <p class="text-sm font-semibold uppercase tracking-[0.28em] text-indigo-400">Shopping</p>
+      <h1 class="text-3xl font-black tracking-tight sm:text-4xl" style="color: var(--app-text);">Your Cart</h1>
+      <p class="max-w-2xl text-sm" style="color: var(--app-text-muted);">Review items, adjust quantities, and continue to checkout when you are ready.</p>
     </div>
 
     <div *ngIf="errorMessage" class="mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 shadow-sm">
@@ -13,7 +13,7 @@
       {{ successMessage }}
     </div>
 
-    <div *ngIf="isLoadingCart" class="flex min-h-[320px] items-center justify-center rounded-3xl border border-slate-200 bg-white/80 shadow-sm">
+    <div *ngIf="isLoadingCart" class="flex min-h-[320px] items-center justify-center rounded-3xl shadow-sm" style="border-color: var(--app-border); background: var(--app-surface); color: var(--app-text);">
       <div class="text-center">
         <div class="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-slate-200 border-t-indigo-600"></div>
         <p class="text-sm font-medium text-slate-500">Loading your cart...</p>
@@ -22,39 +22,42 @@
 
     <div *ngIf="!isLoadingCart && cart" class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_380px]">
       <section *ngIf="cart.items && cart.items.length > 0; else emptyCart" class="space-y-4">
-        <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+        <div class="rounded-3xl p-6 shadow-sm sm:p-8" style="border-color: var(--app-border); background: var(--app-surface-solid); color: var(--app-text);">
           <div class="mb-6 flex items-center justify-between gap-4">
             <div>
-              <h2 class="text-xl font-bold text-slate-900 sm:text-2xl">Shopping Cart</h2>
-              <p class="text-sm text-slate-500">{{ cart.items.length }} item(s) in your basket</p>
+              <h2 class="text-xl font-bold sm:text-2xl" style="color: var(--app-text);">Shopping Cart</h2>
+              <p class="text-sm" style="color: var(--app-text-muted);">{{ cart.items.length }} item(s) in your basket</p>
             </div>
             <button
               type="button"
-              class="hidden rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 sm:inline-flex"
-              (click)="continueShopping()">
+              class="hidden rounded-full px-4 py-2 text-sm font-semibold transition sm:inline-flex"
+              style="border-color: var(--app-border); color: var(--app-text-muted);" 
+              (click)="continueShopping()"
+              onmouseover="this.style.background=getComputedStyle(document.documentElement).getPropertyValue('--app-surface-muted')" 
+              onmouseout="this.style.background='transparent'">
               Continue shopping
             </button>
           </div>
 
           <div class="space-y-4">
-            <article *ngFor="let item of cart.items" class="grid gap-4 rounded-2xl border border-slate-200 bg-slate-50/80 p-4 shadow-sm transition hover:shadow-md sm:grid-cols-[92px_minmax(0,1fr)_160px] sm:items-center">
-              <div class="overflow-hidden rounded-2xl bg-white shadow-sm">
+            <article *ngFor="let item of cart.items" class="grid gap-4 rounded-2xl p-4 shadow-sm transition hover:shadow-md sm:grid-cols-[92px_minmax(0,1fr)_160px] sm:items-center" style="border-color: var(--app-border); background: var(--app-surface-muted);">
+              <div class="overflow-hidden rounded-2xl shadow-sm" style="background: var(--app-surface);">
                 <img [src]="getProductImage(item)" [alt]="getProductName(item)" class="h-24 w-full object-cover">
               </div>
 
               <div class="min-w-0">
                 <div class="flex items-start justify-between gap-3">
                   <div>
-                    <h3 class="truncate text-lg font-bold text-slate-900">{{ getProductName(item) }}</h3>
+                    <h3 class="truncate text-lg font-bold" style="color: var(--app-text);">{{ getProductName(item) }}</h3>
                     <p *ngIf="item.variant" class="mt-1 inline-flex rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700">
                       {{ item.variant.attribute }}: {{ item.variant.value }}
                     </p>
                   </div>
                 </div>
 
-                <div class="mt-3 flex flex-wrap items-center gap-3 text-sm text-slate-500">
-                  <span class="font-medium text-slate-700">Unit price:</span>
-                  <span class="font-semibold text-slate-900">${{ getUnitPrice(item) | number: '1.2-2' }}</span>
+                <div class="mt-3 flex flex-wrap items-center gap-3 text-sm" style="color: var(--app-text-muted);">
+                  <span class="font-medium" style="color: var(--app-text);">Unit price:</span>
+                  <span class="font-semibold" style="color: var(--app-text);">${{ getUnitPrice(item) | number: '1.2-2' }}</span>
                 </div>
               </div>
 
@@ -66,13 +69,14 @@
                     min="1"
                     [value]="item.quantity"
                     (change)="onQuantityChange(item, $event)"
-                    class="w-24 rounded-full border border-slate-200 bg-white px-4 py-2 text-center text-sm font-semibold text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100">
+                    class="w-24 rounded-full border px-4 py-2 text-center text-sm font-semibold outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
+                    style="border-color: var(--app-border); background: var(--app-surface-solid); color: var(--app-text);">
                 </div>
 
                 <div class="flex items-center justify-between gap-3 sm:justify-end">
                   <div class="text-right">
-                    <p class="text-xs font-medium uppercase tracking-[0.2em] text-slate-400">Line total</p>
-                    <p class="text-lg font-black text-slate-900">${{ getLineTotal(item) | number: '1.2-2' }}</p>
+                    <p class="text-xs font-medium uppercase tracking-[0.2em]" style="color: var(--app-text-muted);">Line total</p>
+                    <p class="text-lg font-black" style="color: var(--app-text);">${{ getLineTotal(item) | number: '1.2-2' }}</p>
                   </div>
                   <button
                     type="button"
@@ -88,21 +92,22 @@
 
         <button
           type="button"
-          class="inline-flex rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 lg:hidden"
+          class="inline-flex rounded-full border px-5 py-3 text-sm font-semibold shadow-sm transition lg:hidden"
+          style="border-color: var(--app-border); background: var(--app-surface-solid); color: var(--app-text);"
           (click)="continueShopping()">
           Continue Shopping
         </button>
       </section>
 
       <ng-template #emptyCart>
-        <div class="rounded-3xl border border-dashed border-slate-300 bg-white p-10 text-center shadow-sm">
-          <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+        <div class="rounded-3xl border border-dashed p-10 text-center shadow-sm" style="border-color: var(--app-border); background: var(--app-surface-solid); color: var(--app-text);">
+          <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full" style="background: var(--app-surface-muted); color: var(--app-text-muted);">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13 5.4 5M7 13l-2 9h12m-8-9v9m4-9v9" />
             </svg>
           </div>
-          <h2 class="text-2xl font-bold text-slate-900">Your cart is empty</h2>
-          <p class="mt-2 text-sm text-slate-500">Start shopping to add items to your cart.</p>
+          <h2 class="text-2xl font-bold" style="color: var(--app-text);">Your cart is empty</h2>
+          <p class="mt-2 text-sm" style="color: var(--app-text-muted);">Start shopping to add items to your cart.</p>
           <button
             type="button"
             class="mt-6 inline-flex rounded-full bg-slate-900 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-900/10 transition hover:bg-slate-800"
@@ -113,21 +118,22 @@
       </ng-template>
 
       <aside *ngIf="cart.items && cart.items.length > 0" class="lg:sticky lg:top-28 lg:self-start">
-        <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+        <div class="rounded-3xl p-6 shadow-sm sm:p-8" style="border-color: var(--app-border); background: var(--app-surface-solid); color: var(--app-text);">
           <div class="mb-6">
-            <h2 class="text-xl font-bold text-slate-900">Order Summary</h2>
-            <p class="mt-1 text-sm text-slate-500">Review totals and apply a promo code.</p>
+            <h2 class="text-xl font-bold" style="color: var(--app-text);">Order Summary</h2>
+            <p class="mt-1 text-sm" style="color: var(--app-text-muted);">Review totals and apply a promo code.</p>
           </div>
 
-          <div class="space-y-4 rounded-2xl bg-slate-50 p-4">
-            <label for="couponCode" class="block text-sm font-semibold text-slate-700">Coupon Code</label>
+          <div class="space-y-4 rounded-2xl p-4" style="background: var(--app-surface-muted);">
+            <label for="couponCode" class="block text-sm font-semibold" style="color: var(--app-text);">Coupon Code</label>
             <div class="flex gap-3">
               <input
                 id="couponCode"
                 type="text"
                 [(ngModel)]="couponCode"
                 placeholder="Enter coupon code"
-                class="min-w-0 flex-1 rounded-full border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100">
+                class="min-w-0 flex-1 rounded-full border px-4 py-3 text-sm outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
+                style="border-color: var(--app-border); background: var(--app-surface-solid); color: var(--app-text);">
               <button
                 *ngIf="!cart.couponCode"
                 type="button"
@@ -152,30 +158,30 @@
 
           <div class="mt-6 space-y-3 border-t border-slate-200 pt-6">
             <div class="space-y-3">
-              <h3 class="text-sm font-semibold text-slate-700">Items</h3>
-              <div *ngFor="let it of cart.items" class="flex items-center justify-between text-sm text-slate-600">
+              <h3 class="text-sm font-semibold" style="color: var(--app-text);">Items</h3>
+              <div *ngFor="let it of cart.items" class="flex items-center justify-between text-sm" style="color: var(--app-text-muted);">
                 <div class="truncate">
-                  <span class="font-medium text-slate-800">{{ getProductName(it) }}</span>
-                  <span class="text-slate-500"> x{{ it.quantity }}</span>
+                  <span class="font-medium" style="color: var(--app-text);">{{ getProductName(it) }}</span>
+                  <span style="color: var(--app-text-muted);"> x{{ it.quantity }}</span>
                 </div>
-                <div class="font-semibold text-slate-900">${{ getLineTotal(it) | number: '1.2-2' }}</div>
+                <div class="font-semibold" style="color: var(--app-text);">{{ '${' + getLineTotal(it) | number: '1.2-2' + '}' }}</div>
               </div>
             </div>
-            <div class="flex items-center justify-between text-sm text-slate-600">
+            <div class="flex items-center justify-between text-sm" style="color: var(--app-text-muted);">
               <span>Subtotal</span>
-              <span class="font-semibold text-slate-900">${{ cart.subtotal | number: '1.2-2' }}</span>
+              <span class="font-semibold" style="color: var(--app-text);">{{ '$' + (cart.subtotal | number: '1.2-2') }}</span>
             </div>
-            <div class="flex items-center justify-between text-sm text-slate-600" *ngIf="cart.discount && cart.discount > 0">
+            <div class="flex items-center justify-between text-sm" style="color: var(--app-text-muted);" *ngIf="cart.discount && cart.discount > 0">
               <span>Discount</span>
-              <span class="font-semibold text-emerald-600">-${{ cart.discount | number: '1.2-2' }}</span>
+              <span class="font-semibold text-emerald-400">-{{ '$' + (cart.discount | number: '1.2-2') }}</span>
             </div>
-            <div class="flex items-center justify-between text-sm text-slate-600">
+            <div class="flex items-center justify-between text-sm" style="color: var(--app-text-muted);">
               <span>Shipping</span>
-              <span class="font-semibold text-slate-900">${{ cart.shippingFee | number: '1.2-2' }}</span>
+              <span class="font-semibold" style="color: var(--app-text);">{{ '$' + (cart.shippingFee | number: '1.2-2') }}</span>
             </div>
-            <div class="flex items-center justify-between border-t border-slate-200 pt-4 text-base font-black text-slate-900">
+            <div class="flex items-center justify-between border-t pt-4 text-base font-black" style="border-color: var(--app-border); color: var(--app-text);">
               <span>Total</span>
-              <span>${{ cart.totalTTC | number: '1.2-2' }}</span>
+              <span>{{ '$' + (cart.totalTTC | number: '1.2-2') }}</span>
             </div>
           </div>
 
@@ -188,7 +194,8 @@
             </button>
             <button
               type="button"
-              class="w-full rounded-full border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+              class="w-full rounded-full border px-6 py-3 text-sm font-semibold transition"
+              style="border-color: var(--app-border); background: var(--app-surface-muted); color: var(--app-text);"
               (click)="continueShopping()">
               Continue Shopping
             </button>
